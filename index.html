@@ -131,22 +131,9 @@
     ul li:hover { background-color: #334155; }
 
     .project {
-      display: flex;
-      align-items: center;
-      gap: 25px;
-      flex-wrap: wrap;
+      padding: 12px 0;
     }
-    .project img {
-      width: 120px;
-      height: 120px;
-      border-radius: 15px;
-      object-fit: cover;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.4);
-      transition: transform 0.3s ease;
-    }
-    .project img:hover { transform: scale(1.05); }
     .project-details {
-      flex: 1;
       font-size: 1.1em;
       font-weight: 600;
       color: #e2e8f0;
@@ -164,8 +151,6 @@
 
     @media (max-width: 600px) {
       ul li { flex: 1 1 100%; }
-      .project { flex-direction: column; text-align: center; }
-      .project img { margin: 0 auto 15px; }
     }
   </style>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous"/>
@@ -208,6 +193,7 @@
         <li>Problem Solving</li>
         <li>Networking & Cybersecurity Basics</li>
         <li>REST APIs & Retrofit</li>
+        <li>MVVM Architecture</li>
         <li>UI/UX Design Principles</li>
         <li>Git & GitHub Workflow</li>
         <li>Unit Testing & Debugging</li>
@@ -218,12 +204,13 @@
     <h2>Projects</h2>
     <div class="card">
       <div class="project">
-        <img src="images/login_app.png" alt="Login/Register App" />
         <div class="project-details">Login/Register App – Kotlin + Firebase Authentication</div>
       </div>
       <div class="project">
-        <img src="images/weather_app.png" alt="Weather App" />
         <div class="project-details">Weather App – REST API + Retrofit + MVVM</div>
+      </div>
+      <div class="project">
+        <div class="project-details">Future Projects – Android Apps with enhanced security</div>
       </div>
     </div>
   </section>
@@ -252,4 +239,5 @@
   </script>
 </body>
 </html>
+
 
