@@ -5,23 +5,34 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Yousef Sabry | Portfolio</title>
   <style>
-    /* Base styling */
+    /* خلفية متحركة */
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       margin: 0; padding: 0;
-      background: linear-gradient(-45deg, #1e3a8a, #3b82f6, #9333ea, #f59e0b);
-      background-size: 400% 400%;
-      animation: gradientBG 12s ease infinite;
+      background: linear-gradient(270deg, #0f0c29, #302b63, #ff0080, #00ffff, #ff8c00);
+      background-size: 1000% 1000%;
+      animation: waveBG 20s ease infinite;
       color: #333;
     }
 
-    @keyframes gradientBG {
+    @keyframes waveBG {
       0% { background-position: 0% 50%; }
+      25% { background-position: 50% 50%; }
       50% { background-position: 100% 50%; }
+      75% { background-position: 50% 50%; }
       100% { background-position: 0% 50%; }
     }
 
-    /* Header style */
+    /* particles.js container */
+    #particles-js {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      top: 0;
+      left: 0;
+    }
+
     header {
       color: white;
       padding: 50px 20px 60px;
@@ -53,6 +64,7 @@
       font-style: italic;
       color: #f1f5f9;
     }
+
     .btn {
       display: inline-block;
       background-color: rgba(30, 58, 138, 0.85);
@@ -64,11 +76,30 @@
       font-size: 1.1em;
       box-shadow: 0 3px 10px rgba(0,0,0,0.4);
       transition: background-color 0.3s ease, box-shadow 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      z-index: 1;
+    }
+    .btn::before {
+      content: "";
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, #3b82f6, #9333ea, #f59e0b);
+      animation: rotate 6s linear infinite;
+      z-index: -1;
+    }
+    @keyframes rotate {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
     .btn:hover {
       background-color: rgba(37, 99, 235, 0.9);
       box-shadow: 0 5px 15px rgba(0,0,0,0.6);
     }
+
     .socials {
       margin-top: 25px;
     }
@@ -82,7 +113,6 @@
       color: #facc15;
     }
 
-    /* Main content section */
     section {
       max-width: 1000px;
       margin: 40px auto 60px;
@@ -103,11 +133,17 @@
       padding: 30px 25px;
       margin-bottom: 35px;
       transition: transform 0.3s ease, box-shadow 0.3s ease;
+      opacity: 0;
+      transform: translateY(30px);
+      animation: fadeInUp 1s ease forwards;
     }
-    .card:hover {
-      transform: translateY(-8px);
-      box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+    @keyframes fadeInUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
+
     ul {
       list-style-type: none;
       padding-left: 0;
@@ -131,7 +167,6 @@
       background-color: #bfdbfe;
     }
 
-    /* Projects layout */
     .project {
       display: flex;
       align-items: center;
@@ -167,7 +202,6 @@
       margin-top: 60px;
     }
 
-    /* Responsive */
     @media (max-width: 600px) {
       ul li {
         flex: 1 1 100%;
@@ -187,6 +221,8 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous"/>
 </head>
 <body>
+  <div id="particles-js"></div>
+
   <header>
     <img src="myphoto.jpg" alt="Yousef Sabry Photo" />
     <h1>Yousef Sabry</h1>
@@ -212,35 +248,5 @@
     <h2>Skills</h2>
     <div class="card">
       <ul>
-        <li>Kotlin & Android Development</li>
-        <li>Jetpack Compose</li>
-        <li>Object-Oriented Programming (OOP)</li>
-        <li>Firebase Authentication & Firestore</li>
-        <li>Problem Solving</li>
-        <li>Networking & Cybersecurity Basics</li>
-      </ul>
-    </div>
-
-    <h2>Projects</h2>
-    <div class="card">
-      <div class="project">
-        <img src="images/login_app.png" alt="Login/Register App" />
-        <div class="project-details">Login/Register App – Kotlin + Firebase Authentication</div>
-      </div>
-      <div class="project">
-        <img src="images/oop_assignments.png" alt="University OOP Assignments" />
-        <div class="project-details">University OOP Assignments – Java/Kotlin</div>
-      </div>
-      <div class="project">
-        <img src="images/future_projects.png" alt="Future Android Apps" />
-        <div class="project-details">Future Projects – Android Apps with enhanced security</div>
-      </div>
-    </div>
-  </section>
-
-  <footer>
-    <p>© 2025 Yousef Sabry | All Rights Reserved</p>
-  </footer>
-</body>
-</html>
+        <li>Kotlin & Android Development
 
