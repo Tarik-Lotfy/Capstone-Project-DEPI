@@ -5,32 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Yousef Sabry | Portfolio</title>
   <style>
-    /* خلفية متحركة */
+    /* خلفية متحركة دارك */
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       margin: 0; padding: 0;
-      background: linear-gradient(270deg, #0f0c29, #302b63, #ff0080, #00ffff, #ff8c00);
-      background-size: 1000% 1000%;
-      animation: waveBG 20s ease infinite;
-      color: #333;
+      background: linear-gradient(270deg, #0a0a0f, #111827, #1e293b, #3b0764);
+      background-size: 600% 600%;
+      animation: waveBG 25s ease infinite;
+      color: #e2e8f0;
     }
 
     @keyframes waveBG {
       0% { background-position: 0% 50%; }
-      25% { background-position: 50% 50%; }
       50% { background-position: 100% 50%; }
-      75% { background-position: 50% 50%; }
       100% { background-position: 0% 50%; }
-    }
-
-    /* particles.js container */
-    #particles-js {
-      position: fixed;
-      width: 100%;
-      height: 100%;
-      z-index: -1;
-      top: 0;
-      left: 0;
     }
 
     header {
@@ -46,72 +34,49 @@
       border: 5px solid white;
       margin-bottom: 20px;
       object-fit: cover;
-      box-shadow: 0 0 15px rgba(255,255,255,0.6);
+      box-shadow: 0 0 20px rgba(0,255,255,0.6);
       transition: transform 0.3s ease;
     }
-    header img:hover {
-      transform: scale(1.05);
-    }
+    header img:hover { transform: scale(1.05); }
     header h1 {
       font-size: 3em;
       margin: 0 0 10px;
       font-weight: 700;
       letter-spacing: 1.5px;
+      color: #38bdf8;
     }
     header p {
       font-size: 1.3em;
       margin: 0 0 20px;
       font-style: italic;
-      color: #f1f5f9;
+      color: #cbd5e1;
     }
 
     .btn {
       display: inline-block;
-      background-color: rgba(30, 58, 138, 0.85);
+      background-color: #2563eb;
       padding: 12px 25px;
       border-radius: 30px;
       color: white;
       text-decoration: none;
       font-weight: 600;
       font-size: 1.1em;
-      box-shadow: 0 3px 10px rgba(0,0,0,0.4);
-      transition: background-color 0.3s ease, box-shadow 0.3s ease;
-      position: relative;
-      overflow: hidden;
-      z-index: 1;
-    }
-    .btn::before {
-      content: "";
-      position: absolute;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
-      background: radial-gradient(circle, #3b82f6, #9333ea, #f59e0b);
-      animation: rotate 6s linear infinite;
-      z-index: -1;
-    }
-    @keyframes rotate {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
+      box-shadow: 0 3px 15px rgba(0,0,0,0.6);
+      transition: all 0.3s ease;
     }
     .btn:hover {
-      background-color: rgba(37, 99, 235, 0.9);
-      box-shadow: 0 5px 15px rgba(0,0,0,0.6);
+      background-color: #1d4ed8;
+      box-shadow: 0 5px 20px rgba(59,130,246,0.8);
     }
 
-    .socials {
-      margin-top: 25px;
-    }
+    .socials { margin-top: 25px; }
     .socials a {
       margin: 0 15px;
       font-size: 1.8em;
-      color: white;
+      color: #e2e8f0;
       transition: color 0.3s ease;
     }
-    .socials a:hover {
-      color: #facc15;
-    }
+    .socials a:hover { color: #facc15; }
 
     section {
       max-width: 1000px;
@@ -120,28 +85,19 @@
     }
     h2 {
       font-size: 2em;
-      color: white;
-      border-bottom: 3px solid #fff;
+      color: #38bdf8;
+      border-bottom: 3px solid #38bdf8;
       padding-bottom: 10px;
       margin-bottom: 25px;
       font-weight: 700;
     }
     .card {
-      background-color: rgba(255,255,255,0.9);
+      background-color: rgba(255,255,255,0.08);
       border-radius: 15px;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
       padding: 30px 25px;
       margin-bottom: 35px;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-      opacity: 0;
-      transform: translateY(30px);
-      animation: fadeInUp 1s ease forwards;
-    }
-    @keyframes fadeInUp {
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      backdrop-filter: blur(8px);
     }
 
     ul {
@@ -153,81 +109,44 @@
       gap: 15px;
     }
     ul li {
-      background: #e0e7ff;
+      background: rgba(56,189,248,0.2);
       padding: 12px 20px;
       border-radius: 25px;
       font-weight: 600;
       font-size: 1.1em;
       flex: 1 1 calc(50% - 30px);
       text-align: center;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      transition: background-color 0.3s;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      transition: background-color 0.3s, transform 0.2s;
+      color: #f1f5f9;
     }
     ul li:hover {
-      background-color: #bfdbfe;
-    }
-
-    .project {
-      display: flex;
-      align-items: center;
-      gap: 25px;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
-    }
-    .project img {
-      width: 120px;
-      height: 120px;
-      border-radius: 18px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-      object-fit: cover;
-      transition: transform 0.3s ease;
-    }
-    .project img:hover {
-      transform: scale(1.05);
-    }
-    .project-details {
-      flex: 1;
-      font-size: 1.15em;
-      font-weight: 600;
-      color: #1e293b;
+      background-color: rgba(56,189,248,0.4);
+      transform: translateY(-3px);
     }
 
     footer {
       text-align: center;
       padding: 20px;
-      background: rgba(0,0,0,0.6);
-      color: white;
+      background: rgba(0,0,0,0.7);
+      color: #e2e8f0;
       font-weight: 600;
       font-size: 1em;
       margin-top: 60px;
     }
 
     @media (max-width: 600px) {
-      ul li {
-        flex: 1 1 100%;
-      }
-      .project {
-        flex-direction: column;
-        text-align: center;
-      }
-      .project img {
-        margin: 0 auto 15px;
-      }
-      .project-details {
-        font-size: 1em;
-      }
+      ul li { flex: 1 1 100%; }
     }
   </style>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous"/>
 </head>
 <body>
-  <div id="particles-js"></div>
-
   <header>
     <img src="myphoto.jpg" alt="Yousef Sabry Photo" />
     <h1>Yousef Sabry</h1>
     <p>Android Developer | OOP Enthusiast | Problem Solver</p>
-    <a class="btn" href="cv.pdf" target="_blank" rel="noopener noreferrer">📄 Download CV</a>
+    <a class="btn" href="cv.pdf" target="_blank">📄 Download CV</a>
     <div class="socials">
       <a href="https://www.linkedin.com/in/yousef-sabry-a64983338" target="_blank"><i class="fab fa-linkedin"></i></a>
       <a href="https://github.com/yousef-sabry" target="_blank"><i class="fab fa-github"></i></a>
@@ -239,14 +158,34 @@
     <h2>About Me</h2>
     <div class="card">
       <p>
-        I am a Computer Science student at Mansoura University.
-        I specialize in Android development using Kotlin and Jetpack Compose,
-        with a strong foundation in Object-Oriented Programming and app security.
+        I am a Computer Science student at Mansoura University.  
+        I specialize in Android development using Kotlin and Jetpack Compose,  
+        with a strong foundation in Object-Oriented Programming and app security.  
+        Passionate about problem solving, UI/UX design, and cybersecurity.
       </p>
     </div>
 
     <h2>Skills</h2>
     <div class="card">
       <ul>
-        <li>Kotlin & Android Development
+        <li>Kotlin & Android Development</li>
+        <li>Jetpack Compose</li>
+        <li>Object-Oriented Programming (OOP)</li>
+        <li>Firebase (Auth, Firestore, Storage)</li>
+        <li>Problem Solving (LeetCode, HackerRank)</li>
+        <li>Networking & Cybersecurity Basics</li>
+        <li>Git & GitHub</li>
+        <li>RESTful APIs</li>
+        <li>UI/UX Design Principles</li>
+        <li>SQL & Database Design</li>
+        <li>Agile & Scrum Basics</li>
+        <li>Team Collaboration Tools (Trello, Slack)</li>
+      </ul>
+    </div>
+  </section>
 
+  <footer>
+    <p>© 2025 Yousef Sabry | All Rights Reserved</p>
+  </footer>
+</body>
+</html>
