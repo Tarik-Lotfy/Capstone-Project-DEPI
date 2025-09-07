@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Yousef Sabry | Portfolio</title>
   <style>
-    /* خلفية دارك متحركة */
+    /* خلفية متحركة داكنة */
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       margin: 0; padding: 0;
@@ -13,6 +13,12 @@
       background-size: 800% 800%;
       animation: darkWave 20s ease infinite;
       color: #f1f5f9;
+      transition: background 0.5s ease, color 0.5s ease;
+    }
+
+    body.light {
+      background: linear-gradient(270deg, #f9fafb, #e2e8f0, #cbd5e1, #f1f5f9);
+      color: #1e293b;
     }
 
     @keyframes darkWave {
@@ -36,6 +42,8 @@
       padding: 60px 20px;
       color: white;
     }
+    body.light header { color: #1e293b; }
+
     header img {
       width: 140px;
       height: 140px;
@@ -45,9 +53,8 @@
       object-fit: cover;
       transition: transform 0.3s ease;
     }
-    header img:hover {
-      transform: scale(1.05);
-    }
+    header img:hover { transform: scale(1.05); }
+
     header h1 {
       font-size: 3em;
       margin: 20px 0 10px;
@@ -58,6 +65,7 @@
       font-style: italic;
       color: #cbd5e1;
     }
+    body.light header p { color: #475569; }
 
     .btn {
       display: inline-block;
@@ -73,34 +81,16 @@
       overflow: hidden;
       z-index: 1;
     }
-    .btn::before {
-      content: "";
-      position: absolute;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
-      background: radial-gradient(circle, #3b82f6, #9333ea, #f59e0b);
-      animation: rotate 6s linear infinite;
-      z-index: -1;
-    }
-    @keyframes rotate {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
 
-    .socials {
-      margin-top: 25px;
-    }
+    .socials { margin-top: 25px; }
     .socials a {
       margin: 0 15px;
       font-size: 1.8em;
       color: white;
       transition: color 0.3s ease;
     }
-    .socials a:hover {
-      color: #facc15;
-    }
+    .socials a:hover { color: #facc15; }
+    body.light .socials a { color: #1e293b; }
 
     section {
       max-width: 1000px;
@@ -114,6 +104,8 @@
       padding-bottom: 10px;
       margin-bottom: 25px;
     }
+    body.light h2 { color: #1e293b; border-color: #1e293b; }
+
     .card {
       background-color: rgba(255,255,255,0.1);
       border-radius: 15px;
@@ -125,11 +117,13 @@
       transform: translateY(30px);
       animation: fadeInUp 1s ease forwards;
     }
+    body.light .card {
+      background-color: rgba(0,0,0,0.05);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+    }
+
     @keyframes fadeInUp {
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     ul {
@@ -148,12 +142,10 @@
       font-size: 1em;
       flex: 1 1 calc(50% - 30px);
       text-align: center;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
       transition: background-color 0.3s;
     }
-    ul li:hover {
-      background-color: #334155;
-    }
+    ul li:hover { background-color: #334155; }
+    body.light ul li { background: #e2e8f0; color: #1e293b; }
 
     .project {
       display: flex;
@@ -169,15 +161,14 @@
       box-shadow: 0 4px 15px rgba(0,0,0,0.4);
       transition: transform 0.3s ease;
     }
-    .project img:hover {
-      transform: scale(1.05);
-    }
+    .project img:hover { transform: scale(1.05); }
     .project-details {
       flex: 1;
       font-size: 1.1em;
       font-weight: 600;
       color: #e2e8f0;
     }
+    body.light .project-details { color: #1e293b; }
 
     footer {
       text-align: center;
@@ -188,24 +179,46 @@
       font-size: 1em;
       margin-top: 60px;
     }
+    body.light footer {
+      background: rgba(0,0,0,0.05);
+      color: #1e293b;
+    }
 
-    @media (max-width: 600px) {
-      ul li {
-        flex: 1 1 100%;
-      }
-      .project {
-        flex-direction: column;
-        text-align: center;
-      }
-      .project img {
-        margin: 0 auto 15px;
-      }
+    /* زرار Toggle Mode */
+    .toggle-mode {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #2563eb;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 30px;
+      cursor: pointer;
+      font-size: 1.1em;
+      font-weight: 600;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      transition: background 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .toggle-mode:hover { background: #1d4ed8; }
+
+    #mode-icon {
+      display: inline-block;
+      transition: transform 0.5s ease, opacity 0.5s ease;
     }
   </style>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous"/>
 </head>
 <body>
   <div id="particles-js"></div>
+
+  <!-- زرار المود -->
+  <button class="toggle-mode" onclick="toggleMode()">
+    <span id="mode-icon">🌙</span> Toggle Mode
+  </button>
 
   <header>
     <img src="myphoto.jpg" alt="Yousef Sabry Photo" />
@@ -251,4 +264,57 @@
     <div class="card">
       <div class="project">
         <img src="images/login_app.png" alt="Login/Register App" />
-        <div class="project-details">Login/Register App – Kotlin + Firebase Authentication</div
+        <div class="project-details">Login/Register App – Kotlin + Firebase Authentication</div>
+      </div>
+      <div class="project">
+        <img src="images/weather_app.png" alt="Weather App" />
+        <div class="project-details">Weather App – REST API + Retrofit + MVVM</div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    &copy; 2025 Yousef Sabry. All rights reserved.
+  </footer>
+
+  <!-- particles.js -->
+  <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+  <script>
+    particlesJS("particles-js", {
+      "particles": {
+        "number": { "value": 120 },
+        "size": { "value": 3 },
+        "move": { "speed": 1 },
+        "line_linked": { "enable": true, "distance": 150, "color": "#ffffff" },
+        "color": { "value": "#ffffff" }
+      },
+      "interactivity": {
+        "events": {
+          "onhover": { "enable": true, "mode": "repulse" }
+        }
+      }
+    });
+
+    function toggleMode() {
+      const body = document.body;
+      const icon = document.getElementById("mode-icon");
+
+      body.classList.toggle("light");
+
+      // تبديل الأيقونة مع أنيميشن
+      icon.style.transform = "rotate(360deg)";
+      icon.style.opacity = "0";
+
+      setTimeout(() => {
+        if (body.classList.contains("light")) {
+          icon.textContent = "☀️";
+        } else {
+          icon.textContent = "🌙";
+        }
+        icon.style.transform = "rotate(0deg)";
+        icon.style.opacity = "1";
+      }, 400);
+    }
+  </script>
+</body>
+</html>
