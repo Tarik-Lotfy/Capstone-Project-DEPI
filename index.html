@@ -6,25 +6,33 @@
   <title>Yousef Sabry | Portfolio</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Segoe UI', sans-serif;
       margin: 0;
       padding: 0;
       background: #f4f6f9;
       color: #333;
     }
     header {
-      background: #2c3e50;
+      background: linear-gradient(135deg, #1e3a8a, #3b82f6);
       color: white;
       padding: 40px 20px;
       text-align: center;
+      position: relative;
+    }
+    header img {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      border: 4px solid white;
+      margin-bottom: 15px;
     }
     header h1 {
-      margin: 0;
+      margin: 10px 0 5px;
       font-size: 2.5em;
     }
     header p {
       font-size: 1.2em;
-      margin-top: 10px;
+      margin-top: 5px;
     }
     section {
       padding: 30px;
@@ -32,8 +40,8 @@
       margin: auto;
     }
     h2 {
-      color: #2c3e50;
-      border-bottom: 2px solid #2c3e50;
+      color: #1e3a8a;
+      border-bottom: 2px solid #1e3a8a;
       padding-bottom: 5px;
     }
     .card {
@@ -42,37 +50,69 @@
       margin: 20px 0;
       border-radius: 12px;
       box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 6px 12px rgba(0,0,0,0.2);
     }
     ul {
       list-style: none;
       padding: 0;
     }
     ul li {
-      background: #ecf0f1;
+      background: #e0e7ff;
       margin: 8px 0;
       padding: 10px;
       border-radius: 8px;
     }
-    a {
-      color: #2980b9;
+    .socials {
+      margin-top: 10px;
+    }
+    .socials a {
+      margin: 0 10px;
+      font-size: 1.5em;
+      color: white;
       text-decoration: none;
     }
-    a:hover {
-      text-decoration: underline;
+    .socials a:hover {
+      color: #facc15;
+    }
+    .btn {
+      display: inline-block;
+      margin-top: 15px;
+      padding: 10px 20px;
+      background: #1e40af;
+      color: white;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: background 0.3s;
+    }
+    .btn:hover {
+      background: #2563eb;
     }
     footer {
       text-align: center;
       padding: 15px;
-      background: #2c3e50;
+      background: linear-gradient(135deg, #1e3a8a, #3b82f6);
       color: white;
       margin-top: 40px;
     }
   </style>
+  <script src="https://kit.fontawesome.com/your-fontawesome-kit.js" crossorigin="anonymous"></script>
 </head>
 <body>
   <header>
+    <!-- ✨ حط صورتك هنا -->
+    <img src="myphoto.jpg" alt="Yousef Sabry Photo">
     <h1>Yousef Sabry</h1>
     <p>Android Developer | OOP Enthusiast | Problem Solver</p>
+    <a class="btn" href="cv.pdf" target="_blank">📄 Download CV</a>
+    <div class="socials">
+      <a href="https://www.linkedin.com/in/yousef-sabry-a64983338" target="_blank"><i class="fab fa-linkedin"></i></a>
+      <a href="https://github.com/yousef-sabry" target="_blank"><i class="fab fa-github"></i></a>
+      <a href="mailto:yousef@example.com"><i class="fas fa-envelope"></i></a>
+    </div>
   </header>
 
   <section>
@@ -103,13 +143,6 @@
       <p><b>University OOP Assignments</b> – Java/Kotlin</p>
       <p><b>Future Projects</b> – Android Apps with enhanced security</p>
     </div>
-
-    <h2>Contact</h2>
-    <div class="card">
-      <p>📧 Email: yousef@example.com</p>
-      <p>🔗 LinkedIn: <a href="https://www.linkedin.com/in/yousef-sabry-a64983338" target="_blank">linkedin.com/in/yousef-sabry-a64983338</a></p>
-      <p>💻 GitHub: <a href="https://github.com/yousef-sabry" target="_blank">github.com/yousef-sabry</a></p>
-    </div>
   </section>
 
   <footer>
@@ -117,4 +150,5 @@
   </footer>
 </body>
 </html>
+
 
