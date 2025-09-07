@@ -9,31 +9,37 @@
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       margin: 0; padding: 0;
-      background-color: #f4f6f9;
+      background: linear-gradient(-45deg, #1e3a8a, #3b82f6, #9333ea, #f59e0b);
+      background-size: 400% 400%;
+      animation: gradientBG 12s ease infinite;
       color: #333;
+    }
+
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
     }
 
     /* Header style */
     header {
-      background: linear-gradient(135deg, #1e3a8a, #3b82f6);
       color: white;
-      padding: 60px 20px 80px;
+      padding: 50px 20px 60px;
       text-align: center;
       position: relative;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
     }
     header img {
-      width: 150px;
-      height: 150px;
+      width: 140px;
+      height: 140px;
       border-radius: 50%;
       border: 5px solid white;
       margin-bottom: 20px;
       object-fit: cover;
-      box-shadow: 0 0 20px rgba(59,130,246,0.6);
+      box-shadow: 0 0 15px rgba(255,255,255,0.6);
       transition: transform 0.3s ease;
     }
     header img:hover {
-      transform: scale(1.07);
+      transform: scale(1.05);
     }
     header h1 {
       font-size: 3em;
@@ -45,29 +51,23 @@
       font-size: 1.3em;
       margin: 0 0 20px;
       font-style: italic;
-      color: #cbd5e1;
+      color: #f1f5f9;
     }
     .btn {
       display: inline-block;
-      background-color: #1e40af;
+      background-color: rgba(30, 58, 138, 0.85);
       padding: 12px 25px;
       border-radius: 30px;
       color: white;
       text-decoration: none;
       font-weight: 600;
       font-size: 1.1em;
-      box-shadow: 0 3px 12px rgba(30,64,175,0.4);
+      box-shadow: 0 3px 10px rgba(0,0,0,0.4);
       transition: background-color 0.3s ease, box-shadow 0.3s ease;
     }
     .btn:hover {
-      background-color: #2563eb;
-      box-shadow: 0 5px 18px rgba(37,99,235,0.6);
-    }
-    .btn.small {
-      padding: 8px 16px;
-      font-size: 0.9em;
-      margin-top: 10px;
-      display: inline-block;
+      background-color: rgba(37, 99, 235, 0.9);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.6);
     }
     .socials {
       margin-top: 25px;
@@ -76,11 +76,10 @@
       margin: 0 15px;
       font-size: 1.8em;
       color: white;
-      transition: color 0.3s ease, transform 0.3s ease;
+      transition: color 0.3s ease;
     }
     .socials a:hover {
       color: #facc15;
-      transform: translateY(-5px);
     }
 
     /* Main content section */
@@ -91,23 +90,23 @@
     }
     h2 {
       font-size: 2em;
-      color: #1e3a8a;
-      border-bottom: 3px solid #3b82f6;
+      color: white;
+      border-bottom: 3px solid #fff;
       padding-bottom: 10px;
       margin-bottom: 25px;
       font-weight: 700;
     }
     .card {
-      background-color: white;
+      background-color: rgba(255,255,255,0.9);
       border-radius: 15px;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.07);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
       padding: 30px 25px;
       margin-bottom: 35px;
-      transition: box-shadow 0.3s ease, transform 0.3s ease;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
     .card:hover {
-      box-shadow: 0 15px 40px rgba(59, 130, 246, 0.25);
       transform: translateY(-8px);
+      box-shadow: 0 15px 40px rgba(0,0,0,0.3);
     }
     ul {
       list-style-type: none;
@@ -137,79 +136,62 @@
       display: flex;
       align-items: center;
       gap: 25px;
-      margin-bottom: 25px;
+      margin-bottom: 20px;
       flex-wrap: wrap;
     }
     .project img {
       width: 120px;
       height: 120px;
       border-radius: 18px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
       object-fit: cover;
       transition: transform 0.3s ease;
     }
     .project img:hover {
-      transform: scale(1.07);
+      transform: scale(1.05);
     }
     .project-details {
       flex: 1;
       font-size: 1.15em;
       font-weight: 600;
-      color: #1e40af;
+      color: #1e293b;
     }
 
     footer {
       text-align: center;
       padding: 20px;
-      background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+      background: rgba(0,0,0,0.6);
       color: white;
       font-weight: 600;
       font-size: 1em;
-      box-shadow: 0 -4px 10px rgba(0,0,0,0.15);
       margin-top: 60px;
-    }
-    footer a {
-      color: #facc15;
-      text-decoration: none;
-      margin-left: 10px;
-    }
-    footer a:hover {
-      text-decoration: underline;
-    }
-
-    /* Animations */
-    .fade-in { animation: fadeIn 1s ease-in forwards; opacity: 0; }
-    .fade-in-delay { animation: fadeIn 1.5s ease-in forwards; opacity: 0; }
-    .fade-in-delay2 { animation: fadeIn 2s ease-in forwards; opacity: 0; }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
     }
 
     /* Responsive */
     @media (max-width: 600px) {
-      ul li { flex: 1 1 100%; }
-      .project { flex-direction: column; text-align: center; }
-      .project img { margin: 0 auto 15px; }
-      .project-details { font-size: 1em; }
+      ul li {
+        flex: 1 1 100%;
+      }
+      .project {
+        flex-direction: column;
+        text-align: center;
+      }
+      .project img {
+        margin: 0 auto 15px;
+      }
+      .project-details {
+        font-size: 1em;
+      }
     }
   </style>
-  <!-- FontAwesome icons -->
-  <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    crossorigin="anonymous"
-  />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous"/>
 </head>
 <body>
   <header>
-    <img src="myphoto.jpg" alt="Yousef Sabry Photo" class="fade-in"/>
-    <h1 class="fade-in-delay">Yousef Sabry</h1>
-    <p class="fade-in-delay2">Android Developer | OOP Enthusiast | Problem Solver</p>
-    <a class="btn" href="cv.pdf" target="_blank" rel="noopener noreferrer">
-      <i class="fas fa-file-pdf"></i> Download CV
-    </a>
+    <img src="myphoto.jpg" alt="Yousef Sabry Photo" />
+    <h1>Yousef Sabry</h1>
+    <p>Android Developer | OOP Enthusiast | Problem Solver</p>
+    <a class="btn" href="cv.pdf" target="_blank" rel="noopener noreferrer">📄 Download CV</a>
     <div class="socials">
       <a href="https://www.linkedin.com/in/yousef-sabry-a64983338" target="_blank"><i class="fab fa-linkedin"></i></a>
       <a href="https://github.com/yousef-sabry" target="_blank"><i class="fab fa-github"></i></a>
@@ -243,32 +225,22 @@
     <div class="card">
       <div class="project">
         <img src="images/login_app.png" alt="Login/Register App" />
-        <div class="project-details">
-          Login/Register App – Kotlin + Firebase Authentication <br/>
-          <a href="https://github.com/yousef-sabry/login-app" class="btn small">View Code</a>
-        </div>
+        <div class="project-details">Login/Register App – Kotlin + Firebase Authentication</div>
       </div>
       <div class="project">
         <img src="images/oop_assignments.png" alt="University OOP Assignments" />
-        <div class="project-details">
-          University OOP Assignments – Java/Kotlin <br/>
-          <a href="https://github.com/yousef-sabry/oop-assignments" class="btn small">View Code</a>
-        </div>
+        <div class="project-details">University OOP Assignments – Java/Kotlin</div>
       </div>
       <div class="project">
         <img src="images/future_projects.png" alt="Future Android Apps" />
-        <div class="project-details">
-          Future Projects – Android Apps with enhanced security <br/>
-          <a href="#" class="btn small">Coming Soon</a>
-        </div>
+        <div class="project-details">Future Projects – Android Apps with enhanced security</div>
       </div>
     </div>
   </section>
 
   <footer>
-    <p>© 2025 Yousef Sabry | All Rights Reserved 
-      <a href="#">↑ Back to top</a>
-    </p>
+    <p>© 2025 Yousef Sabry | All Rights Reserved</p>
   </footer>
 </body>
 </html>
+
