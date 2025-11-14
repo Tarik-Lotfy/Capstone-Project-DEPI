@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">وقت الأفلام</string>
+    <string name="home">الرئيسية</string>
+    <string name="discover">اكتشف</string>
+    <string name="profile">الملف</string>
+    <string name="search_hint">ابحث عن أفلام...</string>
+    <string name="see_all">عرض الكل</string>
+    <string name="now_playing">يُعرض الآن</string>
+    <string name="popular">شائع</string>
+    <string name="top_rated">الأعلى تقييمًا</string>
+    <string name="upcoming">قادم</string>
+    <string name="no_results">لا توجد نتائج</string>
+    <string name="try_different_keywords">جرب كلمات مختلفة أو تحقق من التهجئة</string>
+    <string name="type_at_least_2_chars">اكتب على الأقل حرفين للبحث</string>
+    <string name="dark_mode">الوضع الليلي</string>
+    <string name="notifications">الإشعارات</string>
+    <string name="help_support">المساعدة والدعم</string>
+    <string name="logout">تسجيل الخروج</string>
+    <string name="edit_profile">تعديل الملف</string>
+    <string name="settings">الإعدادات</string>
+    <string name="watchlist">قائمة المشاهدة</string>
+    <string name="movies_watched">الأفلام التي تمت مشاهدتها</string>
+    <string name="hours_watched">ساعات المشاهدة</string>
+    <string name="favorite_genre">النوع المفضل</string>
+    <string name="login">تسجيل الدخول</string>
+    <string name="register">تسجيل حساب</string>
+    <string name="email">البريد الإلكتروني</string>
+    <string name="password">كلمة المرور</string>
+    <string name="name">الاسم الكامل</string>
+    <string name="already_have_account">هل لديك حساب؟ سجل الدخول</string>
+    <string name="dont_have_account">ليس لديك حساب؟ سجل الآن</string>
+    <string name="language">اللغة</string>
+    <string name="language_arabic">العربية</string>
+    <string name="language_english">English</string>
+</resources>
