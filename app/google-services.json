@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "347456001206",
+    "project_id": "moviestime-9a4ef",
+    "storage_bucket": "moviestime-9a4ef.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:347456001206:android:026c36efe4373cf4138217",
+        "android_client_info": {
+          "package_name": "com.example.moviestime"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDkVxFfmLB47AutXJaqPR9V9oRu8lVxb6g"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
