@@ -180,6 +180,7 @@ fun NeonTextField(
         leadingIcon = {
             Icon(icon, contentDescription = null, tint = Color(0xFF2A157C))
         },
+        
         keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
         visualTransformation = if (isPassword) PasswordVisualTransformation() else androidx.compose.ui.text.input.VisualTransformation.None,
         singleLine = true,
