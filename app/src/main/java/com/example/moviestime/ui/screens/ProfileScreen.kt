@@ -1,304 +1,245 @@
 package com.example.moviestime.ui.screens
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ExitToApp
-import androidx.compose.material.icons.automirrored.filled.Help
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.moviestime.R
-import com.example.moviestime.ui.components.MovieCardSmall
+
+import com.example.moviestime.viewmodel.LanguageViewModel
 import com.example.moviestime.viewmodel.MainViewModel
 import com.example.moviestime.viewmodel.ThemeViewModel
-import com.example.moviestime.viewmodel.LanguageViewModel
 
-@androidx.annotation.RequiresPermission(android.Manifest.permission.POST_NOTIFICATIONS)
 @Composable
 fun ProfileScreen(
     mainViewModel: MainViewModel = viewModel(),
     themeViewModel: ThemeViewModel = viewModel(),
     languageViewModel: LanguageViewModel = viewModel()
 ) {
-    val watchlist by mainViewModel.favorites.collectAsState()
-    val isDarkTheme by themeViewModel.isDarkThemeEnabled.collectAsState()
-    val appLanguage by languageViewModel.appLanguage.collectAsState()
+    val backgroundColor = colorResource(R.color.background)
+    val primaryColor = colorResource(R.color.primary)
+    val textColor = colorResource(R.color.foreground)
+    val mutedColor = colorResource(R.color.muted_foreground)
+    val cardColor = colorResource(R.color.card)
+    val goldColor = colorResource(R.color.secondary)
 
-    val stats = mapOf(
-        stringResource(R.string.movies_watched) to "142",
-        stringResource(R.string.hours_watched) to "312",
-        stringResource(R.string.favorite_genre) to "Sci-Fi"
-    )
+    var selectedTabIndex by remember { mutableIntStateOf(0) }
+    val tabs = listOf("Reviews", "Watchlist", "Favorites")
 
-    LazyColumn(
+    Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(backgroundColor)
             .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(20.dp)
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        item {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.fillMaxWidth()
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 12.dp, bottom = 24.dp)
+        ) {
+            Text(
+                text = "Profile",
+                fontWeight = FontWeight.Bold,
+                fontSize = 24.sp,
+                color = textColor,
+                modifier = Modifier.align(Alignment.Center)
+            )
+
+            IconButton(
+                onClick = { /* TODO: Open Settings BottomSheet or Screen */ },
+                modifier = Modifier
+                    .align(Alignment.CenterEnd)
+
+                    .border(2.dp, primaryColor, RoundedCornerShape(12.dp))
+                    .size(44.dp)
             ) {
-                Box(
-                    modifier = Modifier
-                        .size(100.dp)
-                        .clip(RoundedCornerShape(50.dp))
-                        .background(MaterialTheme.colorScheme.primary),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        Icons.Default.Person,
-                        contentDescription = null,
-                        tint = Color.White,
-                        modifier = Modifier.size(48.dp)
-                    )
-                }
-                Spacer(Modifier.height(16.dp))
-                Text(
-                    "John Doe",
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 24.sp,
-                    color = Color.White
+                Icon(
+                    imageVector = Icons.Outlined.Settings,
+                    contentDescription = "Settings",
+                    tint = textColor,
+                    modifier = Modifier.size(22.dp)
                 )
-                Text(
-                    "john.doe@example.com",
-                    color = Color.White.copy(alpha = 0.7f)
-                )
-
-                Spacer(Modifier.height(20.dp))
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly
-                ) {
-                    stats.forEach { (key, value) ->
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text(
-                                value,
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.primary
-                            )
-                            Text(
-                                key,
-                                fontSize = 12.sp,
-                                color = Color.White.copy(alpha = 0.7f)
-                            )
-                        }
-                    }
-                }
             }
         }
 
-        item {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                Button(
-                    onClick = {},
-                    shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary
-                    )
-                ) {
-                    Icon(Icons.Default.Edit, contentDescription = "Edit Profile")
-                    Spacer(Modifier.width(6.dp))
-                    Text(stringResource(R.string.edit_profile), color = Color.Black)
-                }
 
-                Button(
-                    onClick = {},
-                    shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.DarkGray.copy(alpha = 0.7f)
-                    )
-                ) {
-                    Icon(Icons.Default.Settings, contentDescription = "Settings")
-                    Spacer(Modifier.width(6.dp))
-                    Text(stringResource(R.string.settings), color = Color.White)
-                }
-            }
+        Box(
+            modifier = Modifier
+                .size(100.dp)
+                .border(2.dp, goldColor, CircleShape)
+                .padding(4.dp)
+                .clip(CircleShape)
+                .background(primaryColor),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = "Y",
+                fontWeight = FontWeight.Bold,
+                fontSize = 40.sp,
+                color = textColor
+            )
         }
 
-        if (watchlist.isNotEmpty()) {
-            item {
-                Column {
-                    Row(
-                        Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
+        Spacer(Modifier.height(16.dp))
+
+        Text(
+            text = "youssohuyuiyuiyh",
+            fontWeight = FontWeight.Bold,
+            fontSize = 26.sp,
+            color = textColor,
+            textAlign = TextAlign.Center
+        )
+
+        Text(
+            text = "@youssohuyuiyuiyh",
+            fontSize = 14.sp,
+            color = mutedColor,
+            textAlign = TextAlign.Center
+        )
+
+        Spacer(Modifier.height(24.dp))
+
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            ProfileStat(number = "0", label = "Followers", textColor, mutedColor)
+            ProfileStat(number = "0", label = "Following", textColor, mutedColor)
+            ProfileStat(number = "0", label = "Reviews", textColor, mutedColor)
+        }
+
+        Spacer(Modifier.height(24.dp))
+
+        OutlinedButton(
+            onClick = { /* TODO */ },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(48.dp),
+            shape = RoundedCornerShape(12.dp),
+            border = BorderStroke(1.dp, mutedColor.copy(alpha = 0.3f)),
+            colors = ButtonDefaults.outlinedButtonColors(
+                containerColor = Color.Transparent
+            )
+        ) {
+            Text(
+                text = "Edit Profile",
+                fontWeight = FontWeight.SemiBold,
+                color = textColor
+            )
+        }
+
+        Spacer(Modifier.height(24.dp))
+
+
+        Container(color = cardColor, shape = RoundedCornerShape(12.dp)) {
+            Row(modifier = Modifier.fillMaxWidth()) {
+                tabs.forEachIndexed { index, title ->
+                    val isSelected = selectedTabIndex == index
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(40.dp)
+                            .background(
+                                if (isSelected) Color.Black.copy(alpha = 0.3f) else Color.Transparent,
+                                RoundedCornerShape(12.dp)
+                            )
+                            .clickable { selectedTabIndex = index },
+                        contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            stringResource(R.string.watchlist),
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            color = Color.White
+                            text = title,
+                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                            color = if (isSelected) textColor else mutedColor,
+                            fontSize = 14.sp
                         )
-                        TextButton(onClick = {}) {
-                            Text(
-                                stringResource(R.string.see_all),
-                                color = MaterialTheme.colorScheme.primary
-                            )
-                        }
-                    }
-
-                    Spacer(Modifier.height(8.dp))
-
-                    LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                        items(watchlist) { movie ->
-                            MovieCardSmall(
-                                movie = movie,
-                                isFavorite = true,
-                                onMovieClick = {},
-                                onFavoriteClick = { selectedMovie ->
-                                    mainViewModel.toggleFavorite(selectedMovie)
-                                }
-                            )
-                        }
                     }
                 }
             }
         }
 
-        item {
-            Column {
-                ListItem(
-                    headlineContent = {
-                        Text(stringResource(R.string.notifications), color = Color.White)
-                    },
-                    leadingContent = {
-                        Icon(
-                            Icons.Default.Notifications,
-                            contentDescription = "Notifications",
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                    },
-                    trailingContent = {
-                        Switch(
-                            checked = true,
-                            onCheckedChange = {},
-                            colors = SwitchDefaults.colors(
-                                checkedThumbColor = MaterialTheme.colorScheme.primary,
-                                checkedTrackColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
-                            )
-                        )
-                    },
-                    colors = ListItemDefaults.colors(
-                        containerColor = Color.Transparent
-                    )
-                )
+        Spacer(Modifier.height(40.dp))
 
-                ListItem(
-                    headlineContent = {
-                        Text(stringResource(R.string.dark_mode), color = Color.White)
-                    },
-                    leadingContent = {
-                        Icon(
-                            Icons.Default.DarkMode,
-                            contentDescription = "Dark Mode",
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                    },
-                    trailingContent = {
-                        Switch(
-                            checked = isDarkTheme,
-                            onCheckedChange = { isChecked ->
-                                themeViewModel.setDarkThemeEnabled(isChecked)
-                            },
-                            colors = SwitchDefaults.colors(
-                                checkedThumbColor = MaterialTheme.colorScheme.primary,
-                                checkedTrackColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
-                            )
-                        )
-                    },
-                    colors = ListItemDefaults.colors(
-                        containerColor = Color.Transparent
-                    )
-                )
 
-                ListItem(
-                    headlineContent = {
-                        Text(stringResource(R.string.language), color = Color.White)
-                    },
-                    leadingContent = {
-                        Icon(
-                            Icons.Default.Language,
-                            contentDescription = "Language",
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                    },
-                    trailingContent = {
-                        Button(
-                            onClick = {
-                                val newLanguage = if (appLanguage == "ar") "en" else "ar"
-                                languageViewModel.setAppLanguage(newLanguage)
-                            },
-                            shape = RoundedCornerShape(12.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = MaterialTheme.colorScheme.primary
-                            )
-                        ) {
-                            Text(
-                                if (appLanguage == "ar") stringResource(R.string.language_english) else stringResource(R.string.language_arabic),
-                                color = Color.Black,
-                                fontSize = 14.sp
-                            )
-                        }
-                    },
-                    colors = ListItemDefaults.colors(
-                        containerColor = Color.Transparent
-                    )
-                )
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(
+                text = when (selectedTabIndex) {
+                    0 -> "No reviews yet"
+                    1 -> "Watchlist is empty"
+                    else -> "No favorites yet"
+                },
+                fontSize = 16.sp,
+                color = mutedColor
+            )
 
-                ListItem(
-                    headlineContent = {
-                        Text(stringResource(R.string.help_support), color = Color.White)
-                    },
-                    leadingContent = {
-                        Icon(
-                            Icons.AutoMirrored.Filled.Help,
-                            contentDescription = "Help",
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                    },
-                    colors = ListItemDefaults.colors(
-                        containerColor = Color.Transparent
-                    )
-                )
+            Spacer(Modifier.height(8.dp))
 
-                ListItem(
-                    headlineContent = {
-                        Text(stringResource(R.string.logout), color = MaterialTheme.colorScheme.primary)
-                    },
-                    leadingContent = {
-                        Icon(
-                            Icons.AutoMirrored.Filled.ExitToApp,
-                            contentDescription = "Logout",
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                    },
-                    colors = ListItemDefaults.colors(
-                        containerColor = Color.Transparent
-                    )
-                )
-            }
+            Text(
+                text = when (selectedTabIndex) {
+                    0 -> "Write your first review"
+                    1 -> "Add movies to watchlist"
+                    else -> "Mark movies as favorite"
+                },
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold,
+                color = goldColor,
+                modifier = Modifier.clickable { /* TODO */ }
+            )
         }
+    }
+}
+
+@Composable
+fun ProfileStat(number: String, label: String, numberColor: Color, labelColor: Color) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Text(
+            text = number,
+            fontWeight = FontWeight.Bold,
+            fontSize = 20.sp,
+            color = numberColor
+        )
+        Text(
+            text = label,
+            fontSize = 12.sp,
+            color = labelColor
+        )
+    }
+}
+
+@Composable
+fun Container(
+    color: Color,
+    shape: androidx.compose.ui.graphics.Shape,
+    content: @Composable () -> Unit
+) {
+    Surface(
+        color = color,
+        shape = shape,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        content()
     }
 }
