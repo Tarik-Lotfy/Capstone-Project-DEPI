@@ -1,5 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="background">#15110F</color>
+    <color name="foreground">#F0EAE2</color>
+    <color name="card">#231C18</color>
+    <color name="card_foreground">#F0EAE2</color>
+    <color name="primary">#9E1938</color>
+    <color name="cinema_burgundy">#9E1938</color>
+    <color name="primary_foreground">#F0EAE2</color>
+    <color name="secondary">#E8C547</color>
+    <color name="cinema_gold">#E8C547</color>
+    <color name="secondary_foreground">#15110F</color>
+    <color name="accent">#F2D15A</color>
+    <color name="accent_foreground">#15110F</color>
+    <color name="cinema_dark">#15110F</color>
+    <color name="cinema_card">#231C18</color>
+    <color name="spotlight_glow">#FFDB66</color>
+    <color name="muted">#352E29</color>
+    <color name="muted_foreground">#B5A593</color>
+    <color name="border">#3A322C</color>
+    <color name="input">#2E2720</color>
+    <color name="ring">#C72048</color>
+    <color name="destructive">#EA4335</color>
+    <color name="destructive_foreground">#F0EAE2</color>
+    <color name="popover">#231C18</color>
+    <color name="popover_foreground">#F0EAE2</color>
     <color name="purple_200">#FFBB86FC</color>
     <color name="purple_500">#FF6200EE</color>
     <color name="purple_700">#FF3700B3</color>
@@ -7,4 +31,5 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
 </resources>

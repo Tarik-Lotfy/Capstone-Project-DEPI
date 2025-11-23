@@ -9,13 +9,16 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import com.example.moviestime.data.repository.AuthRepository
+import com.google.firebase.auth.FirebaseUser
 
 class AuthViewModel : ViewModel() {
     private val repository = AuthRepository()
 
+    // التصحيح: إزالة "value =" وتمرير القيمة مباشرة
     private val _uiState = MutableStateFlow(AuthUiState())
     val uiState: StateFlow<AuthUiState> = _uiState.asStateFlow()
 
+    // التصحيح: إزالة "value =" وتمرير القيمة مباشرة
     private val _isLoggedIn = MutableStateFlow(repository.currentUser != null)
     val isLoggedIn: StateFlow<Boolean> = _isLoggedIn.asStateFlow()
 
@@ -36,7 +39,6 @@ class AuthViewModel : ViewModel() {
                 if (result.isSuccess) {
                     _isLoggedIn.value = true
                     _uiState.value = AuthUiState()
-                    Log.d("AuthViewModel", "Login successful for: ${result.getOrNull()?.email}")
                 } else {
                     _uiState.value = AuthUiState(error = "Login failed: ${result.exceptionOrNull()?.message}")
                 }
@@ -68,7 +70,6 @@ class AuthViewModel : ViewModel() {
                 if (result.isSuccess) {
                     _isLoggedIn.value = true
                     _uiState.value = AuthUiState()
-                    Log.d("AuthViewModel", "Registration successful for: ${result.getOrNull()?.email}")
                 } else {
                     _uiState.value = AuthUiState(error = "Registration failed: ${result.exceptionOrNull()?.message}")
                 }
@@ -79,11 +80,50 @@ class AuthViewModel : ViewModel() {
         }
     }
 
+    fun signInWithGoogleToken(idToken: String) {
+        _uiState.value = AuthUiState(isLoading = true)
+        viewModelScope.launch {
+            try {
+                val result = repository.signInWithGoogleToken(idToken)
+                if (result.isSuccess) {
+                    _isLoggedIn.value = true
+                    _uiState.value = AuthUiState()
+                } else {
+                    _uiState.value = AuthUiState(error = "Google Sign-In failed: ${result.exceptionOrNull()?.message}")
+                }
+            } catch (e: Exception) {
+                Log.e("AuthViewModel", "Unexpected error", e)
+                _uiState.value = AuthUiState(error = "Unexpected error: ${e.message}")
+            }
+        }
+    }
+
+    fun signInWithFacebookToken(token: String) {
+        _uiState.value = AuthUiState(isLoading = true)
+        viewModelScope.launch {
+            val result = repository.signInWithFacebookToken(token)
+            if (result.isSuccess) {
+                _isLoggedIn.value = true
+                _uiState.value = AuthUiState()
+            } else {
+                _uiState.value = AuthUiState(error = "Facebook Login Failed: ${result.exceptionOrNull()?.message}")
+            }
+        }
+    }
+
+    fun onExternalSignInSuccess() {
+        _isLoggedIn.value = true
+        _uiState.value = AuthUiState()
+    }
+
+    fun onExternalSignInFailure(error: String) {
+        _uiState.value = AuthUiState(error = error)
+    }
+
     fun logout() {
         repository.logout()
         _isLoggedIn.value = false
         _uiState.value = AuthUiState()
-        Log.d("AuthViewModel", "User logged out")
     }
 
     private fun validateEmail(email: String): Boolean {

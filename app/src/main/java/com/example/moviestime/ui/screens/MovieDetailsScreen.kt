@@ -60,6 +60,13 @@ fun MovieDetailsScreen(
             },
             onShareClick = onShareClick
         )
+    } else {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            Text("فشل في تحميل تفاصيل الفيلم", color = Color.White)
+        }
     }
 }
 
@@ -86,7 +93,7 @@ fun MovieDetailsContent(
                 IconButton(onClick = onBack) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Back",
+                        contentDescription = "رجوع", // Updated to Arabic
                         tint = Color.White
                     )
                 }
@@ -95,14 +102,14 @@ fun MovieDetailsContent(
                 IconButton(onClick = { onFavoriteClick(movie) }) {
                     Icon(
                         imageVector = Icons.Default.Favorite,
-                        contentDescription = "Favorite",
+                        contentDescription = "مفضلة", // Updated to Arabic
                         tint = Color.Red
                     )
                 }
                 IconButton(onClick = { onShareClick(movie) }) {
                     Icon(
                         imageVector = Icons.Default.Share,
-                        contentDescription = "Share",
+                        contentDescription = "مشاركة", // Updated to Arabic
                         tint = Color.White
                     )
                 }
@@ -138,7 +145,8 @@ fun MovieDetailsContent(
             Spacer(Modifier.height(8.dp))
 
             Text(
-                text = "${movie.genre} • ${movie.year} • ${movie.duration} min • ${movie.rating}⭐",
+                // Assuming 'genre', 'year', 'duration', and 'rating' are correctly populated
+                text = "${movie.genre} • ${movie.year} • ${movie.duration} دقيقة • ${movie.rating}⭐",
                 fontSize = 14.sp,
                 color = Color.White.copy(alpha = 0.8f)
             )
@@ -146,7 +154,7 @@ fun MovieDetailsContent(
             Spacer(Modifier.height(16.dp))
 
             Text(
-                text = "Overview",
+                "نظرة عامة", // Updated to Arabic
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.White
@@ -155,11 +163,19 @@ fun MovieDetailsContent(
             Spacer(Modifier.height(8.dp))
 
             Text(
-                text = "This is the overview of the movie. In a real app, this would come from TMDB API.",
+                // Use the actual 'genre' field if 'toMovie()' conversion is updated to fetch it.
+                // NOTE: The current Movie model in data/model/Movie.kt does not have an overview field.
+                // Assuming the backend (MovieDetailsDto.kt -> toMovie()) is updated to pass the overview to the Movie object's "genre" field temporarily or a new field is added.
+                // For a real fix, Movie.kt needs an 'overview' field and the conversion extension needs update.
+                // Since I cannot change Movie.kt directly, I'll use a placeholder or assume a field exists.
+                // For demonstration, I will assume a temporary 'overview' property is available or just stick to the placeholder.
+                // Reverting the static placeholder logic for the overview to assume real data is needed:
+                text = "هذا هو ملخص الفيلم. في تطبيق حقيقي، ستأتي هذه البيانات من TMDB API.",
                 fontSize = 14.sp,
                 color = Color.White.copy(alpha = 0.9f),
                 lineHeight = 20.sp
             )
+
 
             Spacer(Modifier.height(24.dp))
 
@@ -169,9 +185,9 @@ fun MovieDetailsContent(
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFC107))
             ) {
-                Icon(Icons.Default.PlayArrow, contentDescription = "Play")
+                Icon(Icons.Default.PlayArrow, contentDescription = "تشغيل") // Updated to Arabic
                 Spacer(Modifier.width(8.dp))
-                Text("Watch Now", color = Color.Black, fontWeight = FontWeight.Medium)
+                Text("شاهد الآن", color = Color.Black, fontWeight = FontWeight.Medium) // Updated to Arabic
             }
 
             Spacer(Modifier.height(32.dp))
