@@ -8,7 +8,7 @@ data class MovieResponse(
     val total_pages: Int,
     val total_results: Int
 )
-
+// movieDto
 data class MovieDto(
     val id: Int,
     val title: String,
