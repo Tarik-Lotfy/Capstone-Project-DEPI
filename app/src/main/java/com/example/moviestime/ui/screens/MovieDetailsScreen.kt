@@ -30,11 +30,12 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.example.moviestime.R
 import com.example.moviestime.data.model.Movie
-
+ import com.example.moviestime.ui.theme.Inter
+import com.example.moviestime.ui.theme.PlayFair
 import com.example.moviestime.viewmodel.MainViewModel
 import com.example.moviestime.viewmodel.MovieDetailsViewModel
 
-@SuppressLint("MissingPermission") // لتجاهل خطأ التحقق من الإذن هنا لأننا نعالجه في MainActivity
+@SuppressLint("MissingPermission")
 @Composable
 fun MovieDetailsScreen(
     movieId: Int,
@@ -53,8 +54,7 @@ fun MovieDetailsScreen(
         viewModel.loadMovieDetails(movieId)
     }
 
-    // ألوان الثيم السينمائي
-    val backgroundColor = colorResource(R.color.background)
+     val backgroundColor = colorResource(R.color.background)
     val primaryColor = colorResource(R.color.primary)
     val textColor = colorResource(R.color.foreground)
     val cardColor = colorResource(R.color.card)
@@ -100,14 +100,13 @@ fun MovieDetailsScreen(
     }
 }
 
-// تأكد أن هذه الدالة تأخذ جميع الباراميترات كما هو موضح هنا
-@Composable
+ @Composable
 fun MovieDetailsContent(
     movie: Movie,
     isFavorite: Boolean,
     onBack: () -> Unit,
-    onPlayClick: () -> Unit,       // تم تعديل التوقيع ليكون () -> Unit
-    onFavoriteClick: () -> Unit,   // تم تعديل التوقيع ليكون () -> Unit
+    onPlayClick: () -> Unit,
+    onFavoriteClick: () -> Unit,
     backgroundColor: Color,
     primaryColor: Color,
     textColor: Color,
@@ -126,14 +125,12 @@ fun MovieDetailsContent(
                 .fillMaxSize()
                 .verticalScroll(scrollState)
         ) {
-            // --- قسم الهيدر (صورة الخلفية + البوستر) ---
-            Box(
+             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(420.dp)
             ) {
-                // 1. صورة الخلفية العريضة
-                AsyncImage(
+                 AsyncImage(
                     model = movie.backdropPath ?: movie.posterPath,
                     contentDescription = "Backdrop",
                     contentScale = ContentScale.Crop,
@@ -143,8 +140,7 @@ fun MovieDetailsContent(
                     error = painterResource(R.drawable.ic_launcher_background)
                 )
 
-                // 2. تدرج لوني
-                Box(
+                 Box(
                     modifier = Modifier
                         .fillMaxSize()
                         .background(
@@ -160,8 +156,7 @@ fun MovieDetailsContent(
                         )
                 )
 
-                // 3. صورة البوستر
-                AsyncImage(
+                 AsyncImage(
                     model = movie.posterPath,
                     contentDescription = "Poster",
                     contentScale = ContentScale.Crop,
@@ -174,15 +169,15 @@ fun MovieDetailsContent(
                         .border(1.dp, Color.White.copy(alpha = 0.2f), RoundedCornerShape(12.dp))
                 )
 
-                // 4. العنوان والتقييم
-                Column(
+                 Column(
                     modifier = Modifier
                         .align(Alignment.BottomStart)
                         .padding(start = 166.dp, bottom = 10.dp, end = 16.dp)
                 ) {
                     Text(
                         text = movie.title,
-                         fontWeight = FontWeight.Bold,
+                        fontFamily = PlayFair,
+                        fontWeight = FontWeight.Bold,
                         fontSize = 26.sp,
                         color = textColor,
                         lineHeight = 32.sp
@@ -200,7 +195,8 @@ fun MovieDetailsContent(
                         Spacer(Modifier.width(4.dp))
                         Text(
                             text = String.format("%.1f", movie.rating),
-                             fontWeight = FontWeight.Bold,
+                            fontFamily = Inter,
+                            fontWeight = FontWeight.Bold,
                             fontSize = 15.sp,
                             color = textColor
                         )
@@ -209,7 +205,8 @@ fun MovieDetailsContent(
 
                         Text(
                             text = "${movie.duration} min",
-                             fontSize = 14.sp,
+                            fontFamily = Inter,
+                            fontSize = 14.sp,
                             color = textColor.copy(alpha = 0.7f)
                         )
                     }
@@ -224,7 +221,8 @@ fun MovieDetailsContent(
                     ) {
                         Text(
                             text = movie.genre.split(",").firstOrNull() ?: "Movie",
-                             fontSize = 12.sp,
+                            fontFamily = Inter,
+                            fontSize = 12.sp,
                             color = textColor.copy(alpha = 0.9f),
                             modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp)
                         )
@@ -232,22 +230,19 @@ fun MovieDetailsContent(
                 }
             }
 
-            // --- قسم الأزرار والقصة ---
-            Column(
+             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 20.dp, vertical = 24.dp)
             ) {
-                // زر الإضافة للمفضلة
-                Button(
-                    onClick = onFavoriteClick, // الآن هذا المتغير معرف في الباراميترات بالأعلى
+                 Button(
+                    onClick = onFavoriteClick,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(52.dp),
                     shape = RoundedCornerShape(10.dp),
                     colors = ButtonDefaults.buttonColors(
-                        // هذه المتغيرات (isFavorite, primaryColor) معرفة في الباراميترات أيضاً
-                        containerColor = if (isFavorite) Color.DarkGray else primaryColor,
+                         containerColor = if (isFavorite) Color.DarkGray else primaryColor,
                         contentColor = Color.White
                     ),
                     elevation = ButtonDefaults.buttonElevation(defaultElevation = 8.dp)
@@ -260,7 +255,8 @@ fun MovieDetailsContent(
                     Spacer(Modifier.width(8.dp))
                     Text(
                         text = if (isFavorite) "Listed" else "Add to Watchlist",
-                         fontWeight = FontWeight.SemiBold,
+                        fontFamily = Inter,
+                        fontWeight = FontWeight.SemiBold,
                         fontSize = 16.sp
                     )
                 }
@@ -268,8 +264,9 @@ fun MovieDetailsContent(
                 Spacer(Modifier.height(32.dp))
 
                 Text(
-                    text = "Overview",
-                     fontWeight = FontWeight.Bold,
+                    text = "OverView",
+                    fontFamily = PlayFair,
+                    fontWeight = FontWeight.Bold,
                     fontSize = 22.sp,
                     color = textColor
                 )
@@ -278,7 +275,8 @@ fun MovieDetailsContent(
 
                 Text(
                     text = movie.overview.ifEmpty { "لا يوجد وصف متاح لهذا الفيلم حالياً." },
-                     fontSize = 15.sp,
+                    fontFamily = Inter,
+                    fontSize = 15.sp,
                     color = textColor.copy(alpha = 0.8f),
                     lineHeight = 26.sp,
                     textAlign = androidx.compose.ui.text.style.TextAlign.Justify
@@ -308,7 +306,7 @@ fun MovieDetailsContent(
         ) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = "Go back",
+                contentDescription = "Back",
                 tint = Color.White,
                 modifier = Modifier.size(20.dp)
             )
@@ -321,14 +319,16 @@ fun DetailItem(label: String, value: String, textColor: Color) {
     Column {
         Text(
             text = label,
-             fontWeight = FontWeight.Medium,
+            fontFamily = Inter,
+            fontWeight = FontWeight.Medium,
             fontSize = 13.sp,
             color = textColor.copy(alpha = 0.5f)
         )
         Spacer(Modifier.height(4.dp))
         Text(
             text = value,
-             fontWeight = FontWeight.SemiBold,
+            fontFamily = Inter,
+            fontWeight = FontWeight.SemiBold,
             fontSize = 16.sp,
             color = textColor
         )

@@ -22,7 +22,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.moviestime.R
-
+import com.example.moviestime.ui.theme.Inter
+import com.example.moviestime.ui.theme.PlayFair
 import com.example.moviestime.viewmodel.LanguageViewModel
 import com.example.moviestime.viewmodel.MainViewModel
 import com.example.moviestime.viewmodel.ThemeViewModel
@@ -58,6 +59,7 @@ fun ProfileScreen(
         ) {
             Text(
                 text = "Profile",
+                fontFamily = PlayFair,
                 fontWeight = FontWeight.Bold,
                 fontSize = 24.sp,
                 color = textColor,
@@ -93,6 +95,7 @@ fun ProfileScreen(
         ) {
             Text(
                 text = "Y",
+                fontFamily = Inter,
                 fontWeight = FontWeight.Bold,
                 fontSize = 40.sp,
                 color = textColor
@@ -103,6 +106,7 @@ fun ProfileScreen(
 
         Text(
             text = "youssohuyuiyuiyh",
+            fontFamily = PlayFair,
             fontWeight = FontWeight.Bold,
             fontSize = 26.sp,
             color = textColor,
@@ -111,14 +115,13 @@ fun ProfileScreen(
 
         Text(
             text = "@youssohuyuiyuiyh",
+            fontFamily = Inter,
             fontSize = 14.sp,
             color = mutedColor,
             textAlign = TextAlign.Center
         )
 
         Spacer(Modifier.height(24.dp))
-
-
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
@@ -143,14 +146,13 @@ fun ProfileScreen(
         ) {
             Text(
                 text = "Edit Profile",
+                fontFamily = Inter,
                 fontWeight = FontWeight.SemiBold,
                 color = textColor
             )
         }
 
         Spacer(Modifier.height(24.dp))
-
-
         Container(color = cardColor, shape = RoundedCornerShape(12.dp)) {
             Row(modifier = Modifier.fillMaxWidth()) {
                 tabs.forEachIndexed { index, title ->
@@ -168,6 +170,7 @@ fun ProfileScreen(
                     ) {
                         Text(
                             text = title,
+                            fontFamily = Inter,
                             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
                             color = if (isSelected) textColor else mutedColor,
                             fontSize = 14.sp
@@ -191,6 +194,7 @@ fun ProfileScreen(
                     1 -> "Watchlist is empty"
                     else -> "No favorites yet"
                 },
+                fontFamily = Inter,
                 fontSize = 16.sp,
                 color = mutedColor
             )
@@ -203,6 +207,7 @@ fun ProfileScreen(
                     1 -> "Add movies to watchlist"
                     else -> "Mark movies as favorite"
                 },
+                fontFamily = Inter,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
                 color = goldColor,
@@ -217,12 +222,14 @@ fun ProfileStat(number: String, label: String, numberColor: Color, labelColor: C
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text(
             text = number,
+            fontFamily = Inter,
             fontWeight = FontWeight.Bold,
             fontSize = 20.sp,
             color = numberColor
         )
         Text(
             text = label,
+            fontFamily = Inter,
             fontSize = 12.sp,
             color = labelColor
         )
