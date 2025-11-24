@@ -1,4 +1,3 @@
-// ui/screens/MoviesApp.kt
 package com.example.moviestime.ui.screens
 
 import androidx.compose.foundation.Image
@@ -13,40 +12,38 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.moviestime.R
+  import com.example.moviestime.viewmodel.LanguageViewModel
 import com.example.moviestime.viewmodel.MainViewModel
-import com.example.moviestime.viewmodel.ThemeViewModel
 import com.example.moviestime.viewmodel.NotificationViewModel
-import com.example.moviestime.viewmodel.LanguageViewModel
+import com.example.moviestime.viewmodel.ThemeViewModel
+import com.example.moviestime.viewmodel.SearchViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @androidx.annotation.RequiresPermission(android.Manifest.permission.POST_NOTIFICATIONS)
 @Composable
 fun MoviesApp(
-    mainViewModel: MainViewModel,
-    themeViewModel: ThemeViewModel,
-    notificationViewModel: NotificationViewModel,
-    languageViewModel: LanguageViewModel
+    mainViewModel: MainViewModel = viewModel(),
+    themeViewModel: ThemeViewModel = viewModel(),
+    notificationViewModel: NotificationViewModel = viewModel(),
+    languageViewModel: LanguageViewModel = viewModel()
 ) {
     val navController = rememberNavController()
-
     val selectedTab by mainViewModel.uiState.collectAsState()
 
-    LaunchedEffect(selectedTab.selectedTab) {
+     LaunchedEffect(selectedTab.selectedTab) {
         when (selectedTab.selectedTab) {
             0 -> navController.navigate("home") {
                 launchSingleTop = true
@@ -67,7 +64,7 @@ fun MoviesApp(
     val icons = listOf(Icons.Default.Home, Icons.Default.Explore, Icons.Default.Person)
 
     Box(modifier = Modifier.fillMaxSize()) {
-        Image(
+         Image(
             painter = painterResource(id = R.drawable.backkkkk),
             contentDescription = "Background",
             contentScale = ContentScale.Crop,
@@ -81,9 +78,7 @@ fun MoviesApp(
                         colors = listOf(
                             Color.Transparent,
                             Color.Black.copy(alpha = 0.8f)
-                        ),
-                        startY = 0f,
-                        endY = Float.POSITIVE_INFINITY
+                        )
                     )
                 )
         )
@@ -161,7 +156,10 @@ fun MoviesApp(
                         ProfileScreen(
                             mainViewModel = mainViewModel,
                             themeViewModel = themeViewModel,
-                            languageViewModel = languageViewModel
+                            languageViewModel = languageViewModel,
+                             onMovieClick = { movieId ->
+                                navController.navigate("movie/$movieId")
+                            }
                         )
                     }
                     composable("search") {
@@ -170,17 +168,18 @@ fun MoviesApp(
                             searchViewModel = viewModel()
                         )
                     }
-                    composable("movie/{movieId}") { backStackEntry ->
-                        val movieId = backStackEntry.arguments?.getString("movieId")?.toInt() ?: 1
+                     composable(
+                        route = "movie/{movieId}",
+                        arguments = listOf(navArgument("movieId") { type = NavType.IntType })
+                    ) { backStackEntry ->
+                        val movieId = backStackEntry.arguments?.getInt("movieId") ?: 0
                         MovieDetailsScreen(
                             movieId = movieId,
                             mainViewModel = mainViewModel,
                             onBack = { navController.popBackStack() },
-                            onPlayClick = { movie ->
-                                navController.navigate("video/${movie.id}")
-                            },
-                            onShareClick = { movie ->
-                            }
+                            onPlayClick = {   },
+                            onFavoriteClick = { movie -> mainViewModel.toggleFavorite(movie) },
+                            onShareClick = {  }
                         )
                     }
                 }

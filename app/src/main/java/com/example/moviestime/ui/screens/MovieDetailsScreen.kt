@@ -24,15 +24,16 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.example.moviestime.R
 import com.example.moviestime.data.model.Movie
- import com.example.moviestime.ui.theme.Inter
+import com.example.moviestime.ui.theme.Inter
 import com.example.moviestime.ui.theme.PlayFair
-import com.example.moviestime.viewmodel.MainViewModel
+ import com.example.moviestime.viewmodel.MainViewModel
 import com.example.moviestime.viewmodel.MovieDetailsViewModel
 
 @SuppressLint("MissingPermission")
@@ -54,7 +55,7 @@ fun MovieDetailsScreen(
         viewModel.loadMovieDetails(movieId)
     }
 
-     val backgroundColor = colorResource(R.color.background)
+    val backgroundColor = colorResource(R.color.background)
     val primaryColor = colorResource(R.color.primary)
     val textColor = colorResource(R.color.foreground)
     val cardColor = colorResource(R.color.card)
@@ -70,7 +71,7 @@ fun MovieDetailsScreen(
             CircularProgressIndicator(color = primaryColor)
         }
     } else {
-         movieState?.let { movie ->
+        movieState?.let { movie ->
             val isFav = favorites.any { it.id == movie.id }
 
             MovieDetailsContent(
@@ -78,9 +79,7 @@ fun MovieDetailsScreen(
                 isFavorite = isFav,
                 onBack = onBack,
                 onPlayClick = { onPlayClick(movie) },
-                 onFavoriteClick = {
-                    mainViewModel.toggleFavorite(movie)
-                },
+                onFavoriteClick = { mainViewModel.toggleFavorite(movie) },
                 backgroundColor = backgroundColor,
                 primaryColor = primaryColor,
                 textColor = textColor,
@@ -88,7 +87,7 @@ fun MovieDetailsScreen(
                 goldColor = goldColor
             )
         } ?: run {
-             Box(
+            Box(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(backgroundColor),
@@ -100,7 +99,7 @@ fun MovieDetailsScreen(
     }
 }
 
- @Composable
+@Composable
 fun MovieDetailsContent(
     movie: Movie,
     isFavorite: Boolean,
@@ -130,7 +129,7 @@ fun MovieDetailsContent(
                     .fillMaxWidth()
                     .height(420.dp)
             ) {
-                 AsyncImage(
+                AsyncImage(
                     model = movie.backdropPath ?: movie.posterPath,
                     contentDescription = "Backdrop",
                     contentScale = ContentScale.Crop,
@@ -140,7 +139,7 @@ fun MovieDetailsContent(
                     error = painterResource(R.drawable.ic_launcher_background)
                 )
 
-                 Box(
+                Box(
                     modifier = Modifier
                         .fillMaxSize()
                         .background(
@@ -156,7 +155,7 @@ fun MovieDetailsContent(
                         )
                 )
 
-                 AsyncImage(
+                AsyncImage(
                     model = movie.posterPath,
                     contentDescription = "Poster",
                     contentScale = ContentScale.Crop,
@@ -169,7 +168,7 @@ fun MovieDetailsContent(
                         .border(1.dp, Color.White.copy(alpha = 0.2f), RoundedCornerShape(12.dp))
                 )
 
-                 Column(
+                Column(
                     modifier = Modifier
                         .align(Alignment.BottomStart)
                         .padding(start = 166.dp, bottom = 10.dp, end = 16.dp)
@@ -230,19 +229,19 @@ fun MovieDetailsContent(
                 }
             }
 
-             Column(
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 20.dp, vertical = 24.dp)
             ) {
-                 Button(
+                Button(
                     onClick = onFavoriteClick,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(52.dp),
                     shape = RoundedCornerShape(10.dp),
                     colors = ButtonDefaults.buttonColors(
-                         containerColor = if (isFavorite) Color.DarkGray else primaryColor,
+                        containerColor = if (isFavorite) Color.DarkGray else primaryColor,
                         contentColor = Color.White
                     ),
                     elevation = ButtonDefaults.buttonElevation(defaultElevation = 8.dp)
@@ -264,7 +263,7 @@ fun MovieDetailsContent(
                 Spacer(Modifier.height(32.dp))
 
                 Text(
-                    text = "OverView",
+                    text = "Overview",
                     fontFamily = PlayFair,
                     fontWeight = FontWeight.Bold,
                     fontSize = 22.sp,
@@ -274,16 +273,62 @@ fun MovieDetailsContent(
                 Spacer(Modifier.height(12.dp))
 
                 Text(
-                    text = movie.overview.ifEmpty { "لا يوجد وصف متاح لهذا الفيلم حالياً." },
+                    text = movie.overview.ifEmpty { "No overview available." },
                     fontFamily = Inter,
                     fontSize = 15.sp,
                     color = textColor.copy(alpha = 0.8f),
                     lineHeight = 26.sp,
-                    textAlign = androidx.compose.ui.text.style.TextAlign.Justify
+                    textAlign = TextAlign.Justify
                 )
 
                 Spacer(Modifier.height(32.dp))
 
+                Text(
+                    text = "Details",
+                    fontFamily = PlayFair,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 22.sp,
+                    color = textColor
+                )
+
+                Spacer(Modifier.height(16.dp))
+
+                Text(
+                    text = "Director",
+                    fontFamily = Inter,
+                    fontWeight = FontWeight.Medium,
+                    fontSize = 14.sp,
+                    color = textColor.copy(alpha = 0.6f)
+                )
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    text = movie.director,
+                    fontFamily = Inter,
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 16.sp,
+                    color = textColor
+                )
+
+                Spacer(Modifier.height(16.dp))
+
+                Text(
+                    text = "Cast",
+                    fontFamily = Inter,
+                    fontWeight = FontWeight.Medium,
+                    fontSize = 14.sp,
+                    color = textColor.copy(alpha = 0.6f)
+                )
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    text = movie.cast,
+                    fontFamily = Inter,
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 16.sp,
+                    color = textColor,
+                    lineHeight = 22.sp
+                )
+
+                Spacer(Modifier.height(16.dp))
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
@@ -296,7 +341,7 @@ fun MovieDetailsContent(
             Spacer(Modifier.height(50.dp))
         }
 
-         IconButton(
+        IconButton(
             onClick = onBack,
             modifier = Modifier
                 .padding(top = 45.dp, start = 20.dp)

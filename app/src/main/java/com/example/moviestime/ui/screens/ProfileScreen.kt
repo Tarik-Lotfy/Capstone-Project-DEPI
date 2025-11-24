@@ -5,6 +5,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -15,16 +18,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.AsyncImage
 import com.example.moviestime.R
+import com.example.moviestime.data.model.Movie
 import com.example.moviestime.ui.theme.Inter
 import com.example.moviestime.ui.theme.PlayFair
-import com.example.moviestime.viewmodel.LanguageViewModel
+ import com.example.moviestime.viewmodel.LanguageViewModel
 import com.example.moviestime.viewmodel.MainViewModel
 import com.example.moviestime.viewmodel.ThemeViewModel
 
@@ -32,8 +39,11 @@ import com.example.moviestime.viewmodel.ThemeViewModel
 fun ProfileScreen(
     mainViewModel: MainViewModel = viewModel(),
     themeViewModel: ThemeViewModel = viewModel(),
-    languageViewModel: LanguageViewModel = viewModel()
+    languageViewModel: LanguageViewModel = viewModel(),
+    onMovieClick: (Int) -> Unit
 ) {
+    val watchlist by mainViewModel.favorites.collectAsState()
+
     val backgroundColor = colorResource(R.color.background)
     val primaryColor = colorResource(R.color.primary)
     val textColor = colorResource(R.color.foreground)
@@ -41,7 +51,7 @@ fun ProfileScreen(
     val cardColor = colorResource(R.color.card)
     val goldColor = colorResource(R.color.secondary)
 
-    var selectedTabIndex by remember { mutableIntStateOf(0) }
+    var selectedTabIndex by remember { mutableIntStateOf(1) }
     val tabs = listOf("Reviews", "Watchlist", "Favorites")
 
     Column(
@@ -51,8 +61,7 @@ fun ProfileScreen(
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-
-        Box(
+         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 12.dp, bottom = 24.dp)
@@ -66,25 +75,25 @@ fun ProfileScreen(
                 modifier = Modifier.align(Alignment.Center)
             )
 
-            IconButton(
-                onClick = { /* TODO: Open Settings BottomSheet or Screen */ },
+            Box(
                 modifier = Modifier
                     .align(Alignment.CenterEnd)
-
-                    .border(2.dp, primaryColor, RoundedCornerShape(12.dp))
                     .size(44.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .border(2.dp, primaryColor, RoundedCornerShape(12.dp))
+                    .clickable {   },
+                contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = Icons.Outlined.Settings,
                     contentDescription = "Settings",
                     tint = textColor,
-                    modifier = Modifier.size(22.dp)
+                    modifier = Modifier.size(24.dp)
                 )
             }
         }
 
-
-        Box(
+         Box(
             modifier = Modifier
                 .size(100.dp)
                 .border(2.dp, goldColor, CircleShape)
@@ -122,19 +131,20 @@ fun ProfileScreen(
         )
 
         Spacer(Modifier.height(24.dp))
-        Row(
+
+         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             ProfileStat(number = "0", label = "Followers", textColor, mutedColor)
             ProfileStat(number = "0", label = "Following", textColor, mutedColor)
-            ProfileStat(number = "0", label = "Reviews", textColor, mutedColor)
+            ProfileStat(number = "${watchlist.size}", label = "Watchlist", textColor, mutedColor)
         }
 
         Spacer(Modifier.height(24.dp))
 
-        OutlinedButton(
-            onClick = { /* TODO */ },
+         OutlinedButton(
+            onClick = {   },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(48.dp),
@@ -153,7 +163,8 @@ fun ProfileScreen(
         }
 
         Spacer(Modifier.height(24.dp))
-        Container(color = cardColor, shape = RoundedCornerShape(12.dp)) {
+
+         Container(color = cardColor, shape = RoundedCornerShape(12.dp)) {
             Row(modifier = Modifier.fillMaxWidth()) {
                 tabs.forEachIndexed { index, title ->
                     val isSelected = selectedTabIndex == index
@@ -180,40 +191,81 @@ fun ProfileScreen(
             }
         }
 
-        Spacer(Modifier.height(40.dp))
+        Spacer(Modifier.height(20.dp))
 
-
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(
-                text = when (selectedTabIndex) {
-                    0 -> "No reviews yet"
-                    1 -> "Watchlist is empty"
-                    else -> "No favorites yet"
-                },
-                fontFamily = Inter,
-                fontSize = 16.sp,
-                color = mutedColor
-            )
-
-            Spacer(Modifier.height(8.dp))
-
-            Text(
-                text = when (selectedTabIndex) {
-                    0 -> "Write your first review"
-                    1 -> "Add movies to watchlist"
-                    else -> "Mark movies as favorite"
-                },
-                fontFamily = Inter,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold,
-                color = goldColor,
-                modifier = Modifier.clickable { /* TODO */ }
+         if (selectedTabIndex == 1) {
+            if (watchlist.isEmpty()) {
+                EmptyTabState(
+                    message = "Your watchlist is empty",
+                    actionText = "Add movies now",
+                    mutedColor = mutedColor,
+                    goldColor = goldColor
+                )
+            } else {
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(3),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    items(watchlist) { movie ->
+                        ProfileMovieItem(
+                            movie = movie,
+                            onClick = { onMovieClick(movie.id) }
+                        )
+                    }
+                }
+            }
+        } else {
+            EmptyTabState(
+                message = "No items yet",
+                actionText = "Explore movies",
+                mutedColor = mutedColor,
+                goldColor = goldColor
             )
         }
+    }
+}
+
+@Composable
+fun ProfileMovieItem(movie: Movie, onClick: () -> Unit) {
+    Card(
+        modifier = Modifier
+            .aspectRatio(0.7f)
+            .clickable { onClick() },
+        shape = RoundedCornerShape(12.dp),
+        elevation = CardDefaults.cardElevation(4.dp)
+    ) {
+        AsyncImage(
+            model = movie.posterPath,
+            contentDescription = movie.title,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.fillMaxSize(),
+            placeholder = painterResource(R.drawable.ic_launcher_background),
+            error = painterResource(R.drawable.ic_launcher_background)
+        )
+    }
+}
+
+@Composable
+fun EmptyTabState(message: String, actionText: String, mutedColor: Color, goldColor: Color) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 40.dp)
+    ) {
+        Text(text = message, fontFamily = Inter, fontSize = 16.sp, color = mutedColor)
+        Spacer(Modifier.height(8.dp))
+        Text(
+            text = actionText,
+            fontFamily = Inter,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold,
+            color = goldColor,
+            modifier = Modifier.clickable { }
+        )
     }
 }
 
@@ -242,11 +294,7 @@ fun Container(
     shape: androidx.compose.ui.graphics.Shape,
     content: @Composable () -> Unit
 ) {
-    Surface(
-        color = color,
-        shape = shape,
-        modifier = Modifier.fillMaxWidth()
-    ) {
+    Surface(color = color, shape = shape, modifier = Modifier.fillMaxWidth()) {
         content()
     }
 }
