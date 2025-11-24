@@ -42,6 +42,7 @@ fun ProfileScreen(
     languageViewModel: LanguageViewModel = viewModel(),
     onMovieClick: (Int) -> Unit
 ) {
+    
     val watchlist by mainViewModel.favorites.collectAsState()
 
     val backgroundColor = colorResource(R.color.background)
