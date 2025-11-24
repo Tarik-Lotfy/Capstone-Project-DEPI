@@ -3,9 +3,10 @@ package com.example.moviestime.ui.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -13,24 +14,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.moviestime.data.model.Movie
 
 @Composable
 fun FeaturedLargeCard(
     movie: Movie,
-    onPlayClick: (Movie) -> Unit = {}
+    onMovieClick: (Movie) -> Unit = {}
 ) {
     Box(
         modifier = Modifier
-            .width(280.dp)
-            .height(320.dp)
-            .clip(RoundedCornerShape(20.dp))
-            .clickable { onPlayClick(movie) }
+            .fillMaxWidth()
+            .height(480.dp)
+            .clip(RoundedCornerShape(24.dp))
+            .clickable { onMovieClick(movie) }
     ) {
         AsyncImage(
             model = movie.posterPath ?: "https://via.placeholder.com/300x450",
@@ -38,42 +37,64 @@ fun FeaturedLargeCard(
             contentScale = ContentScale.Crop,
             modifier = Modifier
                 .fillMaxSize()
-                .clip(RoundedCornerShape(20.dp))
+                .clip(RoundedCornerShape(24.dp))
         )
 
+        // Rating badge in top right
+        Box(
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(16.dp)
+                .background(
+                    MaterialTheme.colorScheme.surface.copy(alpha = 0.9f),
+                    RoundedCornerShape(12.dp)
+                )
+                .padding(horizontal = 12.dp, vertical = 8.dp)
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Star,
+                    contentDescription = "Rating",
+                    tint = MaterialTheme.colorScheme.secondary,
+                    modifier = Modifier.size(16.dp)
+                )
+                Text(
+                    text = String.format("%.1f", movie.rating),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.secondary
+                )
+            }
+        }
+
+        // Movie info at bottom
         Column(
             modifier = Modifier
                 .align(Alignment.BottomStart)
-                .padding(16.dp)
-                .background(Color.Black.copy(alpha = 0.5f), RoundedCornerShape(12.dp))
-                .padding(12.dp)
+                .fillMaxWidth()
+                .background(
+                    MaterialTheme.colorScheme.surface.copy(alpha = 0.95f),
+                    RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
+                )
+                .padding(20.dp)
         ) {
             Text(
                 text = movie.title,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.White,
+                style = MaterialTheme.typography.headlineSmall,
+                color = MaterialTheme.colorScheme.onSurface,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
-
-            Text(
-                text = "${movie.genre} • ${movie.year} • ${movie.duration} min",
-                color = Color.White.copy(alpha = 0.85f),
-                fontSize = 13.sp
-            )
-
+            
             Spacer(Modifier.height(8.dp))
-
-            Button(
-                onClick = { onPlayClick(movie) },
-                shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFC107))
-            ) {
-                Icon(Icons.Default.PlayArrow, contentDescription = "Play")
-                Spacer(Modifier.width(6.dp))
-                Text("Watch Now", color = Color.Black)
-            }
+            
+            Text(
+                text = "${movie.year} • ${movie.genre}",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
+            )
         }
     }
 }

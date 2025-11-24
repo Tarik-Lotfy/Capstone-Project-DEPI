@@ -44,7 +44,7 @@ fun HomeScreen(
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
             item {
-                Text("🎬 Now Playing", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                Text("Now Playing")
                 Spacer(Modifier.height(8.dp))
                 LazyRow(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                     items(5) {
@@ -54,7 +54,7 @@ fun HomeScreen(
             }
 
             item {
-                SectionTitleWithSeeAll("🔥 Popular")
+                SectionTitleWithSeeAll(" Popular")
                 Spacer(Modifier.height(8.dp))
                 LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     items(5) {
@@ -64,7 +64,7 @@ fun HomeScreen(
             }
 
             item {
-                SectionTitleWithSeeAll("🏆 Top Rated")
+                SectionTitleWithSeeAll(" Top Rated")
                 Spacer(Modifier.height(8.dp))
                 LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     items(5) {
@@ -74,7 +74,7 @@ fun HomeScreen(
             }
 
             item {
-                SectionTitleWithSeeAll("🍿 Upcoming")
+                SectionTitleWithSeeAll(" Upcoming")
                 Spacer(Modifier.height(8.dp))
                 LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     items(5) {
@@ -107,20 +107,30 @@ fun HomeScreen(
                 verticalArrangement = Arrangement.spacedBy(20.dp)
             ) {
                 item {
-                    Text("🎬 Now Playing", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.White)
-                    Spacer(Modifier.height(8.dp))
-                    LazyRow(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                    Text(
+                        text = "Now Playing",
+                        style = MaterialTheme.typography.headlineMedium,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    Spacer(Modifier.height(16.dp))
+                    LazyRow(
+                        horizontalArrangement = Arrangement.spacedBy(16.dp),
+                        contentPadding = PaddingValues(horizontal = 0.dp)
+                    ) {
                         items(nowPlaying) { movie ->
-                            FeaturedLargeCard(movie = movie) { selectedMovie ->
-                                navController.navigate("movie/${selectedMovie.id}")
-                            }
+                            FeaturedLargeCard(
+                                movie = movie,
+                                onMovieClick = { selectedMovie ->
+                                    navController.navigate("movie/${selectedMovie.id}")
+                                }
+                            )
                         }
                     }
                 }
 
                 item {
                     SectionWithRow(
-                        title = "🔥 Popular",
+                        title = " Popular",
                         movies = popular,
                         favorites = favorites,
                         onMovieClick = { movie ->
@@ -132,7 +142,7 @@ fun HomeScreen(
 
                 item {
                     SectionWithRow(
-                        title = "🏆 Top Rated",
+                        title = " Top Rated",
                         movies = topRated,
                         favorites = favorites,
                         onMovieClick = { movie ->
@@ -144,7 +154,7 @@ fun HomeScreen(
 
                 item {
                     SectionWithRow(
-                        title = "🍿 Upcoming",
+                        title = " Upcoming",
                         movies = upcoming,
                         favorites = favorites,
                         onMovieClick = { movie ->
