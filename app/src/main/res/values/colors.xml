@@ -1,29 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="background">#15110F</color>
-    <color name="foreground">#F0EAE2</color>
-    <color name="card">#231C18</color>
-    <color name="card_foreground">#F0EAE2</color>
+    <!-- Core Background & Text Colors -->
+    <color name="background">#171311</color>
+    <color name="foreground">#F5F1E8</color>
+    <color name="card">#231F1C</color>
+    <color name="card_foreground">#F5F1E8</color>
+    <color name="cinema_dark">#171311</color>
+    <color name="cinema_card">#231F1C</color>
+    
+    <!-- Brand Colors (Cinema Theme) -->
     <color name="primary">#9E1938</color>
     <color name="cinema_burgundy">#9E1938</color>
-    <color name="primary_foreground">#F0EAE2</color>
+    <color name="primary_foreground">#F5F1E8</color>
     <color name="secondary">#E8C547</color>
     <color name="cinema_gold">#E8C547</color>
-    <color name="secondary_foreground">#15110F</color>
-    <color name="accent">#F2D15A</color>
-    <color name="accent_foreground">#15110F</color>
-    <color name="cinema_dark">#15110F</color>
-    <color name="cinema_card">#231C18</color>
+    <color name="secondary_foreground">#171311</color>
+    
+    <!-- Interactive Elements -->
+    <color name="ring">#CB2149</color>
+    <color name="accent">#F0D04D</color>
+    <color name="accent_foreground">#171311</color>
+    <color name="border">#403935</color>
+    <color name="input">#342F2C</color>
+    
+    <!-- Muted/Subtle Colors -->
+    <color name="muted">#3A3330</color>
+    <color name="muted_foreground">#B5AA9C</color>
+    
+    <!-- Functional Colors -->
+    <color name="destructive">#F23838</color>
+    <color name="destructive_foreground">#F5F1E8</color>
     <color name="spotlight_glow">#FFDB66</color>
-    <color name="muted">#352E29</color>
-    <color name="muted_foreground">#B5A593</color>
-    <color name="border">#3A322C</color>
-    <color name="input">#2E2720</color>
-    <color name="ring">#C72048</color>
-    <color name="destructive">#EA4335</color>
-    <color name="destructive_foreground">#F0EAE2</color>
-    <color name="popover">#231C18</color>
-    <color name="popover_foreground">#F0EAE2</color>
+    
+    <!-- Additional UI Elements -->
+    <color name="popover">#231F1C</color>
+    <color name="popover_foreground">#F5F1E8</color>
     <color name="purple_200">#FFBB86FC</color>
     <color name="purple_500">#FF6200EE</color>
     <color name="purple_700">#FF3700B3</color>

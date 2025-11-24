@@ -54,8 +54,7 @@ class MainActivity : ComponentActivity() {
             }
 
             MovieMiniTheme(
-                darkTheme = isDarkTheme,
-                dynamicColor = true
+                darkTheme = isDarkTheme
             ) {
                 val authViewModel: AuthViewModel = viewModel()
                 val isLoggedIn by authViewModel.isLoggedIn.collectAsState()
@@ -67,7 +66,7 @@ class MainActivity : ComponentActivity() {
                         mainViewModel = mainViewModel,
                         themeViewModel = themeViewModel,
                         notificationViewModel = notificationViewModel,
-                        languageViewModel = languageViewModel
+                        languageViewModel = languageViewModel,
                     )
                 } else {
                     LoginScreen()
