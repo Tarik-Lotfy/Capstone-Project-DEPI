@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -54,11 +55,21 @@ fun HomeScreen(
             }
 
             item {
-                SectionTitleWithSeeAll(" Popular")
+                SectionTitleWithSeeAll("Popular")
                 Spacer(Modifier.height(8.dp))
-                LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    items(5) {
-                        ShimmerMovieCard()
+            }
+            items((0..7).chunked(2)) { row ->
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    row.forEach { _ ->
+                        Box(modifier = Modifier.weight(1f)) {
+                            ShimmerMovieCard()
+                        }
+                    }
+                    if (row.size == 1) {
+                        Spacer(modifier = Modifier.weight(1f))
                     }
                 }
             }
@@ -110,14 +121,14 @@ fun HomeScreen(
                     Text(
                         text = "Now Playing",
                         style = MaterialTheme.typography.headlineMedium,
-                        color = MaterialTheme.colorScheme.primary
+                        color = MaterialTheme.colorScheme.onBackground
                     )
                     Spacer(Modifier.height(16.dp))
                     LazyRow(
                         horizontalArrangement = Arrangement.spacedBy(16.dp),
-                        contentPadding = PaddingValues(horizontal = 0.dp)
+                        contentPadding = PaddingValues(horizontal = 16.dp)
                     ) {
-                        items(nowPlaying) { movie ->
+                        items(nowPlaying.take(5)) { movie ->
                             FeaturedLargeCard(
                                 movie = movie,
                                 onMovieClick = { selectedMovie ->
@@ -129,39 +140,93 @@ fun HomeScreen(
                 }
 
                 item {
-                    SectionWithRow(
-                        title = " Popular",
-                        movies = popular,
-                        favorites = favorites,
-                        onMovieClick = { movie ->
-                            navController.navigate("movie/${movie.id}")
-                        },
-                        onFavoriteClick = { movie -> mainViewModel.toggleFavorite(movie) }
-                    )
+                    Column {
+                        Row(
+                            Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                "Popular",
+                                style = MaterialTheme.typography.headlineMedium,
+                                color = MaterialTheme.colorScheme.onBackground
+                            )
+                            TextButton(onClick = {}) {
+                                Text(
+                                    "See All",
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                            }
+                        }
+                        Spacer(Modifier.height(16.dp))
+                    }
+                }
+
+                itemsIndexed(popular.take(8).chunked(2)) { index, rowMovies ->
+                    if (index > 0) {
+                        Spacer(Modifier.height(12.dp))
+                    }
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        rowMovies.forEach { movie ->
+                            Box(modifier = Modifier.weight(1f)) {
+                                FeaturedCard(
+                                    movie = movie,
+                                    onMovieClick = { selectedMovie ->
+                                        navController.navigate("movie/${selectedMovie.id}")
+                                    }
+                                )
+                            }
+                        }
+                        // Add empty space if odd number of items
+                        if (rowMovies.size == 1) {
+                            Spacer(modifier = Modifier.weight(1f))
+                        }
+                    }
                 }
 
                 item {
-                    SectionWithRow(
-                        title = " Top Rated",
-                        movies = topRated,
-                        favorites = favorites,
-                        onMovieClick = { movie ->
-                            navController.navigate("movie/${movie.id}")
-                        },
-                        onFavoriteClick = { movie -> mainViewModel.toggleFavorite(movie) }
+                    Text(
+                        text = "Top Rated",
+                        style = MaterialTheme.typography.headlineMedium,
+                        color = MaterialTheme.colorScheme.onBackground
                     )
+                    Spacer(Modifier.height(16.dp))
+                    LazyRow(
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        items(topRated.take(8)) { movie ->
+                            MovieRowCard(
+                                movie = movie,
+                                onMovieClick = { selectedMovie ->
+                                    navController.navigate("movie/${selectedMovie.id}")
+                                }
+                            )
+                        }
+                    }
                 }
 
                 item {
-                    SectionWithRow(
-                        title = " Upcoming",
-                        movies = upcoming,
-                        favorites = favorites,
-                        onMovieClick = { movie ->
-                            navController.navigate("movie/${movie.id}")
-                        },
-                        onFavoriteClick =  { movie -> mainViewModel.toggleFavorite(movie) }
+                    Text(
+                        text = "Upcoming",
+                        style = MaterialTheme.typography.headlineMedium,
+                        color = MaterialTheme.colorScheme.onBackground
                     )
+                    Spacer(Modifier.height(16.dp))
+                    LazyRow(
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        items(upcoming.take(8)) { movie ->
+                            MovieRowCard(
+                                movie = movie,
+                                onMovieClick = { selectedMovie ->
+                                    navController.navigate("movie/${selectedMovie.id}")
+                                }
+                            )
+                        }
+                    }
                 }
             }
         }

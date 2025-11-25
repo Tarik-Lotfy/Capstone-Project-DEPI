@@ -65,35 +65,12 @@ fun MoviesApp(
 
     val tabs = listOf("Home", "Discover", "Profile")
     val icons = listOf(Icons.Default.Home, Icons.Default.Explore, Icons.Default.Person)
-
-    Box(modifier = Modifier.fillMaxSize()) {
-        Image(
-            painter = painterResource(id = R.drawable.backkkkk),
-            contentDescription = "Background",
-            contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxSize()
-        )
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    Brush.verticalGradient(
-                        colors = listOf(
-                            Color.Transparent,
-                            Color.Black.copy(alpha = 0.8f)
-                        ),
-                        startY = 0f,
-                        endY = Float.POSITIVE_INFINITY
-                    )
-                )
-        )
-
         Scaffold(
             topBar = {
                 CenterAlignedTopAppBar(
                     title = {
                         Text(
-                            "Movies Time",
+                            "CineVault",
                             fontWeight = FontWeight.Bold,
                             color = Color.White
                         )
@@ -101,15 +78,6 @@ fun MoviesApp(
                     colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
                         containerColor = Color.Transparent
                     ),
-                    actions = {
-                        IconButton(onClick = { navController.navigate("search") }) {
-                            Icon(
-                                Icons.Default.Search,
-                                contentDescription = "Search",
-                                tint = Color.White
-                            )
-                        }
-                    }
                 )
             },
             bottomBar = {
@@ -142,7 +110,12 @@ fun MoviesApp(
             },
             containerColor = Color.Transparent
         ) { padding ->
-            Box(Modifier.padding(padding)) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.background)
+                    .padding(padding)
+            ) {
                 NavHost(navController = navController, startDestination = "home") {
                     composable("home") {
                         HomeScreen(
@@ -186,5 +159,4 @@ fun MoviesApp(
                 }
             }
         }
-    }
 }
