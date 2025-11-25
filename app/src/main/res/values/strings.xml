@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Movies Time</string>
+    <string name="app_name">CineVault</string>
     <string name="home">Home</string>
     <string name="discover">Discover</string>
     <string name="profile">Profile</string>
@@ -33,22 +33,4 @@
     <string name="language">Language</string>
     <string name="language_arabic">العربية</string>
     <string name="language_english">English</string>
-
-    <!--
-      !! هام جداً !!
-      يجب استبدال "YOUR_WEB_CLIENT_ID" بالـ Web client ID الخاص بك من Firebase.
-      يمكنك العثور عليه في:
-      Firebase Console -> Project Settings -> General
-      ابحث عن "Web client ID" (عادة يكون تحت SHA certificates).
-    -->
-    <string name="default_web_client_id" translatable="false">YOUR_WEB_CLIENT_ID</string>
-
-    <!--
-       إعدادات فيسبوك (تمت إضافتها لإصلاح الخطأ في AndroidManifest)
-       إذا كان لديك حساب مطور فيسبوك، ضع الأرقام الحقيقية هنا.
-       إذا لم يكن لديك، اتركها كما هي لكي يعمل التطبيق (لكن تسجيل دخول فيسبوك سيفشل عند الضغط عليه).
-    -->
-    <string name="facebook_app_id" translatable="false">1234567890</string>
-    <string name="facebook_client_token" translatable="false">YOUR_CLIENT_TOKEN</string>
-    <string name="fb_login_protocol_scheme" translatable="false">fb1234567890</string>
 </resources>
