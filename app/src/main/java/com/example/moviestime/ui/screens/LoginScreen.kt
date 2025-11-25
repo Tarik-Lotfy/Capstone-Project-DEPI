@@ -43,6 +43,7 @@ import com.example.moviestime.ui.components.login.NeonTextField
 import com.example.moviestime.viewmodel.AuthViewModel
 
 @Composable
+
 fun LoginScreen(
     authViewModel: AuthViewModel = viewModel()
 ) {
