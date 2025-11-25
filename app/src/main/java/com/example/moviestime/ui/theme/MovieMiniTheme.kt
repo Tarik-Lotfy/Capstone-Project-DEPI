@@ -50,16 +50,16 @@ private val AppTypography = Typography(
     ),
     headlineMedium = TextStyle(
         fontFamily = PlayFair,
-        fontWeight = FontWeight.SemiBold,
+        fontWeight = FontWeight.Normal,
         fontSize = 28.sp,
         lineHeight = 36.sp,
         letterSpacing = 0.sp
     ),
     headlineSmall = TextStyle(
         fontFamily = PlayFair,
-        fontWeight = FontWeight.SemiBold,
-        fontSize = 24.sp,
-        lineHeight = 32.sp,
+        fontWeight = FontWeight.Normal,
+        fontSize = 18.sp,
+        lineHeight = 24.sp,
         letterSpacing = 0.sp
     ),
     // Title styles - PlayFair for headings
