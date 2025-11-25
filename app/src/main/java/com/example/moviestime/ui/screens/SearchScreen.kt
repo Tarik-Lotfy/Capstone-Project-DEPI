@@ -1,5 +1,6 @@
 package com.example.moviestime.ui.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -36,39 +37,58 @@ fun SearchScreen(
     onMovieClick: (Movie) -> Unit = {},
     onFavoriteClick: (Movie) -> Unit = {}
 ) {
+    val accentYellow = Color(0xFFF1C40F)
 
     val query by searchViewModel.searchQuery.collectAsState()
     val results by searchViewModel.searchResults.collectAsState()
     val isLoading by searchViewModel.isLoading.collectAsState()
 
+    val isInitialState = query.isEmpty()
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .padding(horizontal = 16.dp, vertical = 20.dp)
     ) {
-        OutlinedTextField(
+        Text(
+            text = "Search Films & Series",
+            fontSize = 24.sp,
+            fontWeight = FontWeight.ExtraBold,
+            color = Color.White,
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
+
+        TextField(
             value = query,
             onValueChange = { searchViewModel.onSearchQueryChanged(it) },
             leadingIcon = {
-                Icon(Icons.Default.Search, contentDescription = "Search", tint = Color.White.copy(alpha = 0.7f))
+                Icon(
+                    Icons.Default.Search,
+                    contentDescription = "Search",
+                    tint = Color.White.copy(0.7f)
+                )
             },
             placeholder = {
-                Text("Search for movies...", color = Color.White.copy(alpha = 0.5f))
+                Text(
+                    "Search by title, director, year...",
+                    color = Color.White.copy(alpha = 0.5f)
+                )
             },
             modifier = Modifier.fillMaxWidth(),
+            singleLine = true,
             colors = TextFieldDefaults.colors(
-                focusedContainerColor = Color.Black.copy(alpha = 0.4f),
-                unfocusedContainerColor = Color.Black.copy(alpha = 0.4f),
+                focusedContainerColor = Color.White.copy(alpha = 0.1f),
+                unfocusedContainerColor = Color.White.copy(alpha = 0.08f),
+                cursorColor = accentYellow,
+                focusedIndicatorColor = accentYellow,
+                unfocusedIndicatorColor = Color.Transparent,
                 focusedTextColor = Color.White,
-                unfocusedTextColor = Color.White,
-                cursorColor = MaterialTheme.colorScheme.primary,
-                focusedIndicatorColor = MaterialTheme.colorScheme.primary,
-                unfocusedIndicatorColor = Color.White.copy(alpha = 0.3f)
+                unfocusedTextColor = Color.White
             ),
-            shape = RoundedCornerShape(16.dp)
+            shape = RoundedCornerShape(12.dp)
         )
 
-        Spacer(Modifier.height(16.dp))
+        Spacer(Modifier.height(24.dp))
 
         if (isLoading) {
             LazyVerticalGrid(
@@ -82,52 +102,74 @@ fun SearchScreen(
                 }
             }
         } else {
-            if (query.length in 1..1) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        "Type at least 2 characters to search",
-                        color = Color.White.copy(alpha = 0.7f),
-                        fontSize = 16.sp
-                    )
+            when {
+                isInitialState -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        EmptyState(
+                            title = "Start Searching",
+                            subtitle = "Find millions of films and series easily.",
+                            icon = {
+                                Icon(
+                                    Icons.Default.Search,
+                                    contentDescription = "Search Tip",
+                                    tint = Color.White.copy(alpha = 0.3f),
+                                    modifier = Modifier.size(64.dp)
+                                )
+                            }
+                        )
+                    }
                 }
-            }
-            else if (results.isEmpty() && query.length >= 2) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    EmptyState(
-                        title = "No results found for \"$query\"",
-                        subtitle = "Try different keywords or check spelling",
-                        icon = {
-                            Icon(
-                                Icons.Default.Search,
-                                contentDescription = "No results",
-                                tint = Color.White.copy(alpha = 0.5f),
-                                modifier = Modifier.size(64.dp)
+                query.length == 1 -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            "Type at least 2 characters to search",
+                            color = Color.White.copy(alpha = 0.5f),
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+                }
+                results.isEmpty() && query.length >= 2 -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        EmptyState(
+                            title = "No results found for \"$query\"",
+                            subtitle = "Try different keywords or check spelling",
+                            icon = {
+                                Icon(
+                                    Icons.Default.Search,
+                                    contentDescription = "No results",
+                                    tint = Color.White.copy(alpha = 0.3f),
+                                    modifier = Modifier.size(64.dp)
+                                )
+                            }
+                        )
+                    }
+                }
+                results.isNotEmpty() -> {
+                    LazyVerticalGrid(
+                        columns = GridCells.Adaptive(160.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp),
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        items(results, key = { it.id }) { movie ->
+                            MovieGridItem(
+                                movie = movie,
+                                onClick = {
+                                    navController.navigate("movie/${movie.id}")
+                                },
+                                onFavoriteClick = { onFavoriteClick(movie) }
                             )
                         }
-                    )
-                }
-            }
-            else if (results.isNotEmpty()) {
-                LazyVerticalGrid(
-                    columns = GridCells.Adaptive(160.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp),
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    items(results) { movie ->
-                        MovieGridItem(
-                            movie = movie,
-                            onClick = {
-                                navController.navigate("movie/${movie.id}")
-                            },
-                            onFavoriteClick = { onFavoriteClick(movie) }
-                        )
                     }
                 }
             }
@@ -141,12 +183,21 @@ fun MovieGridItem(
     onClick: () -> Unit = {},
     onFavoriteClick: () -> Unit = {}
 ) {
+    val imageCornerRadius = 10.dp
+
+    val favoriteIconBackground = Color.Black.copy(alpha = 0.5f)
+
     Column(
         modifier = Modifier
             .width(160.dp)
             .clickable { onClick() }
     ) {
-        Box {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(imageCornerRadius))
+                .background(Color.White.copy(alpha = 0.05f))
+        ) {
             AsyncImage(
                 model = movie.posterPath ?: "https://via.placeholder.com/300x450",
                 contentDescription = movie.title,
@@ -154,7 +205,7 @@ fun MovieGridItem(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(240.dp)
-                    .clip(RoundedCornerShape(16.dp)),
+                    .clip(RoundedCornerShape(imageCornerRadius)),
                 placeholder = painterResource(R.drawable.ic_launcher_foreground),
                 error = painterResource(R.drawable.ic_launcher_foreground)
             )
@@ -164,11 +215,15 @@ fun MovieGridItem(
                 modifier = Modifier
                     .align(Alignment.TopEnd)
                     .padding(8.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(favoriteIconBackground)
+                    .size(32.dp)
             ) {
                 Icon(
                     Icons.Default.Favorite,
                     contentDescription = "Favorite",
-                    tint = Color.Red
+                    tint = Color.Red,
+                    modifier = Modifier.size(18.dp)
                 )
             }
         }
@@ -177,17 +232,18 @@ fun MovieGridItem(
 
         Text(
             text = movie.title,
-            maxLines = 2,
+            maxLines = 1,
             overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
             color = Color.White,
-            fontWeight = FontWeight.SemiBold,
-            fontSize = 14.sp
+            fontWeight = FontWeight.Bold,
+            fontSize = 15.sp
         )
 
         Text(
             text = movie.year,
-            color = Color.White.copy(alpha = 0.7f),
-            fontSize = 12.sp
+            color = Color.White.copy(alpha = 0.6f),
+            fontSize = 12.sp,
+            fontWeight = FontWeight.Normal
         )
     }
 }
