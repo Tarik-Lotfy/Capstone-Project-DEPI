@@ -65,21 +65,49 @@ fun MoviesApp(
             NavigationBar(containerColor = Color.Black.copy(alpha = 0.7f)) {
                 tabs.forEachIndexed { index, title ->
                     NavigationBarItem(
-                        icon = { Icon(icons[index], contentDescription = title, tint = if (selectedTab.selectedTab == index) MaterialTheme.colorScheme.primary else Color.White.copy(alpha = 0.7f)) },
-                        label = { Text(title, color = if (selectedTab.selectedTab == index) MaterialTheme.colorScheme.primary else Color.White.copy(alpha = 0.7f)) },
+                        icon = {
+                            Icon(
+                                icons[index],
+                                contentDescription = title,
+                                tint = if (selectedTab.selectedTab == index) MaterialTheme.colorScheme.primary else Color.White.copy(
+                                    alpha = 0.7f
+                                )
+                            )
+                        },
+                        label = {
+                            Text(
+                                title,
+                                color = if (selectedTab.selectedTab == index) MaterialTheme.colorScheme.primary else Color.White.copy(
+                                    alpha = 0.7f
+                                )
+                            )
+                        },
                         selected = selectedTab.selectedTab == index,
                         onClick = { mainViewModel.selectTab(index) },
-                        colors = NavigationBarItemDefaults.colors(indicatorColor = Color.White.copy(alpha = 0.2f))
+                        colors = NavigationBarItemDefaults.colors(
+                            indicatorColor = Color.White.copy(
+                                alpha = 0.2f
+                            )
+                        )
                     )
                 }
             }
         },
         containerColor = Color.Transparent
     ) { padding ->
-        Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background).padding(padding)) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+                .padding(padding)
+        ) {
             NavHost(navController = navController, startDestination = "home") {
                 composable("home") {
-                    HomeScreen(navController = navController, homeViewModel = viewModel(), mainViewModel = mainViewModel)
+                    HomeScreen(
+                        navController = navController,
+                        homeViewModel = viewModel(),
+                        mainViewModel = mainViewModel
+                    )
                 }
                 composable("discover") {
                     DiscoverScreen(navController = navController, searchViewModel = viewModel())

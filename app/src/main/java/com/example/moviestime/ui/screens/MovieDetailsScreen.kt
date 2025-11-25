@@ -33,7 +33,7 @@ import com.example.moviestime.R
 import com.example.moviestime.data.model.Movie
 import com.example.moviestime.ui.theme.Inter
 import com.example.moviestime.ui.theme.PlayFair
- import com.example.moviestime.viewmodel.MainViewModel
+import com.example.moviestime.viewmodel.MainViewModel
 import com.example.moviestime.viewmodel.MovieDetailsViewModel
 
 @SuppressLint("MissingPermission")
