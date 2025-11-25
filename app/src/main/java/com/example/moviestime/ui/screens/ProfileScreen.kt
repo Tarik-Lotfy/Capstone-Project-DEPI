@@ -42,7 +42,6 @@ fun ProfileScreen(
     languageViewModel: LanguageViewModel = viewModel(),
     onMovieClick: (Int) -> Unit
 ) {
-
     val watchlist by mainViewModel.favorites.collectAsState()
 
     val backgroundColor = colorResource(R.color.background)
@@ -62,7 +61,7 @@ fun ProfileScreen(
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-         Box(
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 12.dp, bottom = 24.dp)
@@ -82,7 +81,7 @@ fun ProfileScreen(
                     .size(44.dp)
                     .clip(RoundedCornerShape(12.dp))
                     .border(2.dp, primaryColor, RoundedCornerShape(12.dp))
-                    .clickable {   },
+                    .clickable { /* Settings */ },
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
@@ -94,7 +93,7 @@ fun ProfileScreen(
             }
         }
 
-         Box(
+        Box(
             modifier = Modifier
                 .size(100.dp)
                 .border(2.dp, goldColor, CircleShape)
@@ -133,7 +132,7 @@ fun ProfileScreen(
 
         Spacer(Modifier.height(24.dp))
 
-         Row(
+        Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
@@ -144,7 +143,7 @@ fun ProfileScreen(
 
         Spacer(Modifier.height(24.dp))
 
-         OutlinedButton(
+        OutlinedButton(
             onClick = {   },
             modifier = Modifier
                 .fillMaxWidth()
@@ -165,7 +164,7 @@ fun ProfileScreen(
 
         Spacer(Modifier.height(24.dp))
 
-         Container(color = cardColor, shape = RoundedCornerShape(12.dp)) {
+        Container(color = cardColor, shape = RoundedCornerShape(12.dp)) {
             Row(modifier = Modifier.fillMaxWidth()) {
                 tabs.forEachIndexed { index, title ->
                     val isSelected = selectedTabIndex == index
@@ -194,7 +193,7 @@ fun ProfileScreen(
 
         Spacer(Modifier.height(20.dp))
 
-         if (selectedTabIndex == 1) {
+        if (selectedTabIndex == 1) {
             if (watchlist.isEmpty()) {
                 EmptyTabState(
                     message = "Your watchlist is empty",

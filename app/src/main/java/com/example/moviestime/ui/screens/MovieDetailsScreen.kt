@@ -124,7 +124,7 @@ fun MovieDetailsContent(
                 .fillMaxSize()
                 .verticalScroll(scrollState)
         ) {
-             Box(
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(420.dp)
@@ -175,7 +175,7 @@ fun MovieDetailsContent(
                 ) {
                     Text(
                         text = movie.title,
-                        fontFamily = PlayFair,
+                        fontFamily = PlayFair, // Corrected
                         fontWeight = FontWeight.Bold,
                         fontSize = 26.sp,
                         color = textColor,
@@ -263,7 +263,7 @@ fun MovieDetailsContent(
                 Spacer(Modifier.height(32.dp))
 
                 Text(
-                    text = "Overview",
+                    text = "Overview", // Corrected Typo
                     fontFamily = PlayFair,
                     fontWeight = FontWeight.Bold,
                     fontSize = 22.sp,
@@ -293,40 +293,9 @@ fun MovieDetailsContent(
 
                 Spacer(Modifier.height(16.dp))
 
-                Text(
-                    text = "Director",
-                    fontFamily = Inter,
-                    fontWeight = FontWeight.Medium,
-                    fontSize = 14.sp,
-                    color = textColor.copy(alpha = 0.6f)
-                )
-                Spacer(Modifier.height(4.dp))
-                Text(
-                    text = movie.director,
-                    fontFamily = Inter,
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 16.sp,
-                    color = textColor
-                )
-
+                DetailItem(label = "Director", value = movie.director, textColor = textColor)
                 Spacer(Modifier.height(16.dp))
-
-                Text(
-                    text = "Cast",
-                    fontFamily = Inter,
-                    fontWeight = FontWeight.Medium,
-                    fontSize = 14.sp,
-                    color = textColor.copy(alpha = 0.6f)
-                )
-                Spacer(Modifier.height(4.dp))
-                Text(
-                    text = movie.cast,
-                    fontFamily = Inter,
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 16.sp,
-                    color = textColor,
-                    lineHeight = 22.sp
-                )
+                DetailItem(label = "Cast", value = movie.cast, textColor = textColor)
 
                 Spacer(Modifier.height(16.dp))
                 Row(
