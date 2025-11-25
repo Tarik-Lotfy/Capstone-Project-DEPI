@@ -37,6 +37,7 @@ fun SearchScreen(
     onMovieClick: (Movie) -> Unit = {},
     onFavoriteClick: (Movie) -> Unit = {}
 ) {
+
     val accentYellow = Color(0xFFF1C40F)
 
     val query by searchViewModel.searchQuery.collectAsState()
