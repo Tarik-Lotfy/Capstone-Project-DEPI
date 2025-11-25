@@ -3,6 +3,7 @@ package com.example.moviestime.ui.screens
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -27,15 +28,22 @@ import com.example.moviestime.data.remote.Genre
 import com.example.moviestime.viewmodel.SearchViewModel
 
 @Composable
+fun ShimmerMovieGrid() {
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
         verticalArrangement = Arrangement.spacedBy(16.dp),
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        modifier = Modifier.fillMaxSize()
+    ) {
         items(6) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .height(250.dp)
+                    .clip(RoundedCornerShape(8.dp))
                     .background(Color.Gray.copy(alpha = 0.3f))
             )
+        }
     }
 }
 
@@ -49,65 +57,55 @@ fun DiscoverScreen(
     val results by searchViewModel.searchResults.collectAsState()
     val genresApi by searchViewModel.genres.collectAsState()
     val selectedGenreId by searchViewModel.selectedGenreId.collectAsState()
+    val isLoading by searchViewModel.isLoading.collectAsState()
+
+    val isSearchTyping = query.isNotEmpty()
     val isSearching = query.length >= 2
 
-    LazyColumn(
+    val isRecommended = selectedGenreId == null && !isSearching
+    val isGenreSelected = selectedGenreId != null && !isSearching
+
     val genresWithRecommended = remember(genresApi) {
         listOf(Genre(id = 0, name = "Recommended")) + genresApi
     }
 
     val currentResultsTitle = when {
+        isSearching -> "Search Results"
         isRecommended -> "Recommended Movies"
         isGenreSelected -> genresApi.find { it.id == selectedGenreId }?.name + " Movies"
         else -> "Discover"
+    }
+
+    val accentYellow = Color(0xFFF1C40F)
+    val accentBurgundy = Color(0xFF6A0F1C)
+
+
+    Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(20.dp)
+            .padding(horizontal = 16.dp)
     ) {
-        item {
+        Spacer(Modifier.height(20.dp))
+
+        Row(
             modifier = Modifier.fillMaxWidth().height(48.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
             Text(
-                "Discover Movies",
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
                 text = if (isSearchTyping) "Searching..." else "Discover",
                 fontSize = 28.sp,
+                fontWeight = FontWeight.ExtraBold,
                 color = Color.White
             )
-            OutlinedTextField(
-                value = query,
-                onValueChange = { searchViewModel.onSearchQueryChanged(it) },
-                    Icon(Icons.Default.Search, contentDescription = "Search", tint = Color.White.copy(alpha = 0.7f))
-                },
-                    Text("Search movies, series, genres...", color = Color.White.copy(alpha = 0.5f))
-                },
-                modifier = Modifier.fillMaxWidth(),
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = Color.Black.copy(alpha = 0.4f),
-                    unfocusedContainerColor = Color.Black.copy(alpha = 0.4f),
-                    unfocusedTextColor = Color.White,
-                    cursorColor = MaterialTheme.colorScheme.primary,
-                    focusedIndicatorColor = MaterialTheme.colorScheme.primary,
-                    unfocusedIndicatorColor = Color.White.copy(alpha = 0.3f)
-                ),
-                shape = RoundedCornerShape(16.dp)
-        if (results.isNotEmpty()) {
-            item {
-                Column {
-                    Text(
             if (!isSearchTyping) {
+                IconButton(onClick = {}) {
                     Icon(
                         Icons.Default.FilterList,
                         contentDescription = "Filter",
                         tint = accentYellow,
                         modifier = Modifier.size(28.dp)
                     )
-
-                        modifier = Modifier.height(300.dp)
-                    ) {
-                        items(results) { movie ->
-                                onClick = {
                 }
             }
         }
@@ -116,18 +114,28 @@ fun DiscoverScreen(
 
         TextField(
             value = query,
+            onValueChange = { searchViewModel.onSearchQueryChanged(it) },
+            leadingIcon = {
                 Icon(
+                    Icons.Default.Search,
+                    contentDescription = "Search",
+                    tint = Color.White.copy(0.7f)
                 )
             },
             placeholder = {
                 Text(
+                    "Search for films, series, genres...",
+                    color = Color.White.copy(alpha = 0.5f),
                     fontSize = 16.sp
+                )
+            },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
             colors = TextFieldDefaults.colors(
                 focusedContainerColor = Color.White.copy(alpha = 0.1f),
                 unfocusedContainerColor = Color.White.copy(alpha = 0.08f),
                 cursorColor = accentYellow,
+                focusedIndicatorColor = accentYellow,
                 unfocusedIndicatorColor = Color.Transparent,
                 focusedTextColor = Color.White,
                 unfocusedTextColor = Color.White
