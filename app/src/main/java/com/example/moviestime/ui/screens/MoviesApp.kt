@@ -1,6 +1,8 @@
 // ui/screens/MoviesApp.kt
 package com.example.moviestime.ui.screens
 
+import android.Manifest
+import androidx.annotation.RequiresPermission
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -34,7 +36,7 @@ import com.example.moviestime.viewmodel.NotificationViewModel
 import com.example.moviestime.viewmodel.LanguageViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
-@androidx.annotation.RequiresPermission(android.Manifest.permission.POST_NOTIFICATIONS)
+@RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
 @Composable
 fun MoviesApp(
     mainViewModel: MainViewModel,
@@ -134,7 +136,10 @@ fun MoviesApp(
                         ProfileScreen(
                             mainViewModel = mainViewModel,
                             themeViewModel = themeViewModel,
-                            languageViewModel = languageViewModel
+                            languageViewModel = languageViewModel,
+                            onMovieClick = { movieId ->
+                                navController.navigate("movie/$movieId")
+                            }
                         )
                     }
                     composable("search") {

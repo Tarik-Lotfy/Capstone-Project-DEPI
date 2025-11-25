@@ -8,7 +8,7 @@ data class MovieResponse(
     val total_pages: Int,
     val total_results: Int
 )
-// movieDto
+
 data class MovieDto(
     val id: Int,
     val title: String,
@@ -16,6 +16,7 @@ data class MovieDto(
     val overview: String,
     val vote_average: Double,
     val poster_path: String?,
+    val backdrop_path: String?, // أضفنا هذا
     val genre_ids: List<Int> = emptyList(),
     val runtime: Int? = null
 )
@@ -24,10 +25,14 @@ fun MovieDto.toMovie(): Movie {
     return Movie(
         id = id,
         title = title,
-        year = release_date.takeIf { it.isNotEmpty() }?.split("-")?.getOrNull(0) ?: "N/A",
-        genre = "", // هنضيف الأنواع لاحقًا
+        year = release_date.takeIf { !it.isNullOrEmpty() }?.split("-")?.getOrNull(0) ?: "N/A",
+        genre = "", // سيتم تحديث الأنواع لاحقًا أو تجاهلها في القوائم البسيطة
         rating = vote_average.toFloat(),
         duration = runtime ?: 0,
-        posterPath = poster_path?.let { "https://image.tmdb.org/t/p/w500$it" } // ← بدون مسافات!
+        posterPath = poster_path?.let { "https://image.tmdb.org/t/p/w500$it" },
+        backdropPath = backdrop_path?.let { "https://image.tmdb.org/t/p/w780$it" },
+        overview = overview,
+        director = "",
+        cast = ""
     )
 }

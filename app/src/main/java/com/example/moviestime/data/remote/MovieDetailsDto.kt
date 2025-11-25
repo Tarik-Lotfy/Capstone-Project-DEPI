@@ -3,11 +3,12 @@ package com.example.moviestime.data.remote
 import com.example.moviestime.data.model.Movie
 
 data class MovieDetailsDto(
-    val id: Int,
+     val id: Int,
     val title: String,
-    val release_date: String,
-    val overview: String,
+    val release_date: String?,
+    val overview: String?,
     val vote_average: Double,
+    // ---------------------------
     val runtime: Int?,
     val poster_path: String?,
     val backdrop_path: String?,
@@ -19,14 +20,18 @@ data class GenreDto(
     val name: String
 )
 
-fun MovieDetailsDto.toMovie(): Movie {
+fun MovieDetailsDto.toMovie( ): Movie {
     return Movie(
         id = id,
         title = title,
-        year = release_date.takeIf { it.isNotEmpty() }?.split("-")?.getOrNull(0) ?: "N/A",
-        genre = genres.joinToString(", ") { it.name },
+         year = release_date?.takeIf { it.isNotEmpty() }?.split("-")?.getOrNull(0) ?: "N/A",
+        genre = genres.firstOrNull()?.name ?: "",
         rating = vote_average.toFloat(),
         duration = runtime ?: 0,
-        posterPath = poster_path?.let { "https://image.tmdb.org/t/p/w500$it" }
+        posterPath = poster_path?.let { "https://image.tmdb.org/t/p/w500$it" },
+        backdropPath = backdrop_path?.let { "https://image.tmdb.org/t/p/w1280$it" },
+         overview = overview ?: "",
+        director = "",
+        cast = ""
     )
 }
