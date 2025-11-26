@@ -96,113 +96,113 @@ fun LoginScreen(
                     modifier = Modifier
                         .fillMaxWidth(0.87f)
                 ) {
-                        Text(
-                            text = heroTitle,
-                            style = heroStyle,
-                            color = LoginOnSurfaceColor,
-                            modifier = Modifier.padding(bottom = 8.dp)
-                        )
+                    Text(
+                        text = heroTitle,
+                        style = heroStyle,
+                        color = LoginOnSurfaceColor,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
 
-                        Text(
-                            text = heroSubtitle,
-                            style = subtitleStyle,
-                            color = LoginOnSurfaceColor.copy(alpha = 0.7f),
-                            modifier = Modifier.padding(bottom = 24.dp)
-                        )
+                    Text(
+                        text = heroSubtitle,
+                        style = subtitleStyle,
+                        color = LoginOnSurfaceColor.copy(alpha = 0.7f),
+                        modifier = Modifier.padding(bottom = 24.dp)
+                    )
 
-                        if (isRegisterMode) {
-                            NeonTextField(
-                                value = name,
-                                onValueChange = { name = it },
-                                label = "Full Name",
-                                icon = Icons.Default.Person,
-                                modifier = Modifier.fillMaxWidth()
-                            )
-                            Spacer(Modifier.height(16.dp))
-                        }
-
+                    if (isRegisterMode) {
                         NeonTextField(
-                            value = email,
-                            onValueChange = { email = it },
-                            label = "Email",
-                            icon = Icons.Default.Email,
-                            keyboardType = KeyboardType.Email,
+                            value = name,
+                            onValueChange = { name = it },
+                            label = "Full Name",
+                            icon = Icons.Default.Person,
                             modifier = Modifier.fillMaxWidth()
                         )
-
                         Spacer(Modifier.height(16.dp))
-
-                        NeonTextField(
-                            value = password,
-                            onValueChange = { password = it },
-                            label = "Password",
-                            icon = Icons.Default.Lock,
-                            keyboardType = KeyboardType.Password,
-                            isPassword = true,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-
-                        if (uiState.error != null) {
-                            Spacer(Modifier.height(10.dp))
-                            Text(
-                                text = uiState.error!!,
-                                color = colorScheme.error,
-                                style = MaterialTheme.typography.bodySmall,
-                                modifier = Modifier.fillMaxWidth()
-                            )
-                        }
-
-                        Spacer(Modifier.height(26.dp))
-
-                        if (uiState.isLoading) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(40.dp),
-                                color = LoginAccentColor
-                            )
-                        } else {
-                            Button(
-                                onClick = {
-                                    if (isRegisterMode) authViewModel.register(
-                                        email,
-                                        password,
-                                        name
-                                    )
-                                    else authViewModel.login(email, password)
-                                },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(56.dp),
-                                shape = MaterialTheme.shapes.large,
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = LoginAccentColor,
-                                    contentColor = LoginOnAccentColor
-                                ),
-                                elevation = ButtonDefaults.buttonElevation(10.dp)
-                            ) {
-                                Text(
-                                    text = if (isRegisterMode) "Sign Up" else "Login",
-                                    color = LoginOnAccentColor,
-                                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
-                                )
-                            }
-                        }
-
-                        Spacer(Modifier.height(16.dp))
-
-                        TextButton(onClick = { isRegisterMode = !isRegisterMode }) {
-                            Text(
-                                text = if (isRegisterMode) "Already have an account? Login" else "No account? Register",
-                                color = LoginAccentColor,
-                                style = MaterialTheme.typography.bodyMedium
-                            )
-                        }
-
-                        Spacer(Modifier.height(8.dp))
                     }
+
+                    NeonTextField(
+                        value = email,
+                        onValueChange = { email = it },
+                        label = "Email",
+                        icon = Icons.Default.Email,
+                        keyboardType = KeyboardType.Email,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    Spacer(Modifier.height(16.dp))
+
+                    NeonTextField(
+                        value = password,
+                        onValueChange = { password = it },
+                        label = "Password",
+                        icon = Icons.Default.Lock,
+                        keyboardType = KeyboardType.Password,
+                        isPassword = true,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    if (uiState.error != null) {
+                        Spacer(Modifier.height(10.dp))
+                        Text(
+                            text = uiState.error!!,
+                            color = colorScheme.error,
+                            style = MaterialTheme.typography.bodySmall,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+
+                    Spacer(Modifier.height(26.dp))
+
+                    if (uiState.isLoading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(40.dp),
+                            color = LoginAccentColor
+                        )
+                    } else {
+                        Button(
+                            onClick = {
+                                if (isRegisterMode) authViewModel.register(
+                                    email,
+                                    password,
+                                    name
+                                )
+                                else authViewModel.login(email, password)
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(56.dp),
+                            shape = MaterialTheme.shapes.large,
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = LoginAccentColor,
+                                contentColor = LoginOnAccentColor
+                            ),
+                            elevation = ButtonDefaults.buttonElevation(10.dp)
+                        ) {
+                            Text(
+                                text = if (isRegisterMode) "Sign Up" else "Login",
+                                color = LoginOnAccentColor,
+                                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+                            )
+                        }
+                    }
+
+                    Spacer(Modifier.height(16.dp))
+
+                    TextButton(onClick = { isRegisterMode = !isRegisterMode }) {
+                        Text(
+                            text = if (isRegisterMode) "Already have an account? Login" else "No account? Register",
+                            color = LoginAccentColor,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+
+                    Spacer(Modifier.height(8.dp))
                 }
             }
         }
     }
+}
 
 @Composable
 private fun LoginBranding() {
@@ -257,4 +257,3 @@ private fun LoginBranding() {
         )
     }
 }
-

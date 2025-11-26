@@ -34,6 +34,7 @@ import com.example.moviestime.viewmodel.MainViewModel
 import com.example.moviestime.viewmodel.ThemeViewModel
 import com.example.moviestime.viewmodel.NotificationViewModel
 import com.example.moviestime.viewmodel.LanguageViewModel
+import com.example.moviestime.viewmodel.AuthViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
@@ -42,7 +43,8 @@ fun MoviesApp(
     mainViewModel: MainViewModel,
     themeViewModel: ThemeViewModel,
     notificationViewModel: NotificationViewModel,
-    languageViewModel: LanguageViewModel
+    languageViewModel: LanguageViewModel,
+    authViewModel: AuthViewModel = viewModel() // Added AuthViewModel
 ) {
     val navController = rememberNavController()
 
@@ -67,101 +69,121 @@ fun MoviesApp(
 
     val tabs = listOf("Home", "Discover", "Profile")
     val icons = listOf(Icons.Default.Home, Icons.Default.Explore, Icons.Default.Person)
-        Scaffold(
-            topBar = {
-                CenterAlignedTopAppBar(
-                    title = {
-                        Text(
-                            "CineVault",
-                            fontWeight = FontWeight.Bold,
-                            color = Color.White
-                        )
-                    },
-                    colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                        containerColor = Color.Transparent
-                    ),
-                )
-            },
-            bottomBar = {
-                NavigationBar(
-                    containerColor = Color.Black.copy(alpha = 0.7f)
-                ) {
-                    tabs.forEachIndexed { index, title ->
-                        NavigationBarItem(
-                            icon = {
-                                Icon(
-                                    icons[index],
-                                    contentDescription = title,
-                                    tint = if (selectedTab.selectedTab == index) MaterialTheme.colorScheme.primary else Color.White.copy(alpha = 0.7f)
-                                )
-                            },
-                            label = {
-                                Text(
-                                    title,
-                                    color = if (selectedTab.selectedTab == index) MaterialTheme.colorScheme.primary else Color.White.copy(alpha = 0.7f)
-                                )
-                            },
-                            selected = selectedTab.selectedTab == index,
-                            onClick = { mainViewModel.selectTab(index) },
-                            colors = NavigationBarItemDefaults.colors(
-                                indicatorColor = Color.White.copy(alpha = 0.2f)
-                            )
-                        )
-                    }
-                }
-            },
-            containerColor = Color.Transparent
-        ) { padding ->
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.background)
-                    .padding(padding)
+    Scaffold(
+        topBar = {
+            // Hide TopBar on Settings screen if desired, or keep it consistent
+            // Currently, it shows everywhere inside this Scaffold
+            CenterAlignedTopAppBar(
+                title = {
+                    Text(
+                        "CineVault",
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
+                    )
+                },
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = Color.Transparent
+                ),
+            )
+        },
+        bottomBar = {
+            // Check current route to optionally hide bottom bar on Settings
+            // For now, keeping it simple as per original structure
+            NavigationBar(
+                containerColor = Color.Black.copy(alpha = 0.7f)
             ) {
-                NavHost(navController = navController, startDestination = "home") {
-                    composable("home") {
-                        HomeScreen(
-                            navController = navController,
-                            homeViewModel = viewModel(),
-                            mainViewModel = mainViewModel
+                tabs.forEachIndexed { index, title ->
+                    NavigationBarItem(
+                        icon = {
+                            Icon(
+                                icons[index],
+                                contentDescription = title,
+                                tint = if (selectedTab.selectedTab == index) MaterialTheme.colorScheme.primary else Color.White.copy(alpha = 0.7f)
+                            )
+                        },
+                        label = {
+                            Text(
+                                title,
+                                color = if (selectedTab.selectedTab == index) MaterialTheme.colorScheme.primary else Color.White.copy(alpha = 0.7f)
+                            )
+                        },
+                        selected = selectedTab.selectedTab == index,
+                        onClick = { mainViewModel.selectTab(index) },
+                        colors = NavigationBarItemDefaults.colors(
+                            indicatorColor = Color.White.copy(alpha = 0.2f)
                         )
-                    }
-                    composable("discover") {
-                        DiscoverScreen(
-                            navController = navController,
-                            searchViewModel = viewModel()
-                        )
-                    }
-                    composable("profile") {
-                        ProfileScreen(
-                            mainViewModel = mainViewModel,
-                            themeViewModel = themeViewModel,
-                            languageViewModel = languageViewModel,
-                            onMovieClick = { movieId ->
-                                navController.navigate("movie/$movieId")
-                            }
-                        )
-                    }
-                    composable("search") {
-                        SearchScreen(
-                            navController = navController,
-                            searchViewModel = viewModel()
-                        )
-                    }
-                    composable("movie/{movieId}") { backStackEntry ->
-                        val movieId = backStackEntry.arguments?.getString("movieId")?.toInt() ?: 1
-                        MovieDetailsScreen(
-                            movieId = movieId,
-                            mainViewModel = mainViewModel,
-                            onBack = { navController.popBackStack() },
-                            onPlayClick = { movie ->
-                                navController.navigate("video/${movie.id}")
-                            },
-                            onShareClick = { movie ->
-                            }
-                        )
-                    }
+                    )
+                }
+            }
+        },
+        containerColor = Color.Transparent
+    ) { padding ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+                .padding(padding)
+        ) {
+            NavHost(navController = navController, startDestination = "home") {
+                composable("home") {
+                    HomeScreen(
+                        navController = navController,
+                        homeViewModel = viewModel(),
+                        mainViewModel = mainViewModel
+                    )
+                }
+                composable("discover") {
+                    DiscoverScreen(
+                        navController = navController,
+                        searchViewModel = viewModel()
+                    )
+                }
+                composable("profile") {
+                    ProfileScreen(
+                        mainViewModel = mainViewModel,
+                        themeViewModel = themeViewModel,
+                        languageViewModel = languageViewModel,
+                        onMovieClick = { movieId ->
+                            navController.navigate("movie/$movieId")
+                        },
+                        onSettingsClick = {
+                            // This triggered the crash before because "settings" route didn't exist
+                            navController.navigate("settings")
+                        }
+                    )
+                }
+                // --- ADDED SETTINGS ROUTE HERE ---
+                composable("settings") {
+                    SettingsScreen(
+                        onBack = { navController.popBackStack() },
+                        onSignOut = {
+                            authViewModel.logout()
+                            // Assuming your MainActivity observes isLoggedIn and switches
+                            // to LoginScreen automatically when this happens.
+                        }
+                    )
+                }
+
+                composable("search") {
+                    SearchScreen(
+                        navController = navController,
+                        searchViewModel = viewModel()
+                    )
+                }
+                composable("movie/{movieId}") { backStackEntry ->
+                    val movieId = backStackEntry.arguments?.getString("movieId")?.toInt() ?: 1
+                    MovieDetailsScreen(
+                        movieId = movieId,
+                        mainViewModel = mainViewModel,
+                        onBack = { navController.popBackStack() },
+                        onPlayClick = { movie ->
+                            navController.navigate("video/${movie.id}")
+                        },
+                        onShareClick = { movie ->
+                        }
+                    )
                 }
             }
         }
+    }
 }
