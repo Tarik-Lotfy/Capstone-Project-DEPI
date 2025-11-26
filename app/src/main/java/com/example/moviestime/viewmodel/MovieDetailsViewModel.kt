@@ -24,7 +24,15 @@ class MovieDetailsViewModel : ViewModel() {
             _isLoading.value = true
             try {
                 val details = repository.getMovieDetails(movieId)
-                _movieDetails.value = details.toMovie()
+
+                val videosResponse = repository.getMovieVideos(movieId)
+
+                val trailerKey = videosResponse.results.firstOrNull {
+                    it.site == "YouTube" && it.type == "Trailer"
+                }?.key
+
+                _movieDetails.value = details.toMovie(trailerKey = trailerKey)
+
             } catch (e: Exception) {
                 e.printStackTrace()
             } finally {

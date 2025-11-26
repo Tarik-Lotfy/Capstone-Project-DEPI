@@ -1,9 +1,7 @@
-// ui/screens/MoviesApp.kt
 package com.example.moviestime.ui.screens
 
 import android.Manifest
 import androidx.annotation.RequiresPermission
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,29 +10,25 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Explore
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.moviestime.R
 import com.example.moviestime.viewmodel.MainViewModel
 import com.example.moviestime.viewmodel.ThemeViewModel
 import com.example.moviestime.viewmodel.NotificationViewModel
 import com.example.moviestime.viewmodel.LanguageViewModel
 import com.example.moviestime.viewmodel.AuthViewModel
+import android.content.Intent
+import android.net.Uri
+import android.content.ActivityNotFoundException
+import android.util.Log
 
 @OptIn(ExperimentalMaterial3Api::class)
 @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
@@ -44,7 +38,7 @@ fun MoviesApp(
     themeViewModel: ThemeViewModel,
     notificationViewModel: NotificationViewModel,
     languageViewModel: LanguageViewModel,
-    authViewModel: AuthViewModel = viewModel() // Added AuthViewModel
+    authViewModel: AuthViewModel = viewModel()
 ) {
     val navController = rememberNavController()
 
@@ -71,8 +65,6 @@ fun MoviesApp(
     val icons = listOf(Icons.Default.Home, Icons.Default.Explore, Icons.Default.Person)
     Scaffold(
         topBar = {
-            // Hide TopBar on Settings screen if desired, or keep it consistent
-            // Currently, it shows everywhere inside this Scaffold
             CenterAlignedTopAppBar(
                 title = {
                     Text(
@@ -87,8 +79,6 @@ fun MoviesApp(
             )
         },
         bottomBar = {
-            // Check current route to optionally hide bottom bar on Settings
-            // For now, keeping it simple as per original structure
             NavigationBar(
                 containerColor = Color.Black.copy(alpha = 0.7f)
             ) {
@@ -147,19 +137,15 @@ fun MoviesApp(
                             navController.navigate("movie/$movieId")
                         },
                         onSettingsClick = {
-                            // This triggered the crash before because "settings" route didn't exist
                             navController.navigate("settings")
                         }
                     )
                 }
-                // --- ADDED SETTINGS ROUTE HERE ---
                 composable("settings") {
                     SettingsScreen(
                         onBack = { navController.popBackStack() },
                         onSignOut = {
                             authViewModel.logout()
-                            // Assuming your MainActivity observes isLoggedIn and switches
-                            // to LoginScreen automatically when this happens.
                         }
                     )
                 }
@@ -177,10 +163,21 @@ fun MoviesApp(
                         mainViewModel = mainViewModel,
                         onBack = { navController.popBackStack() },
                         onPlayClick = { movie ->
-                            navController.navigate("video/${movie.id}")
+                            movie.trailerKey?.let { key ->
+                                val encodedKey = java.net.URLEncoder.encode(key, "UTF-8")
+                                navController.navigate("video_player_route/$encodedKey")
+                            }
                         },
                         onShareClick = { movie ->
                         }
+                    )
+                }
+                composable("video_player_route/{trailerKey}") { backStackEntry ->
+                    val trailerKey = backStackEntry.arguments?.getString("trailerKey") ?: "ERROR"
+
+                    VideoPlayerScreen(
+                        trailerKey = trailerKey,
+                        onBack = { navController.popBackStack() }
                     )
                 }
             }

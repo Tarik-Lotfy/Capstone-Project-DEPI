@@ -6,11 +6,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
@@ -21,6 +21,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -37,6 +38,11 @@ import com.example.moviestime.ui.theme.PlayFair
 import com.example.moviestime.viewmodel.MainViewModel
 import com.example.moviestime.viewmodel.MovieDetailsViewModel
 
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.List
+
 @SuppressLint("MissingPermission")
 @Composable
 fun MovieDetailsScreen(
@@ -51,6 +57,10 @@ fun MovieDetailsScreen(
     val movieState by viewModel.movieDetails.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val favorites by mainViewModel.favorites.collectAsState()
+
+    val isWatchedState = remember(movieState) {
+        mutableStateOf(false)
+    }
 
     LaunchedEffect(movieId) {
         viewModel.loadMovieDetails(movieId)
@@ -78,9 +88,14 @@ fun MovieDetailsScreen(
             MovieDetailsContent(
                 movie = movie,
                 isFavorite = isFav,
+                isWatched = isWatchedState.value,
                 onBack = onBack,
                 onPlayClick = { onPlayClick(movie) },
                 onFavoriteClick = { mainViewModel.toggleFavorite(movie) },
+                onWatchedClick = {
+                    isWatchedState.value = !isWatchedState.value
+                },
+                onWatchlistClick = { mainViewModel.toggleFavorite(movie) },
                 backgroundColor = backgroundColor,
                 primaryColor = primaryColor,
                 textColor = textColor,
@@ -104,9 +119,12 @@ fun MovieDetailsScreen(
 fun MovieDetailsContent(
     movie: Movie,
     isFavorite: Boolean,
+    isWatched: Boolean,
     onBack: () -> Unit,
     onPlayClick: () -> Unit,
     onFavoriteClick: () -> Unit,
+    onWatchedClick: () -> Unit,
+    onWatchlistClick: () -> Unit,
     backgroundColor: Color,
     primaryColor: Color,
     textColor: Color,
@@ -235,29 +253,68 @@ fun MovieDetailsContent(
                     .fillMaxWidth()
                     .padding(horizontal = 20.dp, vertical = 24.dp)
             ) {
+                val trailerKey = movie.trailerKey
+
                 Button(
-                    onClick = onFavoriteClick,
+                    onClick = onPlayClick,
+                    enabled = trailerKey != null,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(52.dp),
-                    shape = RoundedCornerShape(10.dp),
+                        .height(56.dp),
+                    shape = RoundedCornerShape(12.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = if (isFavorite) Color.DarkGray else primaryColor,
+                        containerColor = if (trailerKey != null) primaryColor else cardColor.copy(alpha = 0.5f),
                         contentColor = Color.White
                     ),
                     elevation = ButtonDefaults.buttonElevation(defaultElevation = 8.dp)
                 ) {
                     Icon(
-                        if (isFavorite) Icons.Default.Check else Icons.Default.Add,
-                        contentDescription = null,
-                        modifier = Modifier.size(22.dp)
+                        painter = painterResource(R.drawable.ic_move),
+                        contentDescription = "Trailer",
+                        modifier = Modifier.size(24.dp)
                     )
-                    Spacer(Modifier.width(8.dp))
+                    Spacer(Modifier.width(10.dp))
                     Text(
-                        text = if (isFavorite) "Listed" else "Add to Watchlist",
+                        text = "Play Trailer",
                         fontFamily = Inter,
-                        fontWeight = FontWeight.SemiBold,
-                        fontSize = 16.sp
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 18.sp
+                    )
+                }
+
+                Spacer(Modifier.height(20.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceAround,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    CircularToggleButton(
+                        icon = if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                        contentDescription = "Favorite",
+                        isActive = isFavorite,
+                        onClick = onFavoriteClick,
+                        activeColor = goldColor,
+                        cardColor = cardColor,
+                        textColor = textColor
+                    )
+                    CircularToggleButton(
+                        icon = if (isWatched) Icons.Default.Check else Icons.Default.Visibility,
+                        contentDescription = if (isWatched) "Watched" else "Watched",
+                        isActive = isWatched,
+                        onClick = onWatchedClick,
+                        activeColor = primaryColor,
+                        cardColor = cardColor,
+                        textColor = textColor
+                    )
+                    CircularToggleButton(
+                        icon = Icons.Default.List,
+                        contentDescription = "Watchlist",
+                        isActive = isFavorite,
+                        onClick = onWatchlistClick,
+                        activeColor = primaryColor,
+                        cardColor = cardColor,
+                        textColor = textColor
                     )
                 }
 
@@ -358,6 +415,46 @@ fun MovieDetailsContent(
         }
     }
 }
+
+@Composable
+fun CircularToggleButton(
+    icon: ImageVector,
+    contentDescription: String,
+    isActive: Boolean,
+    onClick: () -> Unit,
+    activeColor: Color,
+    cardColor: Color,
+    textColor: Color
+) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Card(
+            onClick = onClick,
+            modifier = Modifier.size(56.dp),
+            shape = CircleShape,
+            colors = CardDefaults.cardColors(
+                containerColor = if (isActive) activeColor.copy(alpha = 0.3f) else cardColor,
+                contentColor = if (isActive) activeColor else textColor
+            ),
+            border = BorderStroke(1.dp, if (isActive) activeColor else textColor.copy(alpha = 0.3f))
+        ) {
+            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Icon(
+                    icon,
+                    contentDescription = contentDescription,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+        }
+        Spacer(Modifier.height(4.dp))
+        Text(
+            text = contentDescription.split(" ").firstOrNull() ?: "",
+            fontFamily = Inter,
+            fontSize = 11.sp,
+            color = textColor.copy(alpha = 0.7f)
+        )
+    }
+}
+
 
 @Composable
 fun DetailItem(label: String, value: String, textColor: Color) {
