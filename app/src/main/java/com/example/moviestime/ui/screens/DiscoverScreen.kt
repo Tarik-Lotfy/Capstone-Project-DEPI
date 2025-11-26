@@ -1,5 +1,6 @@
 package com.example.moviestime.ui.screens
 
+import android.R
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -24,6 +25,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.moviestime.data.remote.Genre
+import com.example.moviestime.ui.components.MovieRowCard
+import com.example.moviestime.ui.theme.Inter
+import com.example.moviestime.ui.theme.PlayFair
 import com.example.moviestime.viewmodel.SearchViewModel
 
 @Composable
@@ -86,31 +90,6 @@ fun DiscoverScreen(
     ) {
         Spacer(Modifier.height(20.dp))
 
-        Row(
-            modifier = Modifier.fillMaxWidth().height(48.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(
-                text = if (isSearchTyping) "Searching..." else "Discover",
-                fontSize = 28.sp,
-                fontWeight = FontWeight.ExtraBold,
-                color = Color.White
-            )
-            if (!isSearchTyping) {
-                IconButton(onClick = {}) {
-                    Icon(
-                        Icons.Default.FilterList,
-                        contentDescription = "Filter",
-                        tint = accentYellow,
-                        modifier = Modifier.size(28.dp)
-                    )
-                }
-            }
-        }
-
-        Spacer(Modifier.height(18.dp))
-
         TextField(
             value = query,
             onValueChange = { searchViewModel.onSearchQueryChanged(it) },
@@ -146,9 +125,8 @@ fun DiscoverScreen(
             Spacer(Modifier.height(24.dp))
 
             Text(
-                "Explore by Genre",
-                fontSize = 18.sp,
-                fontWeight = FontWeight.SemiBold,
+                text = "Explore by Genre",
+                style = MaterialTheme.typography.headlineSmall,
                 color = Color.White
             )
 
@@ -187,9 +165,8 @@ fun DiscoverScreen(
 
         currentResultsTitle?.let { title ->
             Text(
-                title,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
+                text = title,
+                style = MaterialTheme.typography.headlineMedium,
                 color = Color.White,
                 modifier = Modifier.padding(bottom = 12.dp)
             )
@@ -210,12 +187,11 @@ fun DiscoverScreen(
                 modifier = Modifier.weight(1f)
             ) {
                 items(results, key = { it.id }) { movie ->
-                    MovieGridItem(
+                    MovieRowCard(
                         movie = movie,
-                        onClick = {
+                        onMovieClick = {
                             onMovieClick(movie.id)
                         },
-                        onFavoriteClick = {}
                     )
                 }
             }
@@ -233,10 +209,11 @@ fun DiscoverScreen(
                     )
                     Spacer(Modifier.height(8.dp))
                     Text(
-                        "No films matched your search.",
-                        color = Color.White.copy(alpha = 0.7f),
+                        text = "No films matched your search.",
+                        fontFamily = Inter,
+                        fontWeight = FontWeight.Medium,
                         fontSize = 16.sp,
-                        fontWeight = FontWeight.Medium
+                        color = Color.White.copy(alpha = 0.7f)
                     )
                 }
             }
@@ -254,10 +231,11 @@ fun DiscoverScreen(
                     )
                     Spacer(Modifier.height(8.dp))
                     Text(
-                        "No movies available in this category.",
-                        color = Color.White.copy(alpha = 0.7f),
+                        text = "No movies available in this category.",
+                        fontFamily = Inter,
+                        fontWeight = FontWeight.Medium,
                         fontSize = 16.sp,
-                        fontWeight = FontWeight.Medium
+                        color = Color.White.copy(alpha = 0.7f)
                     )
                 }
             }

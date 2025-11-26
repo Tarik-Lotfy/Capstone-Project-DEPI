@@ -96,7 +96,7 @@ fun MovieDetailsScreen(
                 isFavorite = isFav,
                 onBack = onBack,
                 onPlayClick = { onPlayClick(movie) },
-                onFavoriteClick = @androidx.annotation.RequiresPermission(android.Manifest.permission.POST_NOTIFICATIONS) { mainViewModel.toggleFavorite(movie) },
+                onFavoriteClick ={ mainViewModel.toggleFavorite(movie) },
                 backgroundColor = backgroundColor,
                 primaryColor = primaryColor,
                 textColor = textColor,

@@ -189,8 +189,8 @@ data class MovieDetailsScreenRoute(
         LaunchedEffect(Unit) {
             topBarState.value = AppTopBarConfig(
                 title = "Movie Details",
-                showBack = true,
-                onBack = { navigator.pop() },
+                showBack = false,
+                onBack = null,
                 trailingContent = null
             )
         }
