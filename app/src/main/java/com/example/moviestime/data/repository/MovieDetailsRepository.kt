@@ -2,6 +2,7 @@ package com.example.moviestime.data.repository
 
 import com.example.moviestime.data.remote.RetrofitClient
 import com.example.moviestime.data.remote.MovieDetailsDto
+import com.example.moviestime.data.remote.MovieVideosResponse // Import the new DTO
 
 class MovieDetailsRepository {
     private val api = RetrofitClient.apiService
@@ -9,5 +10,9 @@ class MovieDetailsRepository {
 
     suspend fun getMovieDetails(movieId: Int): MovieDetailsDto {
         return api.getMovieDetails(movieId, API_KEY)
+    }
+
+    suspend fun getMovieVideos(movieId: Int): MovieVideosResponse {
+        return api.getMovieVideos(movieId, API_KEY)
     }
 }

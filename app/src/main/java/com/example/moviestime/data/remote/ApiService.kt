@@ -54,4 +54,10 @@ interface ApiService {
         @Query("with_genres") genreId: Int,
         @Query("page") page: Int = 1
     ): MovieResponse
+
+    @GET("movie/{movie_id}/videos")
+    suspend fun getMovieVideos(
+        @Path("movie_id") movieId: Int,
+        @Query("api_key") apiKey: String
+    ): MovieVideosResponse
 }

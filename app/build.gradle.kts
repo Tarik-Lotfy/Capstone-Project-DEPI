@@ -48,7 +48,7 @@ android {
 dependencies {
 
     // Dependencies from toml
-    implementation("com.google.firebase:firebase-auth:23.0.0") // Ensure version is explicitly set if conflict occurs
+    implementation("com.google.firebase:firebase-auth")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -58,10 +58,6 @@ dependencies {
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.foundation)
-
-    // Note: If libs.firebase.firestore.ktx is broken, we use the manual version below.
-    // implementation(libs.firebase.firestore.ktx)
-
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -95,9 +91,10 @@ dependencies {
     implementation("androidx.room:room-ktx:2.6.1")
     kapt("androidx.room:room-compiler:2.6.1")
 
-    // Firebase Auth (Already defined above, but ensuring play-services-auth is here)
+    // Firebase Auth
+    implementation("com.google.firebase:firebase-auth:23.0.0")
     implementation("com.google.android.gms:play-services-auth:21.0.0")
-
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3")
     // --- Facebook SDK ---
     implementation("com.facebook.android:facebook-login:16.3.0")
 
@@ -111,11 +108,9 @@ dependencies {
     // Material Icons Extended
     implementation("androidx.compose.material:material-icons-extended:1.6.8")
 
-    // --- FIREBASE FIXED DEPENDENCIES (Added Versions) ---
-    implementation("com.google.firebase:firebase-firestore:25.1.0")
-    implementation("com.google.firebase:firebase-storage:21.0.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3")
-
     // Youtube Player
     implementation("com.pierfrancescosoffritti.androidyoutubeplayer:core:12.0.0")
+
+    implementation("androidx.compose.ui:ui-viewbinding:1.6.0")
 }
+

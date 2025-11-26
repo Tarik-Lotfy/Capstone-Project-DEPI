@@ -1,4 +1,3 @@
-// ui/screens/MoviesApp.kt
 package com.example.moviestime.ui.screens
 
 import android.Manifest
@@ -15,18 +14,21 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.moviestime.R
 import com.example.moviestime.viewmodel.MainViewModel
 import com.example.moviestime.viewmodel.ThemeViewModel
 import com.example.moviestime.viewmodel.NotificationViewModel
 import com.example.moviestime.viewmodel.LanguageViewModel
 import com.example.moviestime.viewmodel.AuthViewModel
+import android.content.Intent
+import android.net.Uri
+import android.content.ActivityNotFoundException
+import android.util.Log
 
 @OptIn(ExperimentalMaterial3Api::class)
 @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
@@ -39,40 +41,67 @@ fun MoviesApp(
     authViewModel: AuthViewModel = viewModel()
 ) {
     val navController = rememberNavController()
+
     val selectedTab by mainViewModel.uiState.collectAsState()
 
     LaunchedEffect(selectedTab.selectedTab) {
         when (selectedTab.selectedTab) {
-            0 -> navController.navigate("home") { launchSingleTop = true; restoreState = true }
-            1 -> navController.navigate("discover") { launchSingleTop = true; restoreState = true }
-            2 -> navController.navigate("profile") { launchSingleTop = true; restoreState = true }
+            0 -> navController.navigate("home") {
+                launchSingleTop = true
+                restoreState = true
+            }
+            1 -> navController.navigate("discover") {
+                launchSingleTop = true
+                restoreState = true
+            }
+            2 -> navController.navigate("profile") {
+                launchSingleTop = true
+                restoreState = true
+            }
         }
     }
 
-    // استخدام stringResource للنصوص السفلية
-    val tabs = listOf(
-        stringResource(R.string.home),
-        stringResource(R.string.discover),
-        stringResource(R.string.profile)
-    )
+    val tabs = listOf("Home", "Discover", "Profile")
     val icons = listOf(Icons.Default.Home, Icons.Default.Explore, Icons.Default.Person)
-
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text(stringResource(R.string.app_name), fontWeight = FontWeight.Bold, color = Color.White) },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = Color.Transparent),
+                title = {
+                    Text(
+                        "CineVault",
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
+                    )
+                },
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = Color.Transparent
+                ),
             )
         },
         bottomBar = {
-            NavigationBar(containerColor = Color.Black.copy(alpha = 0.7f)) {
+            NavigationBar(
+                containerColor = Color.Black.copy(alpha = 0.7f)
+            ) {
                 tabs.forEachIndexed { index, title ->
                     NavigationBarItem(
-                        icon = { Icon(icons[index], contentDescription = title, tint = if (selectedTab.selectedTab == index) MaterialTheme.colorScheme.primary else Color.White.copy(alpha = 0.7f)) },
-                        label = { Text(title, color = if (selectedTab.selectedTab == index) MaterialTheme.colorScheme.primary else Color.White.copy(alpha = 0.7f)) },
+                        icon = {
+                            Icon(
+                                icons[index],
+                                contentDescription = title,
+                                tint = if (selectedTab.selectedTab == index) MaterialTheme.colorScheme.primary else Color.White.copy(alpha = 0.7f)
+                            )
+                        },
+                        label = {
+                            Text(
+                                title,
+                                color = if (selectedTab.selectedTab == index) MaterialTheme.colorScheme.primary else Color.White.copy(alpha = 0.7f)
+                            )
+                        },
                         selected = selectedTab.selectedTab == index,
                         onClick = { mainViewModel.selectTab(index) },
-                        colors = NavigationBarItemDefaults.colors(indicatorColor = Color.White.copy(alpha = 0.2f))
+                        colors = NavigationBarItemDefaults.colors(
+                            indicatorColor = Color.White.copy(alpha = 0.2f)
+                        )
                     )
                 }
             }
@@ -87,45 +116,45 @@ fun MoviesApp(
         ) {
             NavHost(navController = navController, startDestination = "home") {
                 composable("home") {
-                    HomeScreen(navController = navController, homeViewModel = viewModel(), mainViewModel = mainViewModel)
+                    HomeScreen(
+                        navController = navController,
+                        homeViewModel = viewModel(),
+                        mainViewModel = mainViewModel
+                    )
                 }
                 composable("discover") {
-                    DiscoverScreen(navController = navController, searchViewModel = viewModel())
+                    DiscoverScreen(
+                        navController = navController,
+                        searchViewModel = viewModel()
+                    )
                 }
-
                 composable("profile") {
                     ProfileScreen(
                         mainViewModel = mainViewModel,
                         themeViewModel = themeViewModel,
                         languageViewModel = languageViewModel,
-                        authViewModel = authViewModel,
-                        onMovieClick = { movieId -> navController.navigate("movie/$movieId") },
-                        onSettingsClick = { navController.navigate("settings") },
-                        onEditProfileClick = { navController.navigate("edit_profile") }
+                        onMovieClick = { movieId ->
+                            navController.navigate("movie/$movieId")
+                        },
+                        onSettingsClick = {
+                            navController.navigate("settings")
+                        }
                     )
                 }
-
                 composable("settings") {
-                    val currentLanguage by languageViewModel.currentLanguage.collectAsState()
-
                     SettingsScreen(
                         onBack = { navController.popBackStack() },
-                        onSignOut = { authViewModel.logout() },
-                        onEditProfile = { navController.navigate("edit_profile") },
-                        onLanguageChange = { languageViewModel.toggleLanguage() },
-                        currentLanguage = currentLanguage
-                    )
-                }
-
-                composable("edit_profile") {
-                    EditProfileScreen(
-                        onBackClick = { navController.popBackStack() },
-                        authViewModel = authViewModel
+                        onSignOut = {
+                            authViewModel.logout()
+                        }
                     )
                 }
 
                 composable("search") {
-                    SearchScreen(navController = navController, searchViewModel = viewModel())
+                    SearchScreen(
+                        navController = navController,
+                        searchViewModel = viewModel()
+                    )
                 }
                 composable("movie/{movieId}") { backStackEntry ->
                     val movieId = backStackEntry.arguments?.getString("movieId")?.toInt() ?: 1
@@ -133,8 +162,22 @@ fun MoviesApp(
                         movieId = movieId,
                         mainViewModel = mainViewModel,
                         onBack = { navController.popBackStack() },
-                        onPlayClick = { movie -> navController.navigate("video/${movie.id}") },
-                        onShareClick = { }
+                        onPlayClick = { movie ->
+                            movie.trailerKey?.let { key ->
+                                val encodedKey = java.net.URLEncoder.encode(key, "UTF-8")
+                                navController.navigate("video_player_route/$encodedKey")
+                            }
+                        },
+                        onShareClick = { movie ->
+                        }
+                    )
+                }
+                composable("video_player_route/{trailerKey}") { backStackEntry ->
+                    val trailerKey = backStackEntry.arguments?.getString("trailerKey") ?: "ERROR"
+
+                    VideoPlayerScreen(
+                        trailerKey = trailerKey,
+                        onBack = { navController.popBackStack() }
                     )
                 }
             }

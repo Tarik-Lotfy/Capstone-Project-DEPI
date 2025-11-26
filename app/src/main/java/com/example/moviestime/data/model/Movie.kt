@@ -11,5 +11,6 @@ data class Movie(
     val backdropPath: String? = null,
     val overview: String = "",
     val director: String = "",
-    val cast: String = ""
+    val cast: String = "",
+    val trailerKey: String? = null
 )

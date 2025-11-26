@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.moviestime.data.remote.Genre
+import com.example.moviestime.ui.components.MovieRowCard
 import com.example.moviestime.viewmodel.SearchViewModel
 import kotlin.math.ceil
 
@@ -211,18 +212,6 @@ fun DiscoverScreen(
         if (isLoading || results.isNotEmpty() || isSearchTyping || isGenreSelected || isRecommended) {
 
             item {
-                currentResultsTitle?.let { title ->
-                    Text(
-                        title,
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White,
-                        modifier = Modifier.padding(bottom = 12.dp)
-                    )
-                }
-            }
-
-            item {
                 Box(
                     modifier = Modifier.fillMaxWidth().height(gridContentHeight),
                     contentAlignment = Alignment.Center
@@ -237,10 +226,11 @@ fun DiscoverScreen(
                                 modifier = Modifier.fillMaxSize()
                             ) {
                                 items(results, key = { it.id }) { movie ->
-                                    MovieGridItem(
+                                    MovieRowCard(
                                         movie = movie,
-                                        onClick = { navController.navigate("movie/${movie.id}") },
-                                        onFavoriteClick = {}
+                                        onMovieClick = { selectedMovie ->
+                                            navController.navigate("movie/${selectedMovie.id}")
+                                        }
                                     )
                                 }
                             }
