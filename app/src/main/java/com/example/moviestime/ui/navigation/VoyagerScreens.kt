@@ -2,8 +2,13 @@ package com.example.moviestime.ui.navigation
 
 import android.Manifest
 import androidx.annotation.RequiresPermission
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.viewmodel.compose.viewModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
@@ -16,10 +21,13 @@ import com.example.moviestime.ui.screens.AppTopBarConfig
 import com.example.moviestime.ui.screens.DiscoverScreen
 import com.example.moviestime.ui.screens.HomeScreen
 import com.example.moviestime.ui.screens.LocalAppTopBarState
+import com.example.moviestime.ui.screens.LoginScreen
 import com.example.moviestime.ui.screens.MovieDetailsScreen
 import com.example.moviestime.ui.screens.ProfileScreen
 import com.example.moviestime.ui.screens.SearchScreen
 import com.example.moviestime.ui.screens.SeeAllMoviesScreen
+import com.example.moviestime.ui.screens.SettingsScreen
+import com.example.moviestime.viewmodel.AuthViewModel
 import com.example.moviestime.viewmodel.HomeViewModel
 import com.example.moviestime.viewmodel.LanguageViewModel
 import com.example.moviestime.viewmodel.MainViewModel
@@ -51,7 +59,15 @@ object HomeScreenRoute : Screen {
                 title = "CineVault",
                 showBack = false,
                 onBack = null,
-                trailingContent = null
+                trailingContent = {
+                    IconButton(onClick = { navigator.push(SettingsScreenRoute) }) {
+                        Icon(
+                            imageVector = Icons.Outlined.Settings,
+                            contentDescription = "Settings",
+                            tint = Color.White
+                        )
+                    }
+                }
             )
         }
 
@@ -138,7 +154,15 @@ object ProfileScreenRoute : Screen {
                 title = "Profile",
                 showBack = false,
                 onBack = null,
-                trailingContent = null
+                trailingContent = {
+                    IconButton(onClick = { navigator.push(SettingsScreenRoute) }) {
+                        Icon(
+                            imageVector = Icons.Outlined.Settings,
+                            contentDescription = "Settings",
+                            tint = Color.White
+                        )
+                    }
+                }
             )
         }
 
@@ -165,8 +189,8 @@ data class MovieDetailsScreenRoute(
         LaunchedEffect(Unit) {
             topBarState.value = AppTopBarConfig(
                 title = "Movie Details",
-                showBack = false,
-                onBack = null,
+                showBack = true,
+                onBack = { navigator.pop() },
                 trailingContent = null
             )
         }
@@ -214,6 +238,55 @@ data class SeeAllScreenRoute(
                 navigator.push(MovieDetailsScreenRoute(movieId))
             }
         )
+    }
+}
+
+object SettingsScreenRoute : Screen {
+    private fun readResolve(): Any = SettingsScreenRoute
+
+    @Composable
+    override fun Content() {
+        val navigator = LocalNavigator.currentOrThrow
+        val topBarState = LocalAppTopBarState.current
+        val authViewModel: AuthViewModel = viewModel()
+        val themeViewModel: ThemeViewModel = viewModel()
+        val languageViewModel: LanguageViewModel = viewModel()
+
+        LaunchedEffect(Unit) {
+            topBarState.value = AppTopBarConfig(
+                title = "Settings",
+                showBack = true,
+                onBack = { navigator.pop() },
+                trailingContent = null
+            )
+        }
+
+        SettingsScreen(
+            authViewModel = authViewModel,
+            languageViewModel = languageViewModel,
+            themeViewModel = themeViewModel,
+            onEditProfile = {
+                // TODO: Navigate to edit profile screen when implemented
+            },
+            onDeleteAccount = {
+                // TODO: Implement delete account functionality
+            },
+            onSignOut = {
+                // Navigate to login screen after logout
+                // The MainActivity will handle this based on isLoggedIn state
+            }
+        )
+    }
+}
+
+object LoginScreenRoute : Screen {
+    private fun readResolve(): Any = LoginScreenRoute
+
+    @Composable
+    override fun Content() {
+        val authViewModel: AuthViewModel = viewModel()
+
+        LoginScreen(authViewModel = authViewModel)
     }
 }
 

@@ -23,7 +23,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavHostController
 import com.example.moviestime.data.remote.Genre
 import com.example.moviestime.viewmodel.SearchViewModel
 
@@ -50,8 +49,8 @@ fun ShimmerMovieGrid() {
 
 @Composable
 fun DiscoverScreen(
-    navController: NavHostController,
-    searchViewModel: SearchViewModel = viewModel()
+    searchViewModel: SearchViewModel = viewModel(),
+    onMovieClick: (Int) -> Unit
 ) {
     val query by searchViewModel.searchQuery.collectAsState()
     val results by searchViewModel.searchResults.collectAsState()
@@ -213,7 +212,9 @@ fun DiscoverScreen(
                 items(results, key = { it.id }) { movie ->
                     MovieGridItem(
                         movie = movie,
-                        onClick = { navController.navigate("movie/${movie.id}") },
+                        onClick = {
+                            onMovieClick(movie.id)
+                        },
                         onFavoriteClick = {}
                     )
                 }
