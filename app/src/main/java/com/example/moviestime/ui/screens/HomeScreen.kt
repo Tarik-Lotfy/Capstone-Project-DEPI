@@ -18,6 +18,7 @@ import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.launch
 import com.example.moviestime.ui.components.*
+import com.example.moviestime.ui.navigation.SeeAllCategory
 import com.example.moviestime.viewmodel.HomeViewModel
 import com.example.moviestime.viewmodel.MainViewModel
 
@@ -26,7 +27,8 @@ import com.example.moviestime.viewmodel.MainViewModel
 fun HomeScreen(
     homeViewModel: HomeViewModel = viewModel(),
     mainViewModel: MainViewModel = viewModel(),
-    onMovieClick: (Int) -> Unit
+    onMovieClick: (Int) -> Unit,
+    onSeeAllClick: (SeeAllCategory) -> Unit
 ) {
     val popular by homeViewModel.popular.collectAsState()
     val topRated by homeViewModel.topRated.collectAsState()
@@ -48,7 +50,7 @@ fun HomeScreen(
                 Spacer(Modifier.height(8.dp))
                 LazyRow(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                     items(5) {
-                        ShimmerMovieCard()
+                        ShimmerLargeMovieCard()
                     }
                 }
             }
@@ -150,7 +152,7 @@ fun HomeScreen(
                                 style = MaterialTheme.typography.headlineMedium,
                                 color = MaterialTheme.colorScheme.onBackground
                             )
-                            TextButton(onClick = {}) {
+                            TextButton(onClick = { onSeeAllClick(SeeAllCategory.POPULAR) }) {
                                 Text(
                                     "See All",
                                     color = MaterialTheme.colorScheme.primary
@@ -187,11 +189,23 @@ fun HomeScreen(
                 }
 
                 item {
-                    Text(
-                        text = "Top Rated",
-                        style = MaterialTheme.typography.headlineMedium,
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
+                    Row(
+                        Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "Top Rated",
+                            style = MaterialTheme.typography.headlineMedium,
+                            color = MaterialTheme.colorScheme.onBackground
+                        )
+                        TextButton(onClick = { onSeeAllClick(SeeAllCategory.TOP_RATED) }) {
+                            Text(
+                                "See All",
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                    }
                     Spacer(Modifier.height(16.dp))
                     LazyRow(
                         horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -208,11 +222,23 @@ fun HomeScreen(
                 }
 
                 item {
-                    Text(
-                        text = "Upcoming",
-                        style = MaterialTheme.typography.headlineMedium,
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
+                    Row(
+                        Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "Upcoming",
+                            style = MaterialTheme.typography.headlineMedium,
+                            color = MaterialTheme.colorScheme.onBackground
+                        )
+                        TextButton(onClick = { onSeeAllClick(SeeAllCategory.UPCOMING) }) {
+                            Text(
+                                "See All",
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                    }
                     Spacer(Modifier.height(16.dp))
                     LazyRow(
                         horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -233,7 +259,7 @@ fun HomeScreen(
 }
 
 @Composable
-fun SectionTitleWithSeeAll(title: String) {
+fun SectionTitleWithSeeAll(title: String, onClick: () -> Unit = {}) {
     Row(
         Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -245,7 +271,7 @@ fun SectionTitleWithSeeAll(title: String) {
             fontWeight = FontWeight.Bold,
             color = Color.White
         )
-        TextButton(onClick = {}) {
+        TextButton(onClick = onClick) {
             Text(
                 "See All",
                 color = MaterialTheme.colorScheme.primary

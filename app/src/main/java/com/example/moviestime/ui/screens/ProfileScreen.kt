@@ -62,37 +62,37 @@ fun ProfileScreen(
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-         Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 12.dp, bottom = 24.dp)
-        ) {
-            Text(
-                text = "Profile",
-                fontFamily = PlayFair,
-                fontWeight = FontWeight.Bold,
-                fontSize = 24.sp,
-                color = textColor,
-                modifier = Modifier.align(Alignment.Center)
-            )
-
-            Box(
-                modifier = Modifier
-                    .align(Alignment.CenterEnd)
-                    .size(44.dp)
-                    .clip(RoundedCornerShape(12.dp))
-                    .border(2.dp, primaryColor, RoundedCornerShape(12.dp))
-                    .clickable {   },
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Outlined.Settings,
-                    contentDescription = "Settings",
-                    tint = textColor,
-                    modifier = Modifier.size(24.dp)
-                )
-            }
-        }
+//         Box(
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .padding(top = 12.dp, bottom = 24.dp)
+//        ) {
+//            Text(
+//                text = "Profile",
+//                fontFamily = PlayFair,
+//                fontWeight = FontWeight.Bold,
+//                fontSize = 24.sp,
+//                color = textColor,
+//                modifier = Modifier.align(Alignment.Center)
+//            )
+//
+//            Box(
+//                modifier = Modifier
+//                    .align(Alignment.CenterEnd)
+//                    .size(44.dp)
+//                    .clip(RoundedCornerShape(12.dp))
+//                    .border(2.dp, primaryColor, RoundedCornerShape(12.dp))
+//                    .clickable {   },
+//                contentAlignment = Alignment.Center
+//            ) {
+//                Icon(
+//                    imageVector = Icons.Outlined.Settings,
+//                    contentDescription = "Settings",
+//                    tint = textColor,
+//                    modifier = Modifier.size(24.dp)
+//                )
+//            }
+//        }
 
          Box(
             modifier = Modifier
