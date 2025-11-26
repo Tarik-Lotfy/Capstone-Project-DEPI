@@ -125,6 +125,8 @@ class AuthViewModel : ViewModel() {
                     _isLoggedIn.value = true
                     _uiState.value = AuthUiState()
                     loadUserProfile()
+
+
                 } else {
                     _uiState.value = AuthUiState(error = "Login failed: ${result.exceptionOrNull()?.message}")
                 }
