@@ -40,7 +40,6 @@ fun MovieRowCard(
                 .clip(RoundedCornerShape(16.dp))
         )
 
-        // Rating badge in top right
         Box(
             modifier = Modifier
                 .align(Alignment.TopEnd)
@@ -69,7 +68,6 @@ fun MovieRowCard(
             }
         }
 
-        // Movie info at bottom - gradient overlay that blends with image
         Box(
             modifier = Modifier
                 .align(Alignment.BottomStart)

@@ -60,4 +60,11 @@ interface ApiService {
         @Path("movie_id") movieId: Int,
         @Query("api_key") apiKey: String
     ): MovieVideosResponse
+
+    @GET("movie/{movie_id}/similar")
+    suspend fun getSimilarMovies(
+        @Path("movie_id") movieId: Int,
+        @Query("api_key") apiKey: String,
+        @Query("page") page: Int = 1
+    ): MovieResponse
 }

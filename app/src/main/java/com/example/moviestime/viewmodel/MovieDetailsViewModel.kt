@@ -12,10 +12,10 @@ import com.example.moviestime.data.repository.MovieDetailsRepository
 
 class MovieDetailsViewModel : ViewModel() {
     private val repository = MovieDetailsRepository()
-
     private val _movieDetails = MutableStateFlow<Movie?>(null)
     val movieDetails: StateFlow<Movie?> = _movieDetails.asStateFlow()
-
+    private val _similarMovies = MutableStateFlow<List<Movie>>(emptyList())
+    val similarMovies: StateFlow<List<Movie>> = _similarMovies.asStateFlow()
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
@@ -26,12 +26,13 @@ class MovieDetailsViewModel : ViewModel() {
                 val details = repository.getMovieDetails(movieId)
 
                 val videosResponse = repository.getMovieVideos(movieId)
-
+                val similarMoviesResponse = repository.getSimilarMovies(movieId)
                 val trailerKey = videosResponse.results.firstOrNull {
                     it.site == "YouTube" && it.type == "Trailer"
                 }?.key
 
                 _movieDetails.value = details.toMovie(trailerKey = trailerKey)
+                _similarMovies.value = similarMoviesResponse.results.map { it.toMovie() }
 
             } catch (e: Exception) {
                 e.printStackTrace()
