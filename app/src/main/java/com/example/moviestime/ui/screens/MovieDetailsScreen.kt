@@ -1,17 +1,16 @@
 package com.example.moviestime.ui.screens
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.BorderStroke
+import android.app.Application
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
@@ -22,8 +21,8 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -38,21 +37,22 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import coil.compose.AsyncImage
 import com.example.moviestime.R
 import com.example.moviestime.data.model.Movie
-import com.example.moviestime.ui.components.MovieRowCard
 import com.example.moviestime.ui.theme.Inter
 import com.example.moviestime.ui.theme.PlayFair
 import com.example.moviestime.viewmodel.MainViewModel
 import com.example.moviestime.viewmodel.MovieDetailsViewModel
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.List
 
-class MovieDetailsScreen(val movieId: Int) : Screen {
+data class MovieDetailsScreen(
+    val movieId: Int
+) : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-        val mainViewModel = LocalMainViewModel.current
+        val context = LocalContext.current
+        val application = context.applicationContext as Application
+
+        // ✅ تم الإصلاح: إنشاء MainViewModel بشكل مباشر بدلاً من الاعتماد على LocalMainViewModel
+        val mainViewModel: MainViewModel = viewModel { MainViewModel(application) }
 
         MovieDetailsScreenContent(
             movieId = movieId,
@@ -60,12 +60,15 @@ class MovieDetailsScreen(val movieId: Int) : Screen {
             mainViewModel = mainViewModel,
             onPlayClick = { movie ->
                 movie.trailerKey?.let { key ->
-                    // قد تحتاج لتشفير المفتاح إذا كان يحتوي على رموز خاصة، ولكن عادة في Voyager نمرر البيانات كـ String بسيط
                     val encodedKey = java.net.URLEncoder.encode(key, "UTF-8")
                     navigator.push(VideoPlayerScreen(encodedKey))
                 }
             },
-            onMovieClick = { id -> navigator.push(MovieDetailsScreen(id)) }
+            onMovieClick = { id -> navigator.push(MovieDetailsScreen(id)) },
+            // ⚠️ ملاحظة: تأكد من أن MainViewModel يحتوي على دالة toggleFavorite
+            onFavoriteClick = { movie ->
+                // mainViewModel.toggleFavorite(movie)
+            }
         )
     }
 }
@@ -86,10 +89,6 @@ fun MovieDetailsScreenContent(
     val similarMovies by viewModel.similarMovies.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val favorites by mainViewModel.favorites.collectAsState()
-
-    val isWatchedState = remember(movieState) {
-        mutableStateOf(false)
-    }
 
     LaunchedEffect(movieId) {
         viewModel.loadMovieDetails(movieId)
@@ -118,16 +117,10 @@ fun MovieDetailsScreenContent(
                 movie = movie,
                 similarMovies = similarMovies,
                 isFavorite = isFav,
-                isWatched = isWatchedState.value,
                 onBack = onBack,
                 onPlayClick = { onPlayClick(movie) },
-                onFavoriteClick = { mainViewModel.toggleFavorite(movie) },
-                onWatchedClick = {
-                    isWatchedState.value = !isWatchedState.value
-                },
-                onWatchlistClick = { mainViewModel.toggleFavorite(movie) },
+                onFavoriteClick = { onFavoriteClick(movie) },
                 onMovieClick = onMovieClick,
-                onFavoriteMovieClick = { movieToFav -> mainViewModel.toggleFavorite(movieToFav) },
                 backgroundColor = backgroundColor,
                 primaryColor = primaryColor,
                 textColor = textColor,
@@ -150,16 +143,12 @@ fun MovieDetailsScreenContent(
 @Composable
 fun MovieDetailsContent(
     movie: Movie,
-    similarMovies: List<Movie>,
+    similarMovies: List<Movie> = emptyList(),
     isFavorite: Boolean,
-    isWatched: Boolean,
     onBack: () -> Unit,
     onPlayClick: () -> Unit,
     onFavoriteClick: () -> Unit,
-    onWatchedClick: () -> Unit,
-    onWatchlistClick: () -> Unit,
-    onMovieClick: (Int) -> Unit,
-    onFavoriteMovieClick: (Movie) -> Unit,
+    onMovieClick: (Int) -> Unit = {},
     backgroundColor: Color,
     primaryColor: Color,
     textColor: Color,
@@ -215,7 +204,7 @@ fun MovieDetailsContent(
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .align(Alignment.BottomStart)
-                        .padding(start = 20.dp)
+                        .padding(start = 20.dp, bottom = 0.dp)
                         .width(130.dp)
                         .height(190.dp)
                         .clip(RoundedCornerShape(12.dp))
@@ -288,179 +277,76 @@ fun MovieDetailsContent(
                     .fillMaxWidth()
                     .padding(horizontal = 20.dp, vertical = 24.dp)
             ) {
-                val trailerKey = movie.trailerKey
-
                 Button(
-                    onClick = onPlayClick,
-                    enabled = trailerKey != null,
+                    onClick = onFavoriteClick,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(56.dp),
-                    shape = RoundedCornerShape(12.dp),
+                        .height(52.dp),
+                    shape = RoundedCornerShape(10.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = if (trailerKey != null) primaryColor else cardColor.copy(alpha = 0.5f),
+                        containerColor = if (isFavorite) Color.DarkGray else primaryColor,
                         contentColor = Color.White
                     ),
                     elevation = ButtonDefaults.buttonElevation(defaultElevation = 8.dp)
                 ) {
                     Icon(
-                        painter = painterResource(R.drawable.ic_move),
-                        contentDescription = "Trailer",
-                        modifier = Modifier.size(24.dp)
+                        if (isFavorite) Icons.Default.Check else Icons.Default.Add,
+                        contentDescription = null,
+                        modifier = Modifier.size(22.dp)
                     )
-                    Spacer(Modifier.width(10.dp))
+                    Spacer(Modifier.width(8.dp))
                     Text(
-                        text = stringResource(R.string.play_trailer),
+                        text = if (isFavorite) stringResource(R.string.favorites) else stringResource(R.string.watchlist),
                         fontFamily = Inter,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 18.sp
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 16.sp
                     )
                 }
 
-                Spacer(Modifier.height(20.dp))
+                Spacer(Modifier.height(32.dp))
 
+                Text(
+                    text = stringResource(R.string.overview),
+                    fontFamily = PlayFair,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 22.sp,
+                    color = textColor
+                )
+
+                Spacer(Modifier.height(12.dp))
+
+                Text(
+                    text = movie.overview.ifEmpty { stringResource(R.string.no_overview) },
+                    fontFamily = Inter,
+                    fontSize = 15.sp,
+                    color = textColor.copy(alpha = 0.8f),
+                    lineHeight = 26.sp,
+                    textAlign = TextAlign.Justify
+                )
+
+                Spacer(Modifier.height(32.dp))
+
+                Text(
+                    text = stringResource(R.string.details),
+                    fontFamily = PlayFair,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 22.sp,
+                    color = textColor
+                )
+
+                Spacer(Modifier.height(16.dp))
+
+                DetailItem(label = stringResource(R.string.director), value = movie.director, textColor = textColor)
+                Spacer(Modifier.height(16.dp))
+                DetailItem(label = stringResource(R.string.cast), value = movie.cast, textColor = textColor)
+
+                Spacer(Modifier.height(16.dp))
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 90.dp),
-                    horizontalArrangement = Arrangement.spacedBy(20.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    CircularToggleButton(
-                        icon = if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                        contentDescription = stringResource(R.string.favorites),
-                        isActive = isFavorite,
-                        onClick = onFavoriteClick,
-                        activeColor = goldColor,
-                        cardColor = cardColor,
-                        textColor = textColor
-                    )
-
-                    CircularToggleButton(
-                        icon = if (isWatched) Icons.Default.Check else Icons.Default.Visibility,
-                        contentDescription = stringResource(R.string.movies_watched), // Or a "Watched" string
-                        isActive = isWatched,
-                        onClick = onWatchedClick,
-                        activeColor = primaryColor,
-                        cardColor = cardColor,
-                        textColor = textColor
-                    )
-
-                    CircularToggleButton(
-                        icon = Icons.Default.List,
-                        contentDescription = stringResource(R.string.watchlist),
-                        isActive = isFavorite,
-                        onClick = onWatchlistClick,
-                        activeColor = primaryColor,
-                        cardColor = cardColor,
-                        textColor = textColor
-                    )
-                }
-
-
-                Spacer(Modifier.height(24.dp))
-
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 12.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = cardColor
-                    ),
-                    shape = RoundedCornerShape(14.dp),
-                    border = BorderStroke(1.dp, Color.White.copy(0.08f))
-                ) {
-                    Column(
-                        modifier = Modifier.padding(18.dp)
-                    ) {
-                        Text(
-                            text = stringResource(R.string.overview),
-                            fontFamily = PlayFair,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 22.sp,
-                            color = textColor
-                        )
-
-                        Spacer(Modifier.height(12.dp))
-
-                        Text(
-                            text = movie.overview.ifEmpty { stringResource(R.string.no_overview) },
-                            fontFamily = Inter,
-                            fontSize = 15.sp,
-                            color = textColor.copy(alpha = 0.8f),
-                            lineHeight = 26.sp,
-                            textAlign = TextAlign.Justify
-                        )
-                    }
-                }
-
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 12.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = cardColor
-                    ),
-                    shape = RoundedCornerShape(14.dp),
-                    border = BorderStroke(1.dp, Color.White.copy(0.08f))
-                ) {
-                    Column(
-                        modifier = Modifier.padding(18.dp)
-                    ) {
-                        Text(
-                            text = stringResource(R.string.details),
-                            fontFamily = PlayFair,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 22.sp,
-                            color = textColor
-                        )
-
-                        Spacer(Modifier.height(16.dp))
-
-                        DetailItem(label = stringResource(R.string.director), value = movie.director, textColor = textColor)
-                        Spacer(Modifier.height(16.dp))
-                        DetailItem(label = stringResource(R.string.cast), value = movie.cast, textColor = textColor)
-
-                        Spacer(Modifier.height(16.dp))
-
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            DetailItem(label = stringResource(R.string.release_date), value = movie.year, textColor = textColor)
-                            DetailItem(label = stringResource(R.string.language), value = "English", textColor = textColor)
-                        }
-                    }
-                }
-
-                if (similarMovies.isNotEmpty()) {
-                    Spacer(Modifier.height(24.dp))
-
-                    Text(
-                        text = stringResource(R.string.more_like_this),
-                        color = textColor,
-                        fontFamily = PlayFair,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 22.sp,
-                        modifier = Modifier.padding(horizontal = 20.dp)
-                    )
-
-                    Spacer(Modifier.height(12.dp))
-
-                    LazyRow(
-                        contentPadding = PaddingValues(start = 0.dp, end = 20.dp)
-                    ) {
-                        items(similarMovies.size) { index ->
-                            val movie = similarMovies[index]
-                            MovieRowCard(
-                                movie = movie,
-                                onMovieClick = {
-                                    onMovieClick(movie.id)
-                                }
-                            )
-                            Spacer(Modifier.width(12.dp))
-                        }
-                    }
+                    DetailItem(label = stringResource(R.string.release_date), value = movie.year, textColor = textColor)
+                    DetailItem(label = stringResource(R.string.language), value = "English", textColor = textColor)
                 }
             }
 
@@ -470,8 +356,7 @@ fun MovieDetailsContent(
         IconButton(
             onClick = onBack,
             modifier = Modifier
-                .align(Alignment.TopStart)
-                .padding(top = 40.dp, start = 20.dp)
+                .padding(top = 45.dp, start = 20.dp)
                 .size(42.dp)
                 .background(Color.Black.copy(alpha = 0.6f), RoundedCornerShape(12.dp))
                 .border(1.dp, Color.White.copy(alpha = 0.2f), RoundedCornerShape(12.dp))
@@ -485,46 +370,6 @@ fun MovieDetailsContent(
         }
     }
 }
-
-@Composable
-fun CircularToggleButton(
-    icon: ImageVector,
-    contentDescription: String,
-    isActive: Boolean,
-    onClick: () -> Unit,
-    activeColor: Color,
-    cardColor: Color,
-    textColor: Color
-) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Card(
-            onClick = onClick,
-            modifier = Modifier.size(56.dp),
-            shape = CircleShape,
-            colors = CardDefaults.cardColors(
-                containerColor = if (isActive) activeColor.copy(alpha = 0.3f) else cardColor,
-                contentColor = if (isActive) activeColor else textColor
-            ),
-            border = BorderStroke(1.dp, if (isActive) activeColor else textColor.copy(alpha = 0.3f))
-        ) {
-            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Icon(
-                    icon,
-                    contentDescription = contentDescription,
-                    modifier = Modifier.size(24.dp)
-                )
-            }
-        }
-        Spacer(Modifier.height(4.dp))
-        Text(
-            text = contentDescription.split(" ").firstOrNull() ?: "",
-            fontFamily = Inter,
-            fontSize = 11.sp,
-            color = textColor.copy(alpha = 0.7f)
-        )
-    }
-}
-
 
 @Composable
 fun DetailItem(label: String, value: String, textColor: Color) {

@@ -21,11 +21,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
@@ -34,40 +34,47 @@ import com.example.moviestime.R
 import com.example.moviestime.data.model.Movie
 import com.example.moviestime.ui.theme.Inter
 import com.example.moviestime.ui.theme.PlayFair
-import com.example.moviestime.viewmodel.AuthViewModel
 import com.example.moviestime.viewmodel.MainViewModel
 
-class ProfileScreen : Screen {
+object ProfileScreen : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-        val mainViewModel = LocalMainViewModel.current
-        val authViewModel = LocalAuthViewModel.current
+        val topBarState = LocalAppTopBarState.current
+        val mainViewModel: MainViewModel = viewModel()
+
+        LaunchedEffect(Unit) {
+            topBarState.value = AppTopBarConfig(
+                title = "Profile",
+                showBack = false,
+                onBack = null,
+                trailingContent = {
+                    IconButton(onClick = { navigator.push(SettingsScreen) }) {
+                        Icon(
+                            imageVector = Icons.Outlined.Settings,
+                            contentDescription = "Settings",
+                            tint = Color.White
+                        )
+                    }
+                }
+            )
+        }
 
         ProfileScreenContent(
             mainViewModel = mainViewModel,
-            authViewModel = authViewModel,
-            onMovieClick = { movieId -> navigator.push(MovieDetailsScreen(movieId)) },
-            onSettingsClick = { navigator.push(SettingsScreen()) },
-            onEditProfileClick = { navigator.push(EditProfileScreen()) }
+            onMovieClick = { navigator.push(MovieDetailsScreen(it)) },
+            onEditProfile = { navigator.push(EditProfileScreen()) }
         )
     }
 }
 
 @Composable
 fun ProfileScreenContent(
-    mainViewModel: MainViewModel,
-    authViewModel: AuthViewModel,
+    mainViewModel: MainViewModel = viewModel(),
     onMovieClick: (Int) -> Unit,
-    onSettingsClick: () -> Unit,
-    onEditProfileClick: () -> Unit
+    onEditProfile: () -> Unit
 ) {
     val watchlist by mainViewModel.favorites.collectAsState()
-    val userProfile by authViewModel.userProfile.collectAsState()
-
-    val userName = if (userProfile.name.isNotEmpty()) userProfile.name else stringResource(R.string.default_user_name)
-    val userEmail = if (userProfile.email.isNotEmpty()) userProfile.email else "user@example.com"
-    val userBio = if (userProfile.bio.isNotEmpty()) userProfile.bio else stringResource(R.string.bio_placeholder)
 
     val backgroundColor = colorResource(R.color.background)
     val primaryColor = colorResource(R.color.primary)
@@ -77,11 +84,7 @@ fun ProfileScreenContent(
     val goldColor = colorResource(R.color.secondary)
 
     var selectedTabIndex by remember { mutableIntStateOf(1) }
-    val tabs = listOf(
-        stringResource(R.string.reviews),
-        stringResource(R.string.watchlist),
-        stringResource(R.string.favorites)
-    )
+    val tabs = listOf("Reviews", "Watchlist", "Favorites")
 
     Column(
         modifier = Modifier
@@ -92,38 +95,6 @@ fun ProfileScreenContent(
     ) {
         Box(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 12.dp, bottom = 24.dp)
-        ) {
-            Text(
-                text = stringResource(R.string.profile),
-                fontFamily = PlayFair,
-                fontWeight = FontWeight.Bold,
-                fontSize = 24.sp,
-                color = textColor,
-                modifier = Modifier.align(Alignment.Center)
-            )
-
-            Box(
-                modifier = Modifier
-                    .align(Alignment.CenterEnd)
-                    .size(44.dp)
-                    .clip(RoundedCornerShape(12.dp))
-                    .border(2.dp, primaryColor, RoundedCornerShape(12.dp))
-                    .clickable { onSettingsClick() },
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Outlined.Settings,
-                    contentDescription = "Settings",
-                    tint = goldColor,
-                    modifier = Modifier.size(24.dp)
-                )
-            }
-        }
-
-        Box(
-            modifier = Modifier
                 .size(100.dp)
                 .border(2.dp, goldColor, CircleShape)
                 .padding(4.dp)
@@ -131,28 +102,19 @@ fun ProfileScreenContent(
                 .background(primaryColor),
             contentAlignment = Alignment.Center
         ) {
-            if (userProfile.photoUrl != null) {
-                AsyncImage(
-                    model = userProfile.photoUrl,
-                    contentDescription = "Profile Picture",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize()
-                )
-            } else {
-                Text(
-                    text = userName.take(1).uppercase(),
-                    fontFamily = Inter,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 40.sp,
-                    color = textColor
-                )
-            }
+            Text(
+                text = "Y",
+                fontFamily = Inter,
+                fontWeight = FontWeight.Bold,
+                fontSize = 40.sp,
+                color = textColor
+            )
         }
 
         Spacer(Modifier.height(16.dp))
 
         Text(
-            text = userName,
+            text = "youssohuyuiyuiyh",
             fontFamily = PlayFair,
             fontWeight = FontWeight.Bold,
             fontSize = 26.sp,
@@ -161,21 +123,11 @@ fun ProfileScreenContent(
         )
 
         Text(
-            text = userEmail,
+            text = "@youssohuyuiyuiyh",
             fontFamily = Inter,
             fontSize = 14.sp,
             color = mutedColor,
             textAlign = TextAlign.Center
-        )
-
-        Spacer(Modifier.height(12.dp))
-        Text(
-            text = userBio,
-            fontFamily = Inter,
-            fontSize = 13.sp,
-            color = textColor.copy(alpha = 0.8f),
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(horizontal = 24.dp)
         )
 
         Spacer(Modifier.height(24.dp))
@@ -184,15 +136,15 @@ fun ProfileScreenContent(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            ProfileStat(number = "0", label = stringResource(R.string.followers), textColor, mutedColor)
-            ProfileStat(number = "0", label = stringResource(R.string.following), textColor, mutedColor)
-            ProfileStat(number = "${watchlist.size}", label = stringResource(R.string.watchlist), textColor, mutedColor)
+            ProfileStat(number = "0", label = "Followers", textColor, mutedColor)
+            ProfileStat(number = "0", label = "Following", textColor, mutedColor)
+            ProfileStat(number = "${watchlist.size}", label = "Watchlist", textColor, mutedColor)
         }
 
         Spacer(Modifier.height(24.dp))
 
         OutlinedButton(
-            onClick = onEditProfileClick,
+            onClick = onEditProfile,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(48.dp),
@@ -203,7 +155,7 @@ fun ProfileScreenContent(
             )
         ) {
             Text(
-                text = stringResource(R.string.edit_profile),
+                text = "Edit Profile",
                 fontFamily = Inter,
                 fontWeight = FontWeight.SemiBold,
                 color = textColor
@@ -244,8 +196,8 @@ fun ProfileScreenContent(
         if (selectedTabIndex == 1) {
             if (watchlist.isEmpty()) {
                 EmptyTabState(
-                    message = stringResource(R.string.watchlist_empty),
-                    actionText = stringResource(R.string.add_movies),
+                    message = "Your watchlist is empty",
+                    actionText = "Add movies now",
                     mutedColor = mutedColor,
                     goldColor = goldColor
                 )
@@ -266,8 +218,8 @@ fun ProfileScreenContent(
             }
         } else {
             EmptyTabState(
-                message = stringResource(R.string.no_items),
-                actionText = stringResource(R.string.explore_movies),
+                message = "No items yet",
+                actionText = "Explore movies",
                 mutedColor = mutedColor,
                 goldColor = goldColor
             )
@@ -275,7 +227,6 @@ fun ProfileScreenContent(
     }
 }
 
-// Helper Composables unchanged
 @Composable
 fun ProfileMovieItem(movie: Movie, onClick: () -> Unit) {
     Card(
