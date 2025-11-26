@@ -14,9 +14,7 @@ import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -133,18 +131,6 @@ fun SettingsScreenContent(
 
         Spacer(Modifier.height(24.dp))
 
-        // --- Support Section ---
-        SectionHeader(title = stringResource(R.string.support_section), color = mutedColor)
-        SettingsGroup(cardColor = cardColor) {
-            SettingsItem(
-                icon = Icons.Outlined.HelpOutline,
-                title = stringResource(R.string.help_support),
-                textColor = textColor
-            )
-        }
-
-        Spacer(Modifier.height(40.dp))
-
         SettingsButton(
             icon = Icons.Default.Language,
             title = if (currentLanguage == "ar") stringResource(R.string.language_english) else stringResource(R.string.language_arabic),
@@ -171,6 +157,24 @@ fun SettingsScreenContent(
             color = Color(0xFFE53935),
             borderColor = Color(0xFFE53935).copy(alpha = 0.5f),
             onClick = onDeleteAccount
+        )
+
+        Spacer(Modifier.height(32.dp))
+
+        // --- Support Section ---
+        SectionHeader(title = stringResource(R.string.support_section), color = mutedColor)
+        SettingsGroup(cardColor = cardColor) {
+            SettingsItem(
+                icon = Icons.Outlined.HelpOutline,
+                title = stringResource(R.string.help_support),
+                textColor = textColor
+            )
+        }
+        Spacer(Modifier.height(12.dp))
+        HelpFeedbackCard(
+            cardColor = cardColor,
+            textColor = textColor,
+            mutedColor = mutedColor
         )
     }
 }
@@ -287,5 +291,84 @@ fun SettingsButton(
             fontSize = 16.sp,
             color = color
         )
+    }
+}
+
+@Composable
+fun HelpFeedbackCard(
+    cardColor: Color,
+    textColor: Color,
+    mutedColor: Color
+) {
+    var isExpanded by remember { mutableStateOf(false) }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(16.dp))
+            .background(cardColor)
+            .clickable { isExpanded = !isExpanded }
+            .padding(16.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Column {
+                Text(
+                    text = stringResource(R.string.help_support),
+                    fontFamily = PlayFair,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 18.sp,
+                    color = textColor
+                )
+                Text(
+                    text = if (isExpanded) stringResource(R.string.tap_to_hide) else stringResource(R.string.tap_to_expand),
+                    fontFamily = Inter,
+                    fontSize = 12.sp,
+                    color = mutedColor
+                )
+            }
+            Icon(
+                imageVector = if (isExpanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
+                contentDescription = null,
+                tint = textColor
+            )
+        }
+
+        if (isExpanded) {
+            Spacer(Modifier.height(12.dp))
+            Text(
+                text = "About MoviesTime",
+                fontFamily = PlayFair,
+                fontWeight = FontWeight.Bold,
+                fontSize = 16.sp,
+                color = textColor
+            )
+            Spacer(Modifier.height(8.dp))
+            Text(
+                text = "MoviesTime curates trending titles, genre-based picks, and editor notes so you can jump straight into the next movie night without digging through endless lists.",
+                fontFamily = Inter,
+                fontSize = 14.sp,
+                color = mutedColor,
+                lineHeight = 20.sp
+            )
+            Spacer(Modifier.height(12.dp))
+            Text(
+                text = "Need help or want to send feedback?",
+                fontFamily = Inter,
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 14.sp,
+                color = textColor
+            )
+            Spacer(Modifier.height(4.dp))
+            Text(
+                text = "CineVault@moviestime.app • @CineVault",
+                fontFamily = Inter,
+                fontSize = 14.sp,
+                color = mutedColor
+            )
+        }
     }
 }

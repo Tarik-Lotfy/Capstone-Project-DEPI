@@ -72,17 +72,21 @@ class AuthViewModel : ViewModel() {
     fun updateUserProfile(name: String, bio: String) {
         val user = auth.currentUser ?: return
 
-         _uiState.value = AuthUiState(isLoading = true)
+        _userProfile.value = _userProfile.value.copy(
+            name = name,
+            bio = bio
+        )
+        _uiState.value = AuthUiState(isUpdateSuccess = true)
 
         viewModelScope.launch {
             try {
                 withContext(Dispatchers.IO) {
-                     val profileUpdates = UserProfileChangeRequest.Builder()
+                    val profileUpdates = UserProfileChangeRequest.Builder()
                         .setDisplayName(name)
                         .build()
                     user.updateProfile(profileUpdates).await()
 
-                     val userData = hashMapOf(
+                    val userData = hashMapOf(
                         "bio" to bio,
                         "name" to name,
                         "email" to user.email
@@ -91,21 +95,9 @@ class AuthViewModel : ViewModel() {
                         .set(userData, SetOptions.merge())
                         .await()
                 }
-
-                 _userProfile.value = _userProfile.value.copy(
-                    name = name,
-                    bio = bio
-                )
-
-                 _uiState.value = AuthUiState(isLoading = false, isUpdateSuccess = true)
-
             } catch (e: Exception) {
                 Log.e("AuthViewModel", "Error updating profile", e)
-                _uiState.value = AuthUiState(error = e.message ?: "Unknown Error", isLoading = false)
-            } finally {
-                 if (_uiState.value.isLoading) {
-                    _uiState.value = _uiState.value.copy(isLoading = false)
-                }
+                _uiState.value = AuthUiState(error = e.message ?: "Unknown Error")
             }
         }
     }

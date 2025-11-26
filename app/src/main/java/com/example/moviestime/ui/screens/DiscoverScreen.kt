@@ -86,8 +86,9 @@ fun DiscoverScreenContent(
     val isRecommended = selectedGenreId == null && !isSearching
     val isGenreSelected = selectedGenreId != null && !isSearching
 
-    val genresWithRecommended = remember(genresApi) {
-        listOf(Genre(id = 0, name = "Recommended"))
+    val recommendedLabel = stringResource(R.string.recommended_movies)
+    val genresWithRecommended = remember(genresApi, recommendedLabel) {
+        listOf(Genre(id = 0, name = recommendedLabel)) + genresApi
     }
 
     val accentYellow = Color(0xFFF1C40F)
@@ -189,7 +190,7 @@ fun DiscoverScreenContent(
                 LazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                     items(genresWithRecommended, key = { it.id }) { genre ->
                         val isSelected = if (genre.id == 0) selectedGenreId == null else genre.id == selectedGenreId
-                        val displayName = if(genre.id == 0) stringResource(R.string.recommended_movies).replace(" Movies", "") else genre.name
+                        val displayName = genre.name
 
                         Box(
                             modifier = Modifier
@@ -197,7 +198,9 @@ fun DiscoverScreenContent(
                                 .background(
                                     if (isSelected) Color(0xFF6A0F1C) else Color(0xFFF1C40F)
                                 )
-                                .clickable { searchViewModel.onGenreSelected(genre.id) }
+                                .clickable {
+                                    searchViewModel.onGenreSelected(genre.id)
+                                }
                                 .padding(horizontal = 16.dp, vertical = 8.dp),
                         ) {
                             Text(
