@@ -1,6 +1,10 @@
 package com.example.moviestime.ui.screens
 
 import android.Manifest
+import android.content.ActivityNotFoundException
+import android.content.Intent
+import android.net.Uri
+import android.util.Log
 import androidx.annotation.RequiresPermission
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -20,15 +24,11 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.moviestime.viewmodel.MainViewModel
-import com.example.moviestime.viewmodel.ThemeViewModel
-import com.example.moviestime.viewmodel.NotificationViewModel
-import com.example.moviestime.viewmodel.LanguageViewModel
 import com.example.moviestime.viewmodel.AuthViewModel
-import android.content.Intent
-import android.net.Uri
-import android.content.ActivityNotFoundException
-import android.util.Log
+import com.example.moviestime.viewmodel.LanguageViewModel
+import com.example.moviestime.viewmodel.MainViewModel
+import com.example.moviestime.viewmodel.NotificationViewModel
+import com.example.moviestime.viewmodel.ThemeViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
@@ -138,6 +138,17 @@ fun MoviesApp(
                         },
                         onSettingsClick = {
                             navController.navigate("settings")
+                        },
+                        onEditProfileClick = {
+                            navController.navigate("edit_profile")
+                        }
+                    )
+                }
+                composable("edit_profile") {
+                    EditProfileScreen(
+                        authViewModel = authViewModel,
+                        onBackClick = {
+                            navController.popBackStack()
                         }
                     )
                 }
@@ -169,8 +180,6 @@ fun MoviesApp(
                             }
                         },
                         onShareClick = { movie -> },
-
-                        // ✅ السطر اللي بيحل المشكلة:
                         onMovieClick = { id ->
                             navController.navigate("movie/$id")
                         }
