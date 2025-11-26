@@ -116,7 +116,7 @@ fun ProfileScreenContent(
                 Icon(
                     imageVector = Icons.Outlined.Settings,
                     contentDescription = "Settings",
-                    tint = textColor,
+                    tint = goldColor,
                     modifier = Modifier.size(24.dp)
                 )
             }
