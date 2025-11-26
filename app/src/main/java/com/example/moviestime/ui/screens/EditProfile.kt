@@ -88,18 +88,7 @@ fun EditProfileScreen(
                     .imePadding(),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                 EditProfileTextField(
-                    value = userProfile.email,
-                    onValueChange = { },
-                    label = "Email",
-                    placeholder = "Email",
-                    supportingText = "Email cannot be changed directly.",
-                    cardColor = CardColor,
-                    textColor = MutedColor,
-                    mutedColor = MutedColor,
-                    borderColor = BorderColor,
-                    readOnly = true
-                )
+
 
                  EditProfileTextField(
                     value = fullName,
