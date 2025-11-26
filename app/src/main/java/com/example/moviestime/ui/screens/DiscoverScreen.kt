@@ -29,6 +29,8 @@ import com.example.moviestime.data.remote.Genre
 import com.example.moviestime.ui.components.MovieRowCard
 import com.example.moviestime.viewmodel.SearchViewModel
 import kotlin.math.ceil
+import com.example.moviestime.ui.theme.Inter
+import com.example.moviestime.ui.theme.PlayFair
 
 @Composable
 fun ShimmerMovieGrid() {

@@ -5,6 +5,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -33,6 +34,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.example.moviestime.R
 import com.example.moviestime.data.model.Movie
+import com.example.moviestime.ui.components.SectionWithRow
 import com.example.moviestime.ui.theme.Inter
 import com.example.moviestime.ui.theme.PlayFair
 import com.example.moviestime.viewmodel.MainViewModel
@@ -42,6 +44,7 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.List
+import com.example.moviestime.ui.components.MovieRowCard
 
 @SuppressLint("MissingPermission")
 @Composable
@@ -51,10 +54,12 @@ fun MovieDetailsScreen(
     mainViewModel: MainViewModel,
     onPlayClick: (Movie) -> Unit = {},
     onFavoriteClick: (Movie) -> Unit = {},
-    onShareClick: (Movie) -> Unit = {}
+    onShareClick: (Movie) -> Unit = {},
+    onMovieClick: (Int) -> Unit
 ) {
     val viewModel: MovieDetailsViewModel = viewModel()
     val movieState by viewModel.movieDetails.collectAsState()
+    val similarMovies by viewModel.similarMovies.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val favorites by mainViewModel.favorites.collectAsState()
 
@@ -87,6 +92,7 @@ fun MovieDetailsScreen(
 
             MovieDetailsContent(
                 movie = movie,
+                similarMovies = similarMovies,
                 isFavorite = isFav,
                 isWatched = isWatchedState.value,
                 onBack = onBack,
@@ -96,6 +102,8 @@ fun MovieDetailsScreen(
                     isWatchedState.value = !isWatchedState.value
                 },
                 onWatchlistClick = { mainViewModel.toggleFavorite(movie) },
+                onMovieClick = onMovieClick,
+                onFavoriteMovieClick = { movieToFav -> mainViewModel.toggleFavorite(movieToFav) },
                 backgroundColor = backgroundColor,
                 primaryColor = primaryColor,
                 textColor = textColor,
@@ -118,6 +126,7 @@ fun MovieDetailsScreen(
 @Composable
 fun MovieDetailsContent(
     movie: Movie,
+    similarMovies: List<Movie>,
     isFavorite: Boolean,
     isWatched: Boolean,
     onBack: () -> Unit,
@@ -125,6 +134,8 @@ fun MovieDetailsContent(
     onFavoriteClick: () -> Unit,
     onWatchedClick: () -> Unit,
     onWatchlistClick: () -> Unit,
+    onMovieClick: (Int) -> Unit,
+    onFavoriteMovieClick: (Movie) -> Unit,
     backgroundColor: Color,
     primaryColor: Color,
     textColor: Color,
@@ -285,8 +296,10 @@ fun MovieDetailsContent(
                 Spacer(Modifier.height(20.dp))
 
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceAround,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 90.dp),
+                    horizontalArrangement = Arrangement.spacedBy(20.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     CircularToggleButton(
@@ -298,15 +311,17 @@ fun MovieDetailsContent(
                         cardColor = cardColor,
                         textColor = textColor
                     )
+
                     CircularToggleButton(
                         icon = if (isWatched) Icons.Default.Check else Icons.Default.Visibility,
-                        contentDescription = if (isWatched) "Watched" else "Watched",
+                        contentDescription = "Watched",
                         isActive = isWatched,
                         onClick = onWatchedClick,
                         activeColor = primaryColor,
                         cardColor = cardColor,
                         textColor = textColor
                     )
+
                     CircularToggleButton(
                         icon = Icons.Default.List,
                         contentDescription = "Watchlist",
@@ -317,6 +332,7 @@ fun MovieDetailsContent(
                         textColor = textColor
                     )
                 }
+
 
                 Spacer(Modifier.height(24.dp))
 
@@ -389,6 +405,36 @@ fun MovieDetailsContent(
                         ) {
                             DetailItem(label = "Release date", value = movie.year, textColor = textColor)
                             DetailItem(label = "Language", value = "English", textColor = textColor)
+                        }
+                    }
+                }
+
+                if (similarMovies.isNotEmpty()) {
+                    Spacer(Modifier.height(24.dp))
+
+                    Text(
+                        text = "More Like This",
+                        color = textColor,
+                        fontFamily = PlayFair,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 22.sp,
+                        modifier = Modifier.padding(horizontal = 20.dp)
+                    )
+
+                    Spacer(Modifier.height(12.dp))
+
+                    LazyRow(
+                        contentPadding = PaddingValues(start = 0.dp, end = 20.dp)
+                    ) {
+                        items(similarMovies.size) { index ->
+                            val movie = similarMovies[index]
+                            MovieRowCard(
+                                movie = movie,
+                                onMovieClick = {
+                                    onMovieClick(movie.id)
+                                }
+                            )
+                            Spacer(Modifier.width(12.dp))
                         }
                     }
                 }

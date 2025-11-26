@@ -168,10 +168,15 @@ fun MoviesApp(
                                 navController.navigate("video_player_route/$encodedKey")
                             }
                         },
-                        onShareClick = { movie ->
+                        onShareClick = { movie -> },
+
+                        // ✅ السطر اللي بيحل المشكلة:
+                        onMovieClick = { id ->
+                            navController.navigate("movie/$id")
                         }
                     )
                 }
+
                 composable("video_player_route/{trailerKey}") { backStackEntry ->
                     val trailerKey = backStackEntry.arguments?.getString("trailerKey") ?: "ERROR"
 
