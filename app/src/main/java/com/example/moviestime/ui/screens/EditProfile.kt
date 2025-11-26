@@ -45,18 +45,14 @@ fun EditProfileScreen(
     val uiState by authViewModel.uiState.collectAsState()
     val context = LocalContext.current
 
-    // نستخدم remember لربط الحقول ببيانات المستخدم الحالية
-    // مفتاح الـ remember هو userProfile، ليتحدث لو تغيرت البيانات الخارجية
     var fullName by remember(userProfile) { mutableStateOf(userProfile.name) }
     var bio by remember(userProfile) { mutableStateOf(userProfile.bio) }
 
-    // --- مراقبة حالة النجاح ---
-    // هذا الجزء هو المسؤول عن الخروج التلقائي عند اكتمال الحفظ
     LaunchedEffect(uiState.isUpdateSuccess) {
         if (uiState.isUpdateSuccess) {
             Toast.makeText(context, "Profile updated successfully!", Toast.LENGTH_SHORT).show()
-            authViewModel.resetState() // إعادة ضبط الحالة لكي لا يخرج فوراً عند الدخول مرة أخرى
-            onBackClick() // العودة للخلف (للبروفايل)
+            authViewModel.resetState()
+            onBackClick()
         }
     }
 
@@ -77,8 +73,7 @@ fun EditProfileScreen(
         ) {
             Spacer(Modifier.height(16.dp))
 
-            // Avatar (Display Only)
-            AvatarSection(
+             AvatarSection(
                 initials = if (fullName.isNotEmpty()) fullName.take(1).uppercase() else "U",
                 imageUrl = userProfile.photoUrl,
                 goldColor = GoldColor,
@@ -93,8 +88,7 @@ fun EditProfileScreen(
                     .imePadding(),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                // Email (Read Only)
-                EditProfileTextField(
+                 EditProfileTextField(
                     value = userProfile.email,
                     onValueChange = { },
                     label = "Email",
@@ -107,8 +101,7 @@ fun EditProfileScreen(
                     readOnly = true
                 )
 
-                // Full Name
-                EditProfileTextField(
+                 EditProfileTextField(
                     value = fullName,
                     onValueChange = { fullName = it },
                     label = "Full Name",
@@ -120,8 +113,7 @@ fun EditProfileScreen(
                     borderColor = BorderColor
                 )
 
-                // Bio
-                EditProfileBioField(
+                 EditProfileBioField(
                     value = bio,
                     onValueChange = { if (it.length <= maxBioLength) bio = it },
                     label = "Bio",

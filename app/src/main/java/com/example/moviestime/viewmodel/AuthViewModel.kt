@@ -24,8 +24,7 @@ data class UserProfile(
     val photoUrl: String? = null
 )
 
-// إضافة حالة النجاح isUpdateSuccess
-data class AuthUiState(
+ data class AuthUiState(
     val isLoading: Boolean = false,
     val error: String? = null,
     val isUpdateSuccess: Boolean = false
@@ -73,20 +72,17 @@ class AuthViewModel : ViewModel() {
     fun updateUserProfile(name: String, bio: String) {
         val user = auth.currentUser ?: return
 
-        // 1. تشغيل التحميل
-        _uiState.value = AuthUiState(isLoading = true)
+         _uiState.value = AuthUiState(isLoading = true)
 
         viewModelScope.launch {
             try {
                 withContext(Dispatchers.IO) {
-                    // تحديث الاسم في Auth
-                    val profileUpdates = UserProfileChangeRequest.Builder()
+                     val profileUpdates = UserProfileChangeRequest.Builder()
                         .setDisplayName(name)
                         .build()
                     user.updateProfile(profileUpdates).await()
 
-                    // تحديث البايو في Firestore
-                    val userData = hashMapOf(
+                     val userData = hashMapOf(
                         "bio" to bio,
                         "name" to name,
                         "email" to user.email
@@ -96,33 +92,28 @@ class AuthViewModel : ViewModel() {
                         .await()
                 }
 
-                // تحديث البيانات محلياً
-                _userProfile.value = _userProfile.value.copy(
+                 _userProfile.value = _userProfile.value.copy(
                     name = name,
                     bio = bio
                 )
 
-                // 2. نجاح العملية: إيقاف التحميل وتفعيل إشارة النجاح
-                _uiState.value = AuthUiState(isLoading = false, isUpdateSuccess = true)
+                 _uiState.value = AuthUiState(isLoading = false, isUpdateSuccess = true)
 
             } catch (e: Exception) {
                 Log.e("AuthViewModel", "Error updating profile", e)
                 _uiState.value = AuthUiState(error = e.message ?: "Unknown Error", isLoading = false)
             } finally {
-                // ضمان إيقاف التحميل في حال حدوث أي خطأ غير متوقع
-                if (_uiState.value.isLoading) {
+                 if (_uiState.value.isLoading) {
                     _uiState.value = _uiState.value.copy(isLoading = false)
                 }
             }
         }
     }
 
-    // دالة لإعادة ضبط الحالة بعد الخروج من الصفحة
-    fun resetState() {
+     fun resetState() {
         _uiState.value = AuthUiState()
     }
 
-    // ... دوال تسجيل الدخول والتسجيل القديمة ...
 
     fun login(email: String, password: String) {
         if (!validateEmail(email)) {

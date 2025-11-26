@@ -95,7 +95,7 @@ fun SettingsScreen(
         SettingsGroup(cardColor = cardColor) {
             SettingsItem(
                 icon = Icons.Outlined.Notifications,
-                title = stringResource(R.string.notifications), // ترجمة
+                title = stringResource(R.string.notifications),
                 textColor = textColor,
                 showDivider = true
             )
@@ -116,11 +116,9 @@ fun SettingsScreen(
 
         Spacer(Modifier.height(40.dp))
 
-        // --- Language Switcher ---
-        SettingsButton(
+         SettingsButton(
             icon = Icons.Default.Language,
-            // عرض النص بناءً على اللغة الحالية
-            title = if (currentLanguage == "ar") stringResource(R.string.language_english) else stringResource(R.string.language_arabic),
+             title = if (currentLanguage == "ar") stringResource(R.string.language_english) else stringResource(R.string.language_arabic),
             color = textColor,
             borderColor = textColor.copy(alpha = 0.3f),
             onClick = onLanguageChange
@@ -128,10 +126,9 @@ fun SettingsScreen(
 
         Spacer(Modifier.height(16.dp))
 
-        // --- Actions ---
-        SettingsButton(
+         SettingsButton(
             icon = Icons.AutoMirrored.Filled.Logout,
-            title = stringResource(R.string.logout), // ترجمة
+            title = stringResource(R.string.logout),
             color = textColor,
             borderColor = textColor.copy(alpha = 0.3f),
             onClick = onSignOut
@@ -141,7 +138,7 @@ fun SettingsScreen(
 
         SettingsButton(
             icon = Icons.Outlined.Delete,
-            title = "Delete Account", // تحتاج لإضافة في strings.xml
+            title = "Delete Account",
             color = Color(0xFFE53935),
             borderColor = Color(0xFFE53935).copy(alpha = 0.5f),
             onClick = onDeleteAccount
@@ -149,8 +146,7 @@ fun SettingsScreen(
     }
 }
 
-// ... (Helper Composables remain the same)
-@Composable
+ @Composable
 fun SectionHeader(title: String, color: Color) {
     Text(
         text = title,
