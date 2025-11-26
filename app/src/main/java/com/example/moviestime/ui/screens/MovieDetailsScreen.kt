@@ -1,6 +1,7 @@
 package com.example.moviestime.ui.screens
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -93,7 +94,7 @@ fun MovieDetailsScreen(
                     .background(backgroundColor),
                 contentAlignment = Alignment.Center
             ) {
-                Text("فشل تحميل تفاصيل الفيلم", color = textColor)
+                Text("Failed to load movie details", color = textColor)
             }
         }
     }
@@ -161,7 +162,7 @@ fun MovieDetailsContent(
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .align(Alignment.BottomStart)
-                        .padding(start = 20.dp, bottom = 0.dp)
+                        .padding(start = 20.dp)
                         .width(130.dp)
                         .height(190.dp)
                         .clip(RoundedCornerShape(12.dp))
@@ -175,7 +176,7 @@ fun MovieDetailsContent(
                 ) {
                     Text(
                         text = movie.title,
-                        fontFamily = PlayFair, // Corrected
+                        fontFamily = PlayFair,
                         fontWeight = FontWeight.Bold,
                         fontSize = 26.sp,
                         color = textColor,
@@ -260,50 +261,79 @@ fun MovieDetailsContent(
                     )
                 }
 
-                Spacer(Modifier.height(32.dp))
+                Spacer(Modifier.height(24.dp))
 
-                Text(
-                    text = "Overview", // Corrected Typo
-                    fontFamily = PlayFair,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 22.sp,
-                    color = textColor
-                )
-
-                Spacer(Modifier.height(12.dp))
-
-                Text(
-                    text = movie.overview.ifEmpty { "No overview available." },
-                    fontFamily = Inter,
-                    fontSize = 15.sp,
-                    color = textColor.copy(alpha = 0.8f),
-                    lineHeight = 26.sp,
-                    textAlign = TextAlign.Justify
-                )
-
-                Spacer(Modifier.height(32.dp))
-
-                Text(
-                    text = "Details",
-                    fontFamily = PlayFair,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 22.sp,
-                    color = textColor
-                )
-
-                Spacer(Modifier.height(16.dp))
-
-                DetailItem(label = "Director", value = movie.director, textColor = textColor)
-                Spacer(Modifier.height(16.dp))
-                DetailItem(label = "Cast", value = movie.cast, textColor = textColor)
-
-                Spacer(Modifier.height(16.dp))
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 12.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = cardColor
+                    ),
+                    shape = RoundedCornerShape(14.dp),
+                    border = BorderStroke(1.dp, Color.White.copy(0.08f))
                 ) {
-                    DetailItem(label = "Release date", value = movie.year, textColor = textColor)
-                    DetailItem(label = "Language", value = "English", textColor = textColor)
+                    Column(
+                        modifier = Modifier.padding(18.dp)
+                    ) {
+                        Text(
+                            text = "Overview",
+                            fontFamily = PlayFair,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 22.sp,
+                            color = textColor
+                        )
+
+                        Spacer(Modifier.height(12.dp))
+
+                        Text(
+                            text = movie.overview.ifEmpty { "No overview available." },
+                            fontFamily = Inter,
+                            fontSize = 15.sp,
+                            color = textColor.copy(alpha = 0.8f),
+                            lineHeight = 26.sp,
+                            textAlign = TextAlign.Justify
+                        )
+                    }
+                }
+
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 12.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = cardColor
+                    ),
+                    shape = RoundedCornerShape(14.dp),
+                    border = BorderStroke(1.dp, Color.White.copy(0.08f))
+                ) {
+                    Column(
+                        modifier = Modifier.padding(18.dp)
+                    ) {
+                        Text(
+                            text = "Details",
+                            fontFamily = PlayFair,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 22.sp,
+                            color = textColor
+                        )
+
+                        Spacer(Modifier.height(16.dp))
+
+                        DetailItem(label = "Director", value = movie.director, textColor = textColor)
+                        Spacer(Modifier.height(16.dp))
+                        DetailItem(label = "Cast", value = movie.cast, textColor = textColor)
+
+                        Spacer(Modifier.height(16.dp))
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            DetailItem(label = "Release date", value = movie.year, textColor = textColor)
+                            DetailItem(label = "Language", value = "English", textColor = textColor)
+                        }
+                    }
                 }
             }
 
@@ -313,7 +343,8 @@ fun MovieDetailsContent(
         IconButton(
             onClick = onBack,
             modifier = Modifier
-                .padding(top = 45.dp, start = 20.dp)
+                .align(Alignment.TopStart)
+                .padding(top = 40.dp, start = 20.dp)
                 .size(42.dp)
                 .background(Color.Black.copy(alpha = 0.6f), RoundedCornerShape(12.dp))
                 .border(1.dp, Color.White.copy(alpha = 0.2f), RoundedCornerShape(12.dp))
