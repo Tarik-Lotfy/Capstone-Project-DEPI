@@ -1,10 +1,6 @@
 package com.example.moviestime.ui.screens
 
 import android.Manifest
-import android.content.ActivityNotFoundException
-import android.content.Intent
-import android.net.Uri
-import android.util.Log
 import androidx.annotation.RequiresPermission
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -18,17 +14,29 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
+import cafe.adriel.voyager.navigator.CurrentScreen
+import cafe.adriel.voyager.navigator.Navigator
+import com.example.moviestime.R
 import com.example.moviestime.viewmodel.AuthViewModel
 import com.example.moviestime.viewmodel.LanguageViewModel
 import com.example.moviestime.viewmodel.MainViewModel
 import com.example.moviestime.viewmodel.NotificationViewModel
 import com.example.moviestime.viewmodel.ThemeViewModel
+
+// تعريف CompositionLocals لتمرير الـ ViewModels للشاشات
+val LocalMainViewModel =
+    staticCompositionLocalOf<MainViewModel> { error("No MainViewModel provided") }
+val LocalThemeViewModel =
+    staticCompositionLocalOf<ThemeViewModel> { error("No ThemeViewModel provided") }
+val LocalNotificationViewModel =
+    staticCompositionLocalOf<NotificationViewModel> { error("No NotificationViewModel provided") }
+val LocalLanguageViewModel =
+    staticCompositionLocalOf<LanguageViewModel> { error("No LanguageViewModel provided") }
+val LocalAuthViewModel =
+    staticCompositionLocalOf<AuthViewModel> { error("No AuthViewModel provided") }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
@@ -40,159 +48,101 @@ fun MoviesApp(
     languageViewModel: LanguageViewModel,
     authViewModel: AuthViewModel = viewModel()
 ) {
-    val navController = rememberNavController()
+    // توفير الـ ViewModels لجميع الشاشات داخل التطبيق
+    CompositionLocalProvider(
+        LocalMainViewModel provides mainViewModel,
+        LocalThemeViewModel provides themeViewModel,
+        LocalNotificationViewModel provides notificationViewModel,
+        LocalLanguageViewModel provides languageViewModel,
+        LocalAuthViewModel provides authViewModel
+    ) {
+        Navigator(HomeScreen()) { navigator ->
+            val selectedTab by mainViewModel.uiState.collectAsState()
 
-    val selectedTab by mainViewModel.uiState.collectAsState()
+            // مزامنة التبويب المختار مع الشاشة الحالية
+            LaunchedEffect(navigator.lastItem) {
+                when (navigator.lastItem) {
+                    is HomeScreen -> mainViewModel.selectTab(0)
+                    is DiscoverScreen -> mainViewModel.selectTab(1)
+                    is ProfileScreen -> mainViewModel.selectTab(2)
+                }
+            }
 
-    LaunchedEffect(selectedTab.selectedTab) {
-        when (selectedTab.selectedTab) {
-            0 -> navController.navigate("home") {
-                launchSingleTop = true
-                restoreState = true
-            }
-            1 -> navController.navigate("discover") {
-                launchSingleTop = true
-                restoreState = true
-            }
-            2 -> navController.navigate("profile") {
-                launchSingleTop = true
-                restoreState = true
-            }
-        }
-    }
-
-    val tabs = listOf("Home", "Discover", "Profile")
-    val icons = listOf(Icons.Default.Home, Icons.Default.Explore, Icons.Default.Person)
-    Scaffold(
-        topBar = {
-            CenterAlignedTopAppBar(
-                title = {
-                    Text(
-                        "CineVault",
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
-                    )
-                },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = Color.Transparent
-                ),
+            val tabs = listOf(
+                stringResource(R.string.home),
+                stringResource(R.string.discover),
+                stringResource(R.string.profile)
             )
-        },
-        bottomBar = {
-            NavigationBar(
-                containerColor = Color.Black.copy(alpha = 0.7f)
-            ) {
-                tabs.forEachIndexed { index, title ->
-                    NavigationBarItem(
-                        icon = {
-                            Icon(
-                                icons[index],
-                                contentDescription = title,
-                                tint = if (selectedTab.selectedTab == index) MaterialTheme.colorScheme.primary else Color.White.copy(alpha = 0.7f)
-                            )
-                        },
-                        label = {
-                            Text(
-                                title,
-                                color = if (selectedTab.selectedTab == index) MaterialTheme.colorScheme.primary else Color.White.copy(alpha = 0.7f)
-                            )
-                        },
-                        selected = selectedTab.selectedTab == index,
-                        onClick = { mainViewModel.selectTab(index) },
-                        colors = NavigationBarItemDefaults.colors(
-                            indicatorColor = Color.White.copy(alpha = 0.2f)
+            val icons = listOf(Icons.Default.Home, Icons.Default.Explore, Icons.Default.Person)
+
+            Scaffold(
+                topBar = {
+                    // إخفاء الشريط العلوي في شاشة مشغل الفيديو أو حسب الحاجة
+                    if (navigator.lastItem !is VideoPlayerScreen) {
+                        CenterAlignedTopAppBar(
+                            title = {
+                                Text(
+                                    stringResource(R.string.app_name),
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color.White
+                                )
+                            },
+                            colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                                containerColor = Color.Transparent
+                            ),
                         )
-                    )
-                }
-            }
-        },
-        containerColor = Color.Transparent
-    ) { padding ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background)
-                .padding(padding)
-        ) {
-            NavHost(navController = navController, startDestination = "home") {
-                composable("home") {
-                    HomeScreen(
-                        navController = navController,
-                        homeViewModel = viewModel(),
-                        mainViewModel = mainViewModel
-                    )
-                }
-                composable("discover") {
-                    DiscoverScreen(
-                        navController = navController,
-                        searchViewModel = viewModel()
-                    )
-                }
-                composable("profile") {
-                    ProfileScreen(
-                        mainViewModel = mainViewModel,
-                        themeViewModel = themeViewModel,
-                        languageViewModel = languageViewModel,
-                        onMovieClick = { movieId ->
-                            navController.navigate("movie/$movieId")
-                        },
-                        onSettingsClick = {
-                            navController.navigate("settings")
-                        },
-                        onEditProfileClick = {
-                            navController.navigate("edit_profile")
-                        }
-                    )
-                }
-                composable("edit_profile") {
-                    EditProfileScreen(
-                        authViewModel = authViewModel,
-                        onBackClick = {
-                            navController.popBackStack()
-                        }
-                    )
-                }
-                composable("settings") {
-                    SettingsScreen(
-                        onBack = { navController.popBackStack() },
-                        onSignOut = {
-                            authViewModel.logout()
-                        }
-                    )
-                }
-
-                composable("search") {
-                    SearchScreen(
-                        navController = navController,
-                        searchViewModel = viewModel()
-                    )
-                }
-                composable("movie/{movieId}") { backStackEntry ->
-                    val movieId = backStackEntry.arguments?.getString("movieId")?.toInt() ?: 1
-                    MovieDetailsScreen(
-                        movieId = movieId,
-                        mainViewModel = mainViewModel,
-                        onBack = { navController.popBackStack() },
-                        onPlayClick = { movie ->
-                            movie.trailerKey?.let { key ->
-                                val encodedKey = java.net.URLEncoder.encode(key, "UTF-8")
-                                navController.navigate("video_player_route/$encodedKey")
+                    }
+                },
+                bottomBar = {
+                    if (navigator.lastItem is HomeScreen || navigator.lastItem is DiscoverScreen || navigator.lastItem is ProfileScreen) {
+                        NavigationBar(
+                            containerColor = Color.Black.copy(alpha = 0.7f)
+                        ) {
+                            tabs.forEachIndexed { index, title ->
+                                NavigationBarItem(
+                                    icon = {
+                                        Icon(
+                                            icons[index],
+                                            contentDescription = title,
+                                            tint = if (selectedTab.selectedTab == index) MaterialTheme.colorScheme.primary else Color.White.copy(
+                                                alpha = 0.7f
+                                            )
+                                        )
+                                    },
+                                    label = {
+                                        Text(
+                                            title,
+                                            color = if (selectedTab.selectedTab == index) MaterialTheme.colorScheme.primary else Color.White.copy(
+                                                alpha = 0.7f
+                                            )
+                                        )
+                                    },
+                                    selected = selectedTab.selectedTab == index,
+                                    onClick = {
+                                        mainViewModel.selectTab(index)
+                                        when (index) {
+                                            0 -> navigator.replaceAll(HomeScreen())
+                                            1 -> navigator.replaceAll(DiscoverScreen())
+                                            2 -> navigator.replaceAll(ProfileScreen())
+                                        }
+                                    },
+                                    colors = NavigationBarItemDefaults.colors(
+                                        indicatorColor = Color.White.copy(alpha = 0.2f)
+                                    )
+                                )
                             }
-                        },
-                        onShareClick = { movie -> },
-                        onMovieClick = { id ->
-                            navController.navigate("movie/$id")
                         }
-                    )
-                }
-
-                composable("video_player_route/{trailerKey}") { backStackEntry ->
-                    val trailerKey = backStackEntry.arguments?.getString("trailerKey") ?: "ERROR"
-
-                    VideoPlayerScreen(
-                        trailerKey = trailerKey,
-                        onBack = { navController.popBackStack() }
-                    )
+                    }
+                },
+                containerColor = Color.Transparent
+            ) { padding ->
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(MaterialTheme.colorScheme.background)
+                        .padding(padding)
+                ) {
+                     CurrentScreen()
                 }
             }
         }

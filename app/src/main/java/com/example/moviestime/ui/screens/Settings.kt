@@ -15,6 +15,8 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -25,12 +27,35 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import com.example.moviestime.R
 import com.example.moviestime.ui.theme.Inter
 import com.example.moviestime.ui.theme.PlayFair
+import com.example.moviestime.viewmodel.AuthViewModel
+import com.example.moviestime.viewmodel.LanguageViewModel
+
+class SettingsScreen : Screen {
+    @Composable
+    override fun Content() {
+        val navigator = LocalNavigator.currentOrThrow
+        val authViewModel = LocalAuthViewModel.current
+        val languageViewModel = LocalLanguageViewModel.current
+        val currentLanguage by languageViewModel.currentLanguage.collectAsState()
+
+        SettingsScreenContent(
+            onBack = { navigator.pop() },
+            onSignOut = { authViewModel.logout() },
+            onEditProfile = { navigator.push(EditProfileScreen()) },
+            onLanguageChange = { languageViewModel.toggleLanguage() },
+            currentLanguage = currentLanguage
+        )
+    }
+}
 
 @Composable
-fun SettingsScreen(
+fun SettingsScreenContent(
     onBack: () -> Unit,
     onSignOut: () -> Unit,
     onEditProfile: () -> Unit = {},
@@ -68,7 +93,7 @@ fun SettingsScreen(
             }
 
             Text(
-                text = stringResource(R.string.settings), // ترجمة العنوان
+                text = stringResource(R.string.settings),
                 fontFamily = PlayFair,
                 fontWeight = FontWeight.Bold,
                 fontSize = 26.sp,
@@ -78,11 +103,11 @@ fun SettingsScreen(
         }
 
         // --- Account Section ---
-        SectionHeader(title = "ACCOUNT", color = mutedColor) // يمكن إضافتها لملف strings لاحقاً
+        SectionHeader(title = stringResource(R.string.account_section), color = mutedColor)
         SettingsGroup(cardColor = cardColor) {
             SettingsItem(
                 icon = Icons.Outlined.Person,
-                title = stringResource(R.string.edit_profile), // ترجمة
+                title = stringResource(R.string.edit_profile),
                 textColor = textColor,
                 onClick = onEditProfile
             )
@@ -91,7 +116,7 @@ fun SettingsScreen(
         Spacer(Modifier.height(24.dp))
 
         // --- Preferences Section ---
-        SectionHeader(title = "PREFERENCES", color = mutedColor)
+        SectionHeader(title = stringResource(R.string.preferences_section), color = mutedColor)
         SettingsGroup(cardColor = cardColor) {
             SettingsItem(
                 icon = Icons.Outlined.Notifications,
@@ -99,26 +124,30 @@ fun SettingsScreen(
                 textColor = textColor,
                 showDivider = true
             )
-
+            SettingsItem(
+                icon = Icons.Outlined.Security,
+                title = stringResource(R.string.privacy),
+                textColor = textColor
+            )
         }
 
         Spacer(Modifier.height(24.dp))
 
         // --- Support Section ---
-        SectionHeader(title = "SUPPORT", color = mutedColor)
+        SectionHeader(title = stringResource(R.string.support_section), color = mutedColor)
         SettingsGroup(cardColor = cardColor) {
             SettingsItem(
                 icon = Icons.Outlined.HelpOutline,
-                title = stringResource(R.string.help_support), // ترجمة
+                title = stringResource(R.string.help_support),
                 textColor = textColor
             )
         }
 
         Spacer(Modifier.height(40.dp))
 
-         SettingsButton(
+        SettingsButton(
             icon = Icons.Default.Language,
-             title = if (currentLanguage == "ar") stringResource(R.string.language_english) else stringResource(R.string.language_arabic),
+            title = if (currentLanguage == "ar") stringResource(R.string.language_english) else stringResource(R.string.language_arabic),
             color = textColor,
             borderColor = textColor.copy(alpha = 0.3f),
             onClick = onLanguageChange
@@ -126,7 +155,7 @@ fun SettingsScreen(
 
         Spacer(Modifier.height(16.dp))
 
-         SettingsButton(
+        SettingsButton(
             icon = Icons.AutoMirrored.Filled.Logout,
             title = stringResource(R.string.logout),
             color = textColor,
@@ -138,7 +167,7 @@ fun SettingsScreen(
 
         SettingsButton(
             icon = Icons.Outlined.Delete,
-            title = "Delete Account",
+            title = stringResource(R.string.delete_account),
             color = Color(0xFFE53935),
             borderColor = Color(0xFFE53935).copy(alpha = 0.5f),
             onClick = onDeleteAccount
@@ -146,7 +175,7 @@ fun SettingsScreen(
     }
 }
 
- @Composable
+@Composable
 fun SectionHeader(title: String, color: Color) {
     Text(
         text = title,

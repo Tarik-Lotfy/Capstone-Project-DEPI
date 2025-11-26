@@ -26,23 +26,38 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import coil.compose.AsyncImage
 import com.example.moviestime.R
 import com.example.moviestime.data.model.Movie
 import com.example.moviestime.ui.theme.Inter
 import com.example.moviestime.ui.theme.PlayFair
-import com.example.moviestime.viewmodel.LanguageViewModel
-import com.example.moviestime.viewmodel.MainViewModel
-import com.example.moviestime.viewmodel.ThemeViewModel
 import com.example.moviestime.viewmodel.AuthViewModel
+import com.example.moviestime.viewmodel.MainViewModel
+
+class ProfileScreen : Screen {
+    @Composable
+    override fun Content() {
+        val navigator = LocalNavigator.currentOrThrow
+        val mainViewModel = LocalMainViewModel.current
+        val authViewModel = LocalAuthViewModel.current
+
+        ProfileScreenContent(
+            mainViewModel = mainViewModel,
+            authViewModel = authViewModel,
+            onMovieClick = { movieId -> navigator.push(MovieDetailsScreen(movieId)) },
+            onSettingsClick = { navigator.push(SettingsScreen()) },
+            onEditProfileClick = { navigator.push(EditProfileScreen()) }
+        )
+    }
+}
 
 @Composable
-fun ProfileScreen(
-    mainViewModel: MainViewModel = viewModel(),
-    themeViewModel: ThemeViewModel = viewModel(),
-    languageViewModel: LanguageViewModel = viewModel(),
-    authViewModel: AuthViewModel = viewModel(),
+fun ProfileScreenContent(
+    mainViewModel: MainViewModel,
+    authViewModel: AuthViewModel,
     onMovieClick: (Int) -> Unit,
     onSettingsClick: () -> Unit,
     onEditProfileClick: () -> Unit
@@ -50,9 +65,9 @@ fun ProfileScreen(
     val watchlist by mainViewModel.favorites.collectAsState()
     val userProfile by authViewModel.userProfile.collectAsState()
 
-    val userName = if (userProfile.name.isNotEmpty()) userProfile.name else "Movie Lover"
+    val userName = if (userProfile.name.isNotEmpty()) userProfile.name else stringResource(R.string.default_user_name)
     val userEmail = if (userProfile.email.isNotEmpty()) userProfile.email else "user@example.com"
-    val userBio = if (userProfile.bio.isNotEmpty()) userProfile.bio else "Tell us about your love for cinema..."
+    val userBio = if (userProfile.bio.isNotEmpty()) userProfile.bio else stringResource(R.string.bio_placeholder)
 
     val backgroundColor = colorResource(R.color.background)
     val primaryColor = colorResource(R.color.primary)
@@ -62,11 +77,10 @@ fun ProfileScreen(
     val goldColor = colorResource(R.color.secondary)
 
     var selectedTabIndex by remember { mutableIntStateOf(1) }
-    // ترجمة التابات
     val tabs = listOf(
-        "Reviews", // غير موجودة في strings.xml
+        stringResource(R.string.reviews),
         stringResource(R.string.watchlist),
-        "Favorites" // غير موجودة في strings.xml
+        stringResource(R.string.favorites)
     )
 
     Column(
@@ -76,14 +90,13 @@ fun ProfileScreen(
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // --- Header ---
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 12.dp, bottom = 24.dp)
         ) {
             Text(
-                text = stringResource(R.string.profile), // ترجمة
+                text = stringResource(R.string.profile),
                 fontFamily = PlayFair,
                 fontWeight = FontWeight.Bold,
                 fontSize = 24.sp,
@@ -109,7 +122,6 @@ fun ProfileScreen(
             }
         }
 
-        // ... (Profile Image & Stats remain the same code)
         Box(
             modifier = Modifier
                 .size(100.dp)
@@ -172,14 +184,13 @@ fun ProfileScreen(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            ProfileStat(number = "0", label = "Followers", textColor, mutedColor)
-            ProfileStat(number = "0", label = "Following", textColor, mutedColor)
+            ProfileStat(number = "0", label = stringResource(R.string.followers), textColor, mutedColor)
+            ProfileStat(number = "0", label = stringResource(R.string.following), textColor, mutedColor)
             ProfileStat(number = "${watchlist.size}", label = stringResource(R.string.watchlist), textColor, mutedColor)
         }
 
         Spacer(Modifier.height(24.dp))
 
-        // Edit Button (Translated)
         OutlinedButton(
             onClick = onEditProfileClick,
             modifier = Modifier
@@ -192,7 +203,7 @@ fun ProfileScreen(
             )
         ) {
             Text(
-                text = stringResource(R.string.edit_profile), // ترجمة
+                text = stringResource(R.string.edit_profile),
                 fontFamily = Inter,
                 fontWeight = FontWeight.SemiBold,
                 color = textColor
@@ -201,7 +212,6 @@ fun ProfileScreen(
 
         Spacer(Modifier.height(24.dp))
 
-        // --- Tabs ---
         Container(color = cardColor, shape = RoundedCornerShape(12.dp)) {
             Row(modifier = Modifier.fillMaxWidth()) {
                 tabs.forEachIndexed { index, title ->
@@ -229,15 +239,13 @@ fun ProfileScreen(
             }
         }
 
-        // ... (Rest of content logic remains same)
         Spacer(Modifier.height(20.dp))
 
-        // --- Content ---
-        if (selectedTabIndex == 1) { // Watchlist Tab
+        if (selectedTabIndex == 1) {
             if (watchlist.isEmpty()) {
                 EmptyTabState(
-                    message = stringResource(R.string.no_results), // استخدام نص "لا نتائج" مؤقتاً
-                    actionText = stringResource(R.string.discover),
+                    message = stringResource(R.string.watchlist_empty),
+                    actionText = stringResource(R.string.add_movies),
                     mutedColor = mutedColor,
                     goldColor = goldColor
                 )
@@ -258,8 +266,8 @@ fun ProfileScreen(
             }
         } else {
             EmptyTabState(
-                message = stringResource(R.string.no_results),
-                actionText = stringResource(R.string.discover),
+                message = stringResource(R.string.no_items),
+                actionText = stringResource(R.string.explore_movies),
                 mutedColor = mutedColor,
                 goldColor = goldColor
             )
@@ -267,7 +275,7 @@ fun ProfileScreen(
     }
 }
 
-// ... (Helper Composables remain the same)
+// Helper Composables unchanged
 @Composable
 fun ProfileMovieItem(movie: Movie, onClick: () -> Unit) {
     Card(

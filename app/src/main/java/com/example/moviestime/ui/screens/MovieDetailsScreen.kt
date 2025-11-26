@@ -26,29 +26,53 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import coil.compose.AsyncImage
 import com.example.moviestime.R
 import com.example.moviestime.data.model.Movie
-import com.example.moviestime.ui.components.SectionWithRow
+import com.example.moviestime.ui.components.MovieRowCard
 import com.example.moviestime.ui.theme.Inter
 import com.example.moviestime.ui.theme.PlayFair
 import com.example.moviestime.viewmodel.MainViewModel
 import com.example.moviestime.viewmodel.MovieDetailsViewModel
-
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.List
-import com.example.moviestime.ui.components.MovieRowCard
+
+class MovieDetailsScreen(val movieId: Int) : Screen {
+    @Composable
+    override fun Content() {
+        val navigator = LocalNavigator.currentOrThrow
+        val mainViewModel = LocalMainViewModel.current
+
+        MovieDetailsScreenContent(
+            movieId = movieId,
+            onBack = { navigator.pop() },
+            mainViewModel = mainViewModel,
+            onPlayClick = { movie ->
+                movie.trailerKey?.let { key ->
+                    // قد تحتاج لتشفير المفتاح إذا كان يحتوي على رموز خاصة، ولكن عادة في Voyager نمرر البيانات كـ String بسيط
+                    val encodedKey = java.net.URLEncoder.encode(key, "UTF-8")
+                    navigator.push(VideoPlayerScreen(encodedKey))
+                }
+            },
+            onMovieClick = { id -> navigator.push(MovieDetailsScreen(id)) }
+        )
+    }
+}
 
 @SuppressLint("MissingPermission")
 @Composable
-fun MovieDetailsScreen(
+fun MovieDetailsScreenContent(
     movieId: Int,
     onBack: () -> Unit = {},
     mainViewModel: MainViewModel,
@@ -117,7 +141,7 @@ fun MovieDetailsScreen(
                     .background(backgroundColor),
                 contentAlignment = Alignment.Center
             ) {
-                Text("Failed to load movie details", color = textColor)
+                Text(stringResource(R.string.failed_load_details), color = textColor)
             }
         }
     }
@@ -233,7 +257,7 @@ fun MovieDetailsContent(
                         Spacer(Modifier.width(16.dp))
 
                         Text(
-                            text = "${movie.duration} min",
+                            text = "${movie.duration} ${stringResource(R.string.min)}",
                             fontFamily = Inter,
                             fontSize = 14.sp,
                             color = textColor.copy(alpha = 0.7f)
@@ -249,7 +273,7 @@ fun MovieDetailsContent(
                         modifier = Modifier.padding(top = 4.dp)
                     ) {
                         Text(
-                            text = movie.genre.split(",").firstOrNull() ?: "Movie",
+                            text = movie.genre.split(",").firstOrNull() ?: stringResource(R.string.movie_default),
                             fontFamily = Inter,
                             fontSize = 12.sp,
                             color = textColor.copy(alpha = 0.9f),
@@ -286,7 +310,7 @@ fun MovieDetailsContent(
                     )
                     Spacer(Modifier.width(10.dp))
                     Text(
-                        text = "Play Trailer",
+                        text = stringResource(R.string.play_trailer),
                         fontFamily = Inter,
                         fontWeight = FontWeight.Bold,
                         fontSize = 18.sp
@@ -304,7 +328,7 @@ fun MovieDetailsContent(
                 ) {
                     CircularToggleButton(
                         icon = if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                        contentDescription = "Favorite",
+                        contentDescription = stringResource(R.string.favorites),
                         isActive = isFavorite,
                         onClick = onFavoriteClick,
                         activeColor = goldColor,
@@ -314,7 +338,7 @@ fun MovieDetailsContent(
 
                     CircularToggleButton(
                         icon = if (isWatched) Icons.Default.Check else Icons.Default.Visibility,
-                        contentDescription = "Watched",
+                        contentDescription = stringResource(R.string.movies_watched), // Or a "Watched" string
                         isActive = isWatched,
                         onClick = onWatchedClick,
                         activeColor = primaryColor,
@@ -324,7 +348,7 @@ fun MovieDetailsContent(
 
                     CircularToggleButton(
                         icon = Icons.Default.List,
-                        contentDescription = "Watchlist",
+                        contentDescription = stringResource(R.string.watchlist),
                         isActive = isFavorite,
                         onClick = onWatchlistClick,
                         activeColor = primaryColor,
@@ -350,7 +374,7 @@ fun MovieDetailsContent(
                         modifier = Modifier.padding(18.dp)
                     ) {
                         Text(
-                            text = "Overview",
+                            text = stringResource(R.string.overview),
                             fontFamily = PlayFair,
                             fontWeight = FontWeight.Bold,
                             fontSize = 22.sp,
@@ -360,7 +384,7 @@ fun MovieDetailsContent(
                         Spacer(Modifier.height(12.dp))
 
                         Text(
-                            text = movie.overview.ifEmpty { "No overview available." },
+                            text = movie.overview.ifEmpty { stringResource(R.string.no_overview) },
                             fontFamily = Inter,
                             fontSize = 15.sp,
                             color = textColor.copy(alpha = 0.8f),
@@ -384,7 +408,7 @@ fun MovieDetailsContent(
                         modifier = Modifier.padding(18.dp)
                     ) {
                         Text(
-                            text = "Details",
+                            text = stringResource(R.string.details),
                             fontFamily = PlayFair,
                             fontWeight = FontWeight.Bold,
                             fontSize = 22.sp,
@@ -393,9 +417,9 @@ fun MovieDetailsContent(
 
                         Spacer(Modifier.height(16.dp))
 
-                        DetailItem(label = "Director", value = movie.director, textColor = textColor)
+                        DetailItem(label = stringResource(R.string.director), value = movie.director, textColor = textColor)
                         Spacer(Modifier.height(16.dp))
-                        DetailItem(label = "Cast", value = movie.cast, textColor = textColor)
+                        DetailItem(label = stringResource(R.string.cast), value = movie.cast, textColor = textColor)
 
                         Spacer(Modifier.height(16.dp))
 
@@ -403,8 +427,8 @@ fun MovieDetailsContent(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            DetailItem(label = "Release date", value = movie.year, textColor = textColor)
-                            DetailItem(label = "Language", value = "English", textColor = textColor)
+                            DetailItem(label = stringResource(R.string.release_date), value = movie.year, textColor = textColor)
+                            DetailItem(label = stringResource(R.string.language), value = "English", textColor = textColor)
                         }
                     }
                 }
@@ -413,7 +437,7 @@ fun MovieDetailsContent(
                     Spacer(Modifier.height(24.dp))
 
                     Text(
-                        text = "More Like This",
+                        text = stringResource(R.string.more_like_this),
                         color = textColor,
                         fontFamily = PlayFair,
                         fontWeight = FontWeight.Bold,

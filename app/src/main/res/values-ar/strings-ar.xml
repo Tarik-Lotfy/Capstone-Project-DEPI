@@ -34,12 +34,14 @@
     <string name="language_arabic">العربية</string>
     <string name="language_english">English</string>
 
-    <!-- New Additions (الترجمات الجديدة) -->
+    <!-- Account & Settings -->
     <string name="account_section">الحساب</string>
     <string name="preferences_section">التفضيلات</string>
     <string name="privacy">الخصوصية</string>
     <string name="support_section">الدعم</string>
     <string name="delete_account">حذف الحساب</string>
+
+    <!-- Profile & Edit Profile -->
     <string name="reviews">المراجعات</string>
     <string name="favorites">المفضلة</string>
     <string name="followers">المتابعين</string>
@@ -48,4 +50,48 @@
     <string name="explore_movies">استكشف الأفلام</string>
     <string name="watchlist_empty">قائمة المشاهدة فارغة</string>
     <string name="add_movies">أضف أفلاماً الآن</string>
+    <string name="profile_updated_success">تم تحديث الملف الشخصي بنجاح!</string>
+    <string name="email_read_only">لا يمكن تغيير البريد الإلكتروني مباشرة.</string>
+    <string name="display_name_desc">اسم العرض الخاص بك</string>
+    <string name="bio">نبذة</string>
+    <string name="bio_placeholder">أخبرنا عن حبك للسينما...</string>
+    <string name="save_changes">حفظ التغييرات</string>
+    <string name="default_user_name">عاشق السينما</string>
+
+    <!-- Login Screen -->
+    <string name="create_account">إنشاء حساب</string>
+    <string name="welcome_back">مرحبًا بعودتك</string>
+    <string name="register_subtitle">خطوة نحو مسرح القصص.</string>
+    <string name="login_subtitle">سجل الدخول لمتابعة رحلتك السينمائية.</string>
+    <string name="sign_up">إنشاء حساب</string>
+    <string name="no_account_register">ليس لديك حساب؟ سجل الآن</string>
+    <string name="app_slogan">رفيقك السينمائي الشخصي</string>
+
+    <!-- Search & Discover -->
+    <string name="search_title">البحث عن الأفلام والمسلسلات</string>
+    <string name="search_placeholder">البحث بالعنوان، المخرج، السنة...</string>
+    <string name="start_searching">ابدأ البحث</string>
+    <string name="find_millions">اعثر على ملايين الأفلام والمسلسلات بسهولة.</string>
+    <string name="no_results_for">لا توجد نتائج لـ</string>
+    <string name="search_results">نتائج البحث</string>
+    <string name="recommended_movies">أفلام مقترحة</string>
+    <string name="movies">أفلام</string>
+    <string name="searching">جاري البحث...</string>
+    <string name="search_placeholder_genres">ابحث عن أفلام، مسلسلات، أنواع...</string>
+    <string name="genre">النوع</string>
+    <string name="no_films_matched">لم يتم العثور على أفلام مطابقة لبحثك.</string>
+    <string name="no_movies_category">لا توجد أفلام متاحة في هذا التصنيف.</string>
+
+    <!-- Movie Details -->
+    <string name="failed_load_details">فشل تحميل تفاصيل الفيلم</string>
+    <string name="play_trailer">تشغيل الإعلان</string>
+    <string name="overview">لمحة عامة</string>
+    <string name="no_overview">لا توجد لمحة متوفرة.</string>
+    <string name="details">التفاصيل</string>
+    <string name="director">المخرج</string>
+    <string name="cast">طاقم العمل</string>
+    <string name="release_date">تاريخ الإصدار</string>
+    <string name="more_like_this">المزيد مثل هذا</string>
+    <string name="min">دقيقة</string>
+    <string name="movie_default">فيلم</string>
 </resources>

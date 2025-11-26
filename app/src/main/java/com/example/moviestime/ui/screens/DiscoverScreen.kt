@@ -20,17 +20,34 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavHostController
+import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
+import com.example.moviestime.R
 import com.example.moviestime.data.remote.Genre
 import com.example.moviestime.ui.components.MovieRowCard
 import com.example.moviestime.viewmodel.SearchViewModel
 import kotlin.math.ceil
-import com.example.moviestime.ui.theme.Inter
-import com.example.moviestime.ui.theme.PlayFair
+
+class DiscoverScreen : Screen {
+    @Composable
+    override fun Content() {
+        val navigator = LocalNavigator.currentOrThrow
+        val searchViewModel: SearchViewModel = viewModel()
+
+        DiscoverScreenContent(
+            searchViewModel = searchViewModel,
+            onMovieClick = { movieId ->
+                navigator?.push(MovieDetailsScreen(movieId))
+            }
+        )
+    }
+}
 
 @Composable
 fun ShimmerMovieGrid() {
@@ -53,9 +70,9 @@ fun ShimmerMovieGrid() {
 }
 
 @Composable
-fun DiscoverScreen(
-    navController: NavHostController,
-    searchViewModel: SearchViewModel = viewModel()
+fun DiscoverScreenContent(
+    searchViewModel: SearchViewModel,
+    onMovieClick: (Int) -> Unit
 ) {
     val query by searchViewModel.searchQuery.collectAsState()
     val results by searchViewModel.searchResults.collectAsState()
@@ -70,18 +87,10 @@ fun DiscoverScreen(
     val isGenreSelected = selectedGenreId != null && !isSearching
 
     val genresWithRecommended = remember(genresApi) {
-        listOf(Genre(id = 0, name = "Recommended")) + genresApi
-    }
-
-    val currentResultsTitle = when {
-        isSearching -> "Search Results"
-        isRecommended -> "Recommended Movies"
-        isGenreSelected -> genresApi.find { it.id == selectedGenreId }?.name + " Movies"
-        else -> "Discover"
+        listOf(Genre(id = 0, name = "Recommended"))
     }
 
     val accentYellow = Color(0xFFF1C40F)
-    val accentBurgundy = Color(0xFF6A0F1C)
 
     val resultRowCount = remember(results.size) {
         if (results.isEmpty()) 0 else ceil(results.size / 2.0).toInt()
@@ -111,7 +120,7 @@ fun DiscoverScreen(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = if (isSearchTyping) "Searching..." else "Discover",
+                    text = if (isSearchTyping) stringResource(R.string.searching) else stringResource(R.string.discover),
                     fontSize = 28.sp,
                     fontWeight = FontWeight.ExtraBold,
                     color = Color.White
@@ -144,7 +153,7 @@ fun DiscoverScreen(
                 },
                 placeholder = {
                     Text(
-                        "Search for films, series, genres...",
+                        stringResource(R.string.search_placeholder_genres),
                         color = Color.White.copy(alpha = 0.5f),
                         fontSize = 16.sp
                     )
@@ -169,7 +178,7 @@ fun DiscoverScreen(
                 Spacer(Modifier.height(24.dp))
 
                 Text(
-                    "Genre",
+                    stringResource(R.string.genre),
                     fontSize = 18.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = Color.White
@@ -180,21 +189,19 @@ fun DiscoverScreen(
                 LazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                     items(genresWithRecommended, key = { it.id }) { genre ->
                         val isSelected = if (genre.id == 0) selectedGenreId == null else genre.id == selectedGenreId
+                        val displayName = if(genre.id == 0) stringResource(R.string.recommended_movies).replace(" Movies", "") else genre.name
 
                         Box(
                             modifier = Modifier
                                 .clip(RoundedCornerShape(20.dp))
                                 .background(
-                                    if (isSelected)
-                                        Color(0xFF6A0F1C)
-                                    else
-                                        Color(0xFFF1C40F)
+                                    if (isSelected) Color(0xFF6A0F1C) else Color(0xFFF1C40F)
                                 )
                                 .clickable { searchViewModel.onGenreSelected(genre.id) }
                                 .padding(horizontal = 16.dp, vertical = 8.dp),
                         ) {
                             Text(
-                                genre.name,
+                                displayName,
                                 color = if (isSelected) Color.White else Color.Black,
                                 fontWeight = FontWeight.Medium,
                                 fontSize = 14.sp
@@ -212,7 +219,6 @@ fun DiscoverScreen(
         }
 
         if (isLoading || results.isNotEmpty() || isSearchTyping || isGenreSelected || isRecommended) {
-
             item {
                 Box(
                     modifier = Modifier.fillMaxWidth().height(gridContentHeight),
@@ -230,9 +236,7 @@ fun DiscoverScreen(
                                 items(results, key = { it.id }) { movie ->
                                     MovieRowCard(
                                         movie = movie,
-                                        onMovieClick = { selectedMovie ->
-                                            navController.navigate("movie/${selectedMovie.id}")
-                                        }
+                                        onMovieClick = { onMovieClick(it.id) }
                                     )
                                 }
                             }
@@ -247,7 +251,7 @@ fun DiscoverScreen(
                                 )
                                 Spacer(Modifier.height(8.dp))
                                 Text(
-                                    "No films matched your search.",
+                                    stringResource(R.string.no_films_matched),
                                     color = Color.White.copy(alpha = 0.7f),
                                     fontSize = 16.sp,
                                     fontWeight = FontWeight.Medium
@@ -264,7 +268,7 @@ fun DiscoverScreen(
                                 )
                                 Spacer(Modifier.height(8.dp))
                                 Text(
-                                    "No movies available in this category.",
+                                    stringResource(R.string.no_movies_category),
                                     color = Color.White.copy(alpha = 0.7f),
                                     fontSize = 16.sp,
                                     fontWeight = FontWeight.Medium

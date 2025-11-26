@@ -21,10 +21,24 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
+
+class VideoPlayerScreen(val trailerKey: String) : Screen {
+    @Composable
+    override fun Content() {
+        val navigator = LocalNavigator.currentOrThrow
+        VideoPlayerScreenContent(
+            trailerKey = trailerKey,
+            onBack = { navigator.pop() }
+        )
+    }
+}
 
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
-fun VideoPlayerScreen(
+fun VideoPlayerScreenContent(
     trailerKey: String,
     onBack: () -> Unit
 ) {
