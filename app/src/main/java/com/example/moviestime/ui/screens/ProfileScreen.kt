@@ -42,7 +42,6 @@ fun ProfileScreen(
     languageViewModel: LanguageViewModel = viewModel(),
     onMovieClick: (Int) -> Unit
 ) {
-    
     val watchlist by mainViewModel.favorites.collectAsState()
 
     val backgroundColor = colorResource(R.color.background)
@@ -62,39 +61,39 @@ fun ProfileScreen(
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-//         Box(
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .padding(top = 12.dp, bottom = 24.dp)
-//        ) {
-//            Text(
-//                text = "Profile",
-//                fontFamily = PlayFair,
-//                fontWeight = FontWeight.Bold,
-//                fontSize = 24.sp,
-//                color = textColor,
-//                modifier = Modifier.align(Alignment.Center)
-//            )
-//
-//            Box(
-//                modifier = Modifier
-//                    .align(Alignment.CenterEnd)
-//                    .size(44.dp)
-//                    .clip(RoundedCornerShape(12.dp))
-//                    .border(2.dp, primaryColor, RoundedCornerShape(12.dp))
-//                    .clickable {   },
-//                contentAlignment = Alignment.Center
-//            ) {
-//                Icon(
-//                    imageVector = Icons.Outlined.Settings,
-//                    contentDescription = "Settings",
-//                    tint = textColor,
-//                    modifier = Modifier.size(24.dp)
-//                )
-//            }
-//        }
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 12.dp, bottom = 24.dp)
+        ) {
+            Text(
+                text = "Profile",
+                fontFamily = PlayFair,
+                fontWeight = FontWeight.Bold,
+                fontSize = 24.sp,
+                color = textColor,
+                modifier = Modifier.align(Alignment.Center)
+            )
 
-         Box(
+            Box(
+                modifier = Modifier
+                    .align(Alignment.CenterEnd)
+                    .size(44.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .border(2.dp, primaryColor, RoundedCornerShape(12.dp))
+                    .clickable { /* Settings */ },
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Outlined.Settings,
+                    contentDescription = "Settings",
+                    tint = textColor,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+        }
+
+        Box(
             modifier = Modifier
                 .size(100.dp)
                 .border(2.dp, goldColor, CircleShape)
@@ -133,7 +132,7 @@ fun ProfileScreen(
 
         Spacer(Modifier.height(24.dp))
 
-         Row(
+        Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
@@ -144,7 +143,7 @@ fun ProfileScreen(
 
         Spacer(Modifier.height(24.dp))
 
-         OutlinedButton(
+        OutlinedButton(
             onClick = {   },
             modifier = Modifier
                 .fillMaxWidth()
@@ -165,7 +164,7 @@ fun ProfileScreen(
 
         Spacer(Modifier.height(24.dp))
 
-         Container(color = cardColor, shape = RoundedCornerShape(12.dp)) {
+        Container(color = cardColor, shape = RoundedCornerShape(12.dp)) {
             Row(modifier = Modifier.fillMaxWidth()) {
                 tabs.forEachIndexed { index, title ->
                     val isSelected = selectedTabIndex == index
@@ -194,7 +193,7 @@ fun ProfileScreen(
 
         Spacer(Modifier.height(20.dp))
 
-         if (selectedTabIndex == 1) {
+        if (selectedTabIndex == 1) {
             if (watchlist.isEmpty()) {
                 EmptyTabState(
                     message = "Your watchlist is empty",
