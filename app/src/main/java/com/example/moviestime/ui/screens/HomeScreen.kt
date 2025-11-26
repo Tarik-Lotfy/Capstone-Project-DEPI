@@ -14,7 +14,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavHostController
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.launch
@@ -25,9 +24,9 @@ import com.example.moviestime.viewmodel.MainViewModel
 @androidx.annotation.RequiresPermission(android.Manifest.permission.POST_NOTIFICATIONS)
 @Composable
 fun HomeScreen(
-    navController: NavHostController,
     homeViewModel: HomeViewModel = viewModel(),
-    mainViewModel: MainViewModel = viewModel()
+    mainViewModel: MainViewModel = viewModel(),
+    onMovieClick: (Int) -> Unit
 ) {
     val popular by homeViewModel.popular.collectAsState()
     val topRated by homeViewModel.topRated.collectAsState()
@@ -129,12 +128,12 @@ fun HomeScreen(
                         contentPadding = PaddingValues(horizontal = 16.dp)
                     ) {
                         items(nowPlaying.take(5)) { movie ->
-                            FeaturedLargeCard(
-                                movie = movie,
-                                onMovieClick = { selectedMovie ->
-                                    navController.navigate("movie/${selectedMovie.id}")
-                                }
-                            )
+                                    FeaturedLargeCard(
+                                        movie = movie,
+                                        onMovieClick = { selectedMovie ->
+                                            onMovieClick(selectedMovie.id)
+                                        }
+                                    )
                         }
                     }
                 }
@@ -175,7 +174,7 @@ fun HomeScreen(
                                 FeaturedCard(
                                     movie = movie,
                                     onMovieClick = { selectedMovie ->
-                                        navController.navigate("movie/${selectedMovie.id}")
+                                        onMovieClick(selectedMovie.id)
                                     }
                                 )
                             }
@@ -201,7 +200,7 @@ fun HomeScreen(
                             MovieRowCard(
                                 movie = movie,
                                 onMovieClick = { selectedMovie ->
-                                    navController.navigate("movie/${selectedMovie.id}")
+                                    onMovieClick(selectedMovie.id)
                                 }
                             )
                         }
@@ -222,7 +221,7 @@ fun HomeScreen(
                             MovieRowCard(
                                 movie = movie,
                                 onMovieClick = { selectedMovie ->
-                                    navController.navigate("movie/${selectedMovie.id}")
+                                    onMovieClick(selectedMovie.id)
                                 }
                             )
                         }

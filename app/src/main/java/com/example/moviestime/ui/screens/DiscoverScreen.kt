@@ -19,13 +19,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavHostController
 import com.example.moviestime.viewmodel.SearchViewModel
 
 @Composable
 fun DiscoverScreen(
-    navController: NavHostController,
-    searchViewModel: SearchViewModel = viewModel()
+    searchViewModel: SearchViewModel = viewModel(),
+    onMovieClick: (Int) -> Unit
 ) {
     val genres = listOf("Action", "Comedy", "Drama", "Horror", "Sci-Fi", "Romance", "Thriller", "Adventure")
 
@@ -91,9 +90,7 @@ fun DiscoverScreen(
                         items(results) { movie ->
                             MovieGridItem(
                                 movie = movie,
-                                onClick = {
-                                    navController.navigate("movie/${movie.id}")
-                                },
+                                onClick = { onMovieClick(movie.id) },
                                 onFavoriteClick = {}
                             )
                         }

@@ -107,5 +107,15 @@ dependencies {
 
     // Youtube Player
     implementation("com.pierfrancescosoffritti.androidyoutubeplayer:core:12.0.0")
+
+    val voyagerVersion = "1.1.0-beta02"
+
+    // Multiplatform
+
+    // Navigator
+    implementation("cafe.adriel.voyager:voyager-navigator:$voyagerVersion")
+
+    // Screen Model
+    implementation("cafe.adriel.voyager:voyager-screenmodel:$voyagerVersion")
 }
 
