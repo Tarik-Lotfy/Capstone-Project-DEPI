@@ -18,14 +18,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.currentOrThrow
 import coil.compose.AsyncImage
 import com.example.moviestime.R
 import com.example.moviestime.data.model.Movie
@@ -33,25 +29,13 @@ import com.example.moviestime.ui.components.EmptyState
 import com.example.moviestime.ui.components.ShimmerMovieCard
 import com.example.moviestime.viewmodel.SearchViewModel
 
-class SearchScreen : Screen {
-    @Composable
-    override fun Content() {
-        val navigator = LocalNavigator.currentOrThrow
-        val searchViewModel: SearchViewModel = viewModel()
-
-        SearchScreenContent(
-            searchViewModel = searchViewModel,
-            onMovieClick = { movie -> navigator.push(MovieDetailsScreen(movie.id)) }
-        )
-    }
-}
-
 @Composable
-fun SearchScreenContent(
-    searchViewModel: SearchViewModel,
-    onMovieClick: (Movie) -> Unit = {},
+fun SearchScreen(
+    searchViewModel: SearchViewModel = viewModel(),
+    onMovieClick: (Movie) -> Unit,
     onFavoriteClick: (Movie) -> Unit = {}
 ) {
+
     val accentYellow = Color(0xFFF1C40F)
 
     val query by searchViewModel.searchQuery.collectAsState()
@@ -66,7 +50,7 @@ fun SearchScreenContent(
             .padding(horizontal = 16.dp, vertical = 20.dp)
     ) {
         Text(
-            text = stringResource(R.string.search_title),
+            text = "Search Films & Series",
             fontSize = 24.sp,
             fontWeight = FontWeight.ExtraBold,
             color = Color.White,
@@ -85,7 +69,7 @@ fun SearchScreenContent(
             },
             placeholder = {
                 Text(
-                    stringResource(R.string.search_placeholder),
+                    "Search by title, director, year...",
                     color = Color.White.copy(alpha = 0.5f)
                 )
             },
@@ -124,8 +108,8 @@ fun SearchScreenContent(
                         contentAlignment = Alignment.Center
                     ) {
                         EmptyState(
-                            title = stringResource(R.string.start_searching),
-                            subtitle = stringResource(R.string.find_millions),
+                            title = "Start Searching",
+                            subtitle = "Find millions of films and series easily.",
                             icon = {
                                 Icon(
                                     Icons.Default.Search,
@@ -143,7 +127,7 @@ fun SearchScreenContent(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            stringResource(R.string.type_at_least_2_chars),
+                            "Type at least 2 characters to search",
                             color = Color.White.copy(alpha = 0.5f),
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Medium
@@ -156,8 +140,8 @@ fun SearchScreenContent(
                         contentAlignment = Alignment.Center
                     ) {
                         EmptyState(
-                            title = stringResource(R.string.no_results_for) + " \"$query\"",
-                            subtitle = stringResource(R.string.try_different_keywords),
+                            title = "No results found for \"$query\"",
+                            subtitle = "Try different keywords or check spelling",
                             icon = {
                                 Icon(
                                     Icons.Default.Search,
@@ -179,7 +163,9 @@ fun SearchScreenContent(
                         items(results, key = { it.id }) { movie ->
                             MovieGridItem(
                                 movie = movie,
-                                onClick = { onMovieClick(movie) },
+                                onClick = {
+                                    onMovieClick(movie)
+                                },
                                 onFavoriteClick = { onFavoriteClick(movie) }
                             )
                         }
@@ -197,6 +183,7 @@ fun MovieGridItem(
     onFavoriteClick: () -> Unit = {}
 ) {
     val imageCornerRadius = 10.dp
+
     val favoriteIconBackground = Color.Black.copy(alpha = 0.5f)
 
     Column(

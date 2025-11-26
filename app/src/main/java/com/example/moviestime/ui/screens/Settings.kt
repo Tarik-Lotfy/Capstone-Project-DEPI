@@ -8,7 +8,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.*
@@ -25,42 +24,25 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.currentOrThrow
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.moviestime.R
 import com.example.moviestime.ui.theme.Inter
 import com.example.moviestime.ui.theme.PlayFair
 import com.example.moviestime.viewmodel.AuthViewModel
 import com.example.moviestime.viewmodel.LanguageViewModel
-
-class SettingsScreen : Screen {
-    @Composable
-    override fun Content() {
-        val navigator = LocalNavigator.currentOrThrow
-        val authViewModel = LocalAuthViewModel.current
-        val languageViewModel = LocalLanguageViewModel.current
-        val currentLanguage by languageViewModel.currentLanguage.collectAsState()
-
-        SettingsScreenContent(
-            onBack = { navigator.pop() },
-            onSignOut = { authViewModel.logout() },
-            onEditProfile = { navigator.push(EditProfileScreen()) },
-            onLanguageChange = { languageViewModel.toggleLanguage() },
-            currentLanguage = currentLanguage
-        )
-    }
-}
+import com.example.moviestime.viewmodel.ThemeViewModel
 
 @Composable
-fun SettingsScreenContent(
-    onBack: () -> Unit,
-    onSignOut: () -> Unit,
+fun SettingsScreen(
+    authViewModel: AuthViewModel = viewModel(),
+    languageViewModel: LanguageViewModel = viewModel(),
+    themeViewModel: ThemeViewModel = viewModel(),
     onEditProfile: () -> Unit = {},
     onDeleteAccount: () -> Unit = {},
-    onLanguageChange: () -> Unit = {},
-    currentLanguage: String = "en"
+    onSignOut: () -> Unit = {}
 ) {
+    val currentLanguage by languageViewModel.appLanguage.collectAsState()
+    val isDarkTheme by themeViewModel.isDarkThemeEnabled.collectAsState()
     val backgroundColor = colorResource(R.color.background)
     val cardColor = colorResource(R.color.card)
     val textColor = colorResource(R.color.foreground)
@@ -74,38 +56,21 @@ fun SettingsScreenContent(
             .verticalScroll(rememberScrollState())
     ) {
         // --- Header ---
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 12.dp, bottom = 24.dp)
-        ) {
-            IconButton(
-                onClick = onBack,
-                modifier = Modifier.align(Alignment.CenterStart)
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Back",
-                    tint = textColor
-                )
-            }
-
-            Text(
-                text = stringResource(R.string.settings),
-                fontFamily = PlayFair,
-                fontWeight = FontWeight.Bold,
-                fontSize = 26.sp,
-                color = textColor,
-                modifier = Modifier.align(Alignment.Center)
-            )
-        }
+        Text(
+            text = stringResource(R.string.settings),
+            fontFamily = PlayFair,
+            fontWeight = FontWeight.Bold,
+            fontSize = 26.sp,
+            color = textColor,
+            modifier = Modifier.padding(top = 12.dp, bottom = 24.dp)
+        )
 
         // --- Account Section ---
-        SectionHeader(title = stringResource(R.string.account_section), color = mutedColor)
+        SectionHeader(title = "ACCOUNT", color = mutedColor) // يمكن إضافتها لملف strings لاحقاً
         SettingsGroup(cardColor = cardColor) {
             SettingsItem(
                 icon = Icons.Outlined.Person,
-                title = stringResource(R.string.edit_profile),
+                title = stringResource(R.string.edit_profile), // ترجمة
                 textColor = textColor,
                 onClick = onEditProfile
             )
@@ -114,29 +79,75 @@ fun SettingsScreenContent(
         Spacer(Modifier.height(24.dp))
 
         // --- Preferences Section ---
-        SectionHeader(title = stringResource(R.string.preferences_section), color = mutedColor)
+        SectionHeader(title = "PREFERENCES", color = mutedColor)
         SettingsGroup(cardColor = cardColor) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 18.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        imageVector = Icons.Outlined.Palette,
+                        contentDescription = null,
+                        tint = textColor.copy(alpha = 0.7f),
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Spacer(Modifier.width(16.dp))
+                    Text(
+                        text = stringResource(R.string.dark_mode),
+                        fontFamily = Inter,
+                        fontWeight = FontWeight.Medium,
+                        fontSize = 16.sp,
+                        color = textColor
+                    )
+                }
+                Switch(
+                    checked = isDarkTheme,
+                    onCheckedChange = { themeViewModel.setDarkThemeEnabled(it) },
+                    colors = SwitchDefaults.colors(
+                        checkedThumbColor = colorResource(R.color.primary),
+                        checkedTrackColor = colorResource(R.color.primary).copy(alpha = 0.5f)
+                    )
+                )
+            }
+            HorizontalDivider(
+                color = Color.White.copy(alpha = 0.05f),
+                thickness = 1.dp,
+                modifier = Modifier.padding(horizontal = 16.dp)
+            )
             SettingsItem(
                 icon = Icons.Outlined.Notifications,
                 title = stringResource(R.string.notifications),
-                textColor = textColor,
-                showDivider = true
-            )
-            SettingsItem(
-                icon = Icons.Outlined.Security,
-                title = stringResource(R.string.privacy),
                 textColor = textColor
             )
         }
 
         Spacer(Modifier.height(24.dp))
 
+        // --- Support Section ---
+        SectionHeader(title = "SUPPORT", color = mutedColor)
+        SettingsGroup(cardColor = cardColor) {
+            SettingsItem(
+                icon = Icons.Outlined.HelpOutline,
+                title = stringResource(R.string.help_support), // ترجمة
+                textColor = textColor
+            )
+        }
+
+        Spacer(Modifier.height(40.dp))
+
         SettingsButton(
             icon = Icons.Default.Language,
             title = if (currentLanguage == "ar") stringResource(R.string.language_english) else stringResource(R.string.language_arabic),
             color = textColor,
             borderColor = textColor.copy(alpha = 0.3f),
-            onClick = onLanguageChange
+            onClick = {
+                val newLanguage = if (currentLanguage == "ar") "en" else "ar"
+                languageViewModel.setAppLanguage(newLanguage)
+            }
         )
 
         Spacer(Modifier.height(16.dp))
@@ -146,35 +157,20 @@ fun SettingsScreenContent(
             title = stringResource(R.string.logout),
             color = textColor,
             borderColor = textColor.copy(alpha = 0.3f),
-            onClick = onSignOut
+            onClick = {
+                authViewModel.logout()
+                onSignOut()
+            }
         )
 
         Spacer(Modifier.height(16.dp))
 
         SettingsButton(
             icon = Icons.Outlined.Delete,
-            title = stringResource(R.string.delete_account),
+            title = "Delete Account",
             color = Color(0xFFE53935),
             borderColor = Color(0xFFE53935).copy(alpha = 0.5f),
             onClick = onDeleteAccount
-        )
-
-        Spacer(Modifier.height(32.dp))
-
-        // --- Support Section ---
-        SectionHeader(title = stringResource(R.string.support_section), color = mutedColor)
-        SettingsGroup(cardColor = cardColor) {
-            SettingsItem(
-                icon = Icons.Outlined.HelpOutline,
-                title = stringResource(R.string.help_support),
-                textColor = textColor
-            )
-        }
-        Spacer(Modifier.height(12.dp))
-        HelpFeedbackCard(
-            cardColor = cardColor,
-            textColor = textColor,
-            mutedColor = mutedColor
         )
     }
 }
@@ -291,84 +287,5 @@ fun SettingsButton(
             fontSize = 16.sp,
             color = color
         )
-    }
-}
-
-@Composable
-fun HelpFeedbackCard(
-    cardColor: Color,
-    textColor: Color,
-    mutedColor: Color
-) {
-    var isExpanded by remember { mutableStateOf(false) }
-
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(16.dp))
-            .background(cardColor)
-            .clickable { isExpanded = !isExpanded }
-            .padding(16.dp)
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Column {
-                Text(
-                    text = stringResource(R.string.help_support),
-                    fontFamily = PlayFair,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 18.sp,
-                    color = textColor
-                )
-                Text(
-                    text = if (isExpanded) stringResource(R.string.tap_to_hide) else stringResource(R.string.tap_to_expand),
-                    fontFamily = Inter,
-                    fontSize = 12.sp,
-                    color = mutedColor
-                )
-            }
-            Icon(
-                imageVector = if (isExpanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
-                contentDescription = null,
-                tint = textColor
-            )
-        }
-
-        if (isExpanded) {
-            Spacer(Modifier.height(12.dp))
-            Text(
-                text = "About MoviesTime",
-                fontFamily = PlayFair,
-                fontWeight = FontWeight.Bold,
-                fontSize = 16.sp,
-                color = textColor
-            )
-            Spacer(Modifier.height(8.dp))
-            Text(
-                text = "MoviesTime curates trending titles, genre-based picks, and editor notes so you can jump straight into the next movie night without digging through endless lists.",
-                fontFamily = Inter,
-                fontSize = 14.sp,
-                color = mutedColor,
-                lineHeight = 20.sp
-            )
-            Spacer(Modifier.height(12.dp))
-            Text(
-                text = "Need help or want to send feedback?",
-                fontFamily = Inter,
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 14.sp,
-                color = textColor
-            )
-            Spacer(Modifier.height(4.dp))
-            Text(
-                text = "CineVault@moviestime.app • @CineVault",
-                fontFamily = Inter,
-                fontSize = 14.sp,
-                color = mutedColor
-            )
-        }
     }
 }
