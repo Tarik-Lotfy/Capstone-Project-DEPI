@@ -25,6 +25,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import com.example.moviestime.R
 import com.example.moviestime.ui.theme.Inter
 import com.example.moviestime.ui.theme.PlayFair
@@ -32,8 +35,38 @@ import com.example.moviestime.viewmodel.AuthViewModel
 import com.example.moviestime.viewmodel.LanguageViewModel
 import com.example.moviestime.viewmodel.ThemeViewModel
 
+object SettingsScreen : Screen {
+    @Composable
+    override fun Content() {
+        val navigator = LocalNavigator.currentOrThrow
+        val topBarState = LocalAppTopBarState.current
+        val authViewModel: AuthViewModel = viewModel()
+        val languageViewModel: LanguageViewModel = viewModel()
+        val themeViewModel: ThemeViewModel = viewModel()
+        val title = stringResource(R.string.settings)
+
+        LaunchedEffect(title) {
+            topBarState.value = AppTopBarConfig(
+                title = title,
+                showBack = true,
+                onBack = { navigator.pop() },
+                trailingContent = null
+            )
+        }
+
+        SettingsScreenContent(
+            authViewModel = authViewModel,
+            languageViewModel = languageViewModel,
+            themeViewModel = themeViewModel,
+            onEditProfile = { navigator.push(EditProfileScreen()) },
+            onDeleteAccount = { /* TODO */ },
+            onSignOut = { navigator.pop() }
+        )
+    }
+}
+
 @Composable
-fun SettingsScreen(
+fun SettingsScreenContent(
     authViewModel: AuthViewModel = viewModel(),
     languageViewModel: LanguageViewModel = viewModel(),
     themeViewModel: ThemeViewModel = viewModel(),
@@ -41,7 +74,7 @@ fun SettingsScreen(
     onDeleteAccount: () -> Unit = {},
     onSignOut: () -> Unit = {}
 ) {
-    val currentLanguage by languageViewModel.appLanguage.collectAsState()
+    val currentLanguage by languageViewModel.currentLanguage.collectAsState()
     val isDarkTheme by themeViewModel.isDarkThemeEnabled.collectAsState()
     val backgroundColor = colorResource(R.color.background)
     val cardColor = colorResource(R.color.card)
@@ -66,11 +99,11 @@ fun SettingsScreen(
         )
 
         // --- Account Section ---
-        SectionHeader(title = "ACCOUNT", color = mutedColor) // يمكن إضافتها لملف strings لاحقاً
+        SectionHeader(title = stringResource(R.string.account_section), color = mutedColor)
         SettingsGroup(cardColor = cardColor) {
             SettingsItem(
                 icon = Icons.Outlined.Person,
-                title = stringResource(R.string.edit_profile), // ترجمة
+                title = stringResource(R.string.edit_profile),
                 textColor = textColor,
                 onClick = onEditProfile
             )
@@ -79,7 +112,7 @@ fun SettingsScreen(
         Spacer(Modifier.height(24.dp))
 
         // --- Preferences Section ---
-        SectionHeader(title = "PREFERENCES", color = mutedColor)
+        SectionHeader(title = stringResource(R.string.preferences_section), color = mutedColor)
         SettingsGroup(cardColor = cardColor) {
             Row(
                 modifier = Modifier
@@ -127,27 +160,12 @@ fun SettingsScreen(
 
         Spacer(Modifier.height(24.dp))
 
-        // --- Support Section ---
-        SectionHeader(title = "SUPPORT", color = mutedColor)
-        SettingsGroup(cardColor = cardColor) {
-            SettingsItem(
-                icon = Icons.Outlined.HelpOutline,
-                title = stringResource(R.string.help_support), // ترجمة
-                textColor = textColor
-            )
-        }
-
-        Spacer(Modifier.height(40.dp))
-
         SettingsButton(
             icon = Icons.Default.Language,
             title = if (currentLanguage == "ar") stringResource(R.string.language_english) else stringResource(R.string.language_arabic),
             color = textColor,
             borderColor = textColor.copy(alpha = 0.3f),
-            onClick = {
-                val newLanguage = if (currentLanguage == "ar") "en" else "ar"
-                languageViewModel.setAppLanguage(newLanguage)
-            }
+            onClick = { languageViewModel.toggleLanguage() }
         )
 
         Spacer(Modifier.height(16.dp))
@@ -167,10 +185,28 @@ fun SettingsScreen(
 
         SettingsButton(
             icon = Icons.Outlined.Delete,
-            title = "Delete Account",
+            title = stringResource(R.string.delete_account),
             color = Color(0xFFE53935),
             borderColor = Color(0xFFE53935).copy(alpha = 0.5f),
             onClick = onDeleteAccount
+        )
+
+        Spacer(Modifier.height(32.dp))
+
+        // --- Support Section ---
+        SectionHeader(title = stringResource(R.string.support_section), color = mutedColor)
+        SettingsGroup(cardColor = cardColor) {
+            SettingsItem(
+                icon = Icons.Outlined.HelpOutline,
+                title = stringResource(R.string.help_support),
+                textColor = textColor
+            )
+        }
+        Spacer(Modifier.height(12.dp))
+        HelpFeedbackCard(
+            cardColor = cardColor,
+            textColor = textColor,
+            mutedColor = mutedColor
         )
     }
 }
@@ -287,5 +323,84 @@ fun SettingsButton(
             fontSize = 16.sp,
             color = color
         )
+    }
+}
+
+@Composable
+fun HelpFeedbackCard(
+    cardColor: Color,
+    textColor: Color,
+    mutedColor: Color
+) {
+    var isExpanded by remember { mutableStateOf(false) }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(16.dp))
+            .background(cardColor)
+            .clickable { isExpanded = !isExpanded }
+            .padding(16.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Column {
+                Text(
+                    text = stringResource(R.string.help_support),
+                    fontFamily = PlayFair,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 18.sp,
+                    color = textColor
+                )
+                Text(
+                    text = if (isExpanded) stringResource(R.string.tap_to_hide) else stringResource(R.string.tap_to_expand),
+                    fontFamily = Inter,
+                    fontSize = 12.sp,
+                    color = mutedColor
+                )
+            }
+            Icon(
+                imageVector = if (isExpanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
+                contentDescription = null,
+                tint = textColor
+            )
+        }
+
+        if (isExpanded) {
+            Spacer(Modifier.height(12.dp))
+            Text(
+                text = "About MoviesTime",
+                fontFamily = PlayFair,
+                fontWeight = FontWeight.Bold,
+                fontSize = 16.sp,
+                color = textColor
+            )
+            Spacer(Modifier.height(8.dp))
+            Text(
+                text = "MoviesTime curates trending titles, genre-based picks, and editor notes so you can jump straight into the next movie night without digging through endless lists.",
+                fontFamily = Inter,
+                fontSize = 14.sp,
+                color = mutedColor,
+                lineHeight = 20.sp
+            )
+            Spacer(Modifier.height(12.dp))
+            Text(
+                text = "Need help or want to send feedback?",
+                fontFamily = Inter,
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 14.sp,
+                color = textColor
+            )
+            Spacer(Modifier.height(4.dp))
+            Text(
+                text = "support@moviestime.app • @MoviesTimeApp",
+                fontFamily = Inter,
+                fontSize = 14.sp,
+                color = mutedColor
+            )
+        }
     }
 }

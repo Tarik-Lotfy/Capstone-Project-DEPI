@@ -1,18 +1,10 @@
 package com.example.moviestime.ui.screens
 
+import android.annotation.SuppressLint
+import android.app.Application
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -21,17 +13,8 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -39,13 +22,18 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import coil.compose.AsyncImage
 import com.example.moviestime.R
 import com.example.moviestime.data.model.Movie
@@ -54,17 +42,51 @@ import com.example.moviestime.ui.theme.PlayFair
 import com.example.moviestime.viewmodel.MainViewModel
 import com.example.moviestime.viewmodel.MovieDetailsViewModel
 
+data class MovieDetailsScreen(
+    val movieId: Int
+) : Screen {
+    @Composable
+    override fun Content() {
+        val navigator = LocalNavigator.currentOrThrow
+        val context = LocalContext.current
+        val application = context.applicationContext as Application
+
+        // ✅ تم الإصلاح: إنشاء MainViewModel بشكل مباشر بدلاً من الاعتماد على LocalMainViewModel
+        val mainViewModel: MainViewModel = viewModel { MainViewModel(application) }
+
+        MovieDetailsScreenContent(
+            movieId = movieId,
+            onBack = { navigator.pop() },
+            mainViewModel = mainViewModel,
+            onPlayClick = { movie ->
+                movie.trailerKey?.let { key ->
+                    val encodedKey = java.net.URLEncoder.encode(key, "UTF-8")
+                    navigator.push(VideoPlayerScreen(encodedKey))
+                }
+            },
+            onMovieClick = { id -> navigator.push(MovieDetailsScreen(id)) },
+            // ⚠️ ملاحظة: تأكد من أن MainViewModel يحتوي على دالة toggleFavorite
+            onFavoriteClick = { movie ->
+                // mainViewModel.toggleFavorite(movie)
+            }
+        )
+    }
+}
+
+@SuppressLint("MissingPermission")
 @Composable
-fun MovieDetailsScreen(
+fun MovieDetailsScreenContent(
     movieId: Int,
     onBack: () -> Unit = {},
     mainViewModel: MainViewModel,
     onPlayClick: (Movie) -> Unit = {},
     onFavoriteClick: (Movie) -> Unit = {},
-    onShareClick: (Movie) -> Unit = {}
+    onShareClick: (Movie) -> Unit = {},
+    onMovieClick: (Int) -> Unit
 ) {
     val viewModel: MovieDetailsViewModel = viewModel()
     val movieState by viewModel.movieDetails.collectAsState()
+    val similarMovies by viewModel.similarMovies.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val favorites by mainViewModel.favorites.collectAsState()
 
@@ -93,10 +115,12 @@ fun MovieDetailsScreen(
 
             MovieDetailsContent(
                 movie = movie,
+                similarMovies = similarMovies,
                 isFavorite = isFav,
                 onBack = onBack,
                 onPlayClick = { onPlayClick(movie) },
-                onFavoriteClick ={ mainViewModel.toggleFavorite(movie) },
+                onFavoriteClick = { onFavoriteClick(movie) },
+                onMovieClick = onMovieClick,
                 backgroundColor = backgroundColor,
                 primaryColor = primaryColor,
                 textColor = textColor,
@@ -110,7 +134,7 @@ fun MovieDetailsScreen(
                     .background(backgroundColor),
                 contentAlignment = Alignment.Center
             ) {
-                Text("فشل تحميل تفاصيل الفيلم", color = textColor)
+                Text(stringResource(R.string.failed_load_details), color = textColor)
             }
         }
     }
@@ -119,10 +143,12 @@ fun MovieDetailsScreen(
 @Composable
 fun MovieDetailsContent(
     movie: Movie,
+    similarMovies: List<Movie> = emptyList(),
     isFavorite: Boolean,
     onBack: () -> Unit,
     onPlayClick: () -> Unit,
     onFavoriteClick: () -> Unit,
+    onMovieClick: (Int) -> Unit = {},
     backgroundColor: Color,
     primaryColor: Color,
     textColor: Color,
@@ -192,7 +218,7 @@ fun MovieDetailsContent(
                 ) {
                     Text(
                         text = movie.title,
-                        fontFamily = PlayFair, // Corrected
+                        fontFamily = PlayFair,
                         fontWeight = FontWeight.Bold,
                         fontSize = 26.sp,
                         color = textColor,
@@ -220,7 +246,7 @@ fun MovieDetailsContent(
                         Spacer(Modifier.width(16.dp))
 
                         Text(
-                            text = "${movie.duration} min",
+                            text = "${movie.duration} ${stringResource(R.string.min)}",
                             fontFamily = Inter,
                             fontSize = 14.sp,
                             color = textColor.copy(alpha = 0.7f)
@@ -236,7 +262,7 @@ fun MovieDetailsContent(
                         modifier = Modifier.padding(top = 4.dp)
                     ) {
                         Text(
-                            text = movie.genre.split(",").firstOrNull() ?: "Movie",
+                            text = movie.genre.split(",").firstOrNull() ?: stringResource(R.string.movie_default),
                             fontFamily = Inter,
                             fontSize = 12.sp,
                             color = textColor.copy(alpha = 0.9f),
@@ -270,7 +296,7 @@ fun MovieDetailsContent(
                     )
                     Spacer(Modifier.width(8.dp))
                     Text(
-                        text = if (isFavorite) "Listed" else "Add to Watchlist",
+                        text = if (isFavorite) stringResource(R.string.favorites) else stringResource(R.string.watchlist),
                         fontFamily = Inter,
                         fontWeight = FontWeight.SemiBold,
                         fontSize = 16.sp
@@ -280,7 +306,7 @@ fun MovieDetailsContent(
                 Spacer(Modifier.height(32.dp))
 
                 Text(
-                    text = "Overview", // Corrected Typo
+                    text = stringResource(R.string.overview),
                     fontFamily = PlayFair,
                     fontWeight = FontWeight.Bold,
                     fontSize = 22.sp,
@@ -290,7 +316,7 @@ fun MovieDetailsContent(
                 Spacer(Modifier.height(12.dp))
 
                 Text(
-                    text = movie.overview.ifEmpty { "No overview available." },
+                    text = movie.overview.ifEmpty { stringResource(R.string.no_overview) },
                     fontFamily = Inter,
                     fontSize = 15.sp,
                     color = textColor.copy(alpha = 0.8f),
@@ -301,7 +327,7 @@ fun MovieDetailsContent(
                 Spacer(Modifier.height(32.dp))
 
                 Text(
-                    text = "Details",
+                    text = stringResource(R.string.details),
                     fontFamily = PlayFair,
                     fontWeight = FontWeight.Bold,
                     fontSize = 22.sp,
@@ -310,17 +336,17 @@ fun MovieDetailsContent(
 
                 Spacer(Modifier.height(16.dp))
 
-                DetailItem(label = "Director", value = movie.director, textColor = textColor)
+                DetailItem(label = stringResource(R.string.director), value = movie.director, textColor = textColor)
                 Spacer(Modifier.height(16.dp))
-                DetailItem(label = "Cast", value = movie.cast, textColor = textColor)
+                DetailItem(label = stringResource(R.string.cast), value = movie.cast, textColor = textColor)
 
                 Spacer(Modifier.height(16.dp))
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    DetailItem(label = "Release date", value = movie.year, textColor = textColor)
-                    DetailItem(label = "Language", value = "English", textColor = textColor)
+                    DetailItem(label = stringResource(R.string.release_date), value = movie.year, textColor = textColor)
+                    DetailItem(label = stringResource(R.string.language), value = "English", textColor = textColor)
                 }
             }
 

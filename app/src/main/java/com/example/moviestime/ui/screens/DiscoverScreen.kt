@@ -1,6 +1,5 @@
 package com.example.moviestime.ui.screens
 
-import android.R
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -24,11 +23,37 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import com.example.moviestime.data.remote.Genre
 import com.example.moviestime.ui.components.MovieRowCard
 import com.example.moviestime.ui.theme.Inter
 import com.example.moviestime.ui.theme.PlayFair
 import com.example.moviestime.viewmodel.SearchViewModel
+
+object DiscoverScreen : Screen {
+    @Composable
+    override fun Content() {
+        val navigator = LocalNavigator.currentOrThrow
+        val topBarState = LocalAppTopBarState.current
+        val searchViewModel: SearchViewModel = viewModel()
+
+        LaunchedEffect(Unit) {
+            topBarState.value = AppTopBarConfig(
+                title = "Discover",
+                showBack = false,
+                onBack = null,
+                trailingContent = null
+            )
+        }
+
+        DiscoverScreenContent(
+            searchViewModel = searchViewModel,
+            onMovieClick = { navigator.push(MovieDetailsScreen(it)) }
+        )
+    }
+}
 
 @Composable
 fun ShimmerMovieGrid() {
@@ -52,7 +77,7 @@ fun ShimmerMovieGrid() {
 
 
 @Composable
-fun DiscoverScreen(
+fun DiscoverScreenContent(
     searchViewModel: SearchViewModel = viewModel(),
     onMovieClick: (Int) -> Unit
 ) {

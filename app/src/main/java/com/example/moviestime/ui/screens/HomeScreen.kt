@@ -1,10 +1,14 @@
 package com.example.moviestime.ui.screens
 
+import android.Manifest
+import androidx.annotation.RequiresPermission
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.*
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
@@ -15,17 +19,54 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.google.accompanist.swiperefresh.SwipeRefresh
-import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
-import kotlinx.coroutines.launch
+import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import com.example.moviestime.ui.components.*
 import com.example.moviestime.ui.navigation.SeeAllCategory
 import com.example.moviestime.viewmodel.HomeViewModel
 import com.example.moviestime.viewmodel.MainViewModel
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import kotlinx.coroutines.launch
 
-@androidx.annotation.RequiresPermission(android.Manifest.permission.POST_NOTIFICATIONS)
+object HomeScreen : Screen {
+    @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
+    @Composable
+    override fun Content() {
+        val navigator = LocalNavigator.currentOrThrow
+        val topBarState = LocalAppTopBarState.current
+        val homeViewModel: HomeViewModel = viewModel()
+        val mainViewModel: MainViewModel = viewModel()
+
+        LaunchedEffect(Unit) {
+            topBarState.value = AppTopBarConfig(
+                title = "CineVault",
+                showBack = false,
+                onBack = null,
+                trailingContent = {
+                    IconButton(onClick = { navigator.push(SettingsScreen) }) {
+                        Icon(
+                            imageVector = Icons.Outlined.Settings,
+                            contentDescription = "Settings",
+                            tint = Color.White
+                        )
+                    }
+                }
+            )
+        }
+
+        HomeScreenContent(
+            homeViewModel = homeViewModel,
+            mainViewModel = mainViewModel,
+            onMovieClick = { navigator.push(MovieDetailsScreen(it)) },
+            onSeeAllClick = { navigator.push(SeeAllMoviesScreen(it)) }
+        )
+    }
+}
+
 @Composable
-fun HomeScreen(
+fun HomeScreenContent(
     homeViewModel: HomeViewModel = viewModel(),
     mainViewModel: MainViewModel = viewModel(),
     onMovieClick: (Int) -> Unit,

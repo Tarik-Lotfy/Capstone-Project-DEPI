@@ -9,18 +9,53 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import com.example.moviestime.ui.components.MovieRowCard
 import com.example.moviestime.ui.navigation.SeeAllCategory
 import com.example.moviestime.viewmodel.HomeViewModel
 
+data class SeeAllMoviesScreen(
+    val category: SeeAllCategory
+) : Screen {
+    @Composable
+    override fun Content() {
+        val navigator = LocalNavigator.currentOrThrow
+        val topBarState = LocalAppTopBarState.current
+        val homeViewModel: HomeViewModel = viewModel()
+
+        LaunchedEffect(category) {
+            val title = when (category) {
+                SeeAllCategory.POPULAR -> "Popular"
+                SeeAllCategory.TOP_RATED -> "Top Rated"
+                SeeAllCategory.UPCOMING -> "Upcoming"
+            }
+            topBarState.value = AppTopBarConfig(
+                title = title,
+                showBack = true,
+                onBack = { navigator.pop() },
+                trailingContent = null
+            )
+        }
+
+        SeeAllMoviesScreenContent(
+            category = category,
+            homeViewModel = homeViewModel,
+            onMovieClick = { navigator.push(MovieDetailsScreen(it)) }
+        )
+    }
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SeeAllMoviesScreen(
+fun SeeAllMoviesScreenContent(
     category: SeeAllCategory,
     homeViewModel: HomeViewModel = viewModel(),
     onMovieClick: (Int) -> Unit
