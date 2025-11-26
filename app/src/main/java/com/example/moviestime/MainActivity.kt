@@ -41,7 +41,7 @@ class MainActivity : ComponentActivity() {
             val isDarkTheme by themeViewModel.isDarkThemeEnabled.collectAsState()
 
             val languageViewModel: LanguageViewModel = viewModel { LanguageViewModel(application) }
-            val appLanguage by languageViewModel.appLanguage.collectAsState()
+            val appLanguage by languageViewModel.currentLanguage.collectAsState()
 
             LaunchedEffect(appLanguage) {
                 val config = resources.configuration

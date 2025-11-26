@@ -4,23 +4,125 @@ import android.util.Log
 import android.util.Patterns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.moviestime.data.repository.AuthRepository
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.UserProfileChangeRequest
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import com.example.moviestime.data.repository.AuthRepository
-import com.google.firebase.auth.FirebaseUser
+import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
+
+data class UserProfile(
+    val name: String = "",
+    val email: String = "",
+    val bio: String = "",
+    val photoUrl: String? = null
+)
+
+// إضافة حالة النجاح isUpdateSuccess
+data class AuthUiState(
+    val isLoading: Boolean = false,
+    val error: String? = null,
+    val isUpdateSuccess: Boolean = false
+)
 
 class AuthViewModel : ViewModel() {
     private val repository = AuthRepository()
+    private val auth = FirebaseAuth.getInstance()
+    private val db = FirebaseFirestore.getInstance()
 
-    // التصحيح: إزالة "value =" وتمرير القيمة مباشرة
     private val _uiState = MutableStateFlow(AuthUiState())
     val uiState: StateFlow<AuthUiState> = _uiState.asStateFlow()
 
-    // التصحيح: إزالة "value =" وتمرير القيمة مباشرة
-    private val _isLoggedIn = MutableStateFlow(repository.currentUser != null)
+    private val _isLoggedIn = MutableStateFlow(auth.currentUser != null)
     val isLoggedIn: StateFlow<Boolean> = _isLoggedIn.asStateFlow()
+
+    private val _userProfile = MutableStateFlow(UserProfile())
+    val userProfile: StateFlow<UserProfile> = _userProfile.asStateFlow()
+
+    init {
+        if (auth.currentUser != null) {
+            loadUserProfile()
+        }
+    }
+
+    fun loadUserProfile() {
+        val user = auth.currentUser ?: return
+        viewModelScope.launch {
+            try {
+                val document = db.collection("users").document(user.uid).get().await()
+                val bio = document.getString("bio") ?: "Tell us about your love for cinema..."
+
+                _userProfile.value = UserProfile(
+                    name = user.displayName ?: "Movie Lover",
+                    email = user.email ?: "",
+                    bio = bio,
+                    photoUrl = user.photoUrl?.toString()
+                )
+            } catch (e: Exception) {
+                Log.e("AuthViewModel", "Error loading profile", e)
+            }
+        }
+    }
+
+    fun updateUserProfile(name: String, bio: String) {
+        val user = auth.currentUser ?: return
+
+        // 1. تشغيل التحميل
+        _uiState.value = AuthUiState(isLoading = true)
+
+        viewModelScope.launch {
+            try {
+                withContext(Dispatchers.IO) {
+                    // تحديث الاسم في Auth
+                    val profileUpdates = UserProfileChangeRequest.Builder()
+                        .setDisplayName(name)
+                        .build()
+                    user.updateProfile(profileUpdates).await()
+
+                    // تحديث البايو في Firestore
+                    val userData = hashMapOf(
+                        "bio" to bio,
+                        "name" to name,
+                        "email" to user.email
+                    )
+                    db.collection("users").document(user.uid)
+                        .set(userData, SetOptions.merge())
+                        .await()
+                }
+
+                // تحديث البيانات محلياً
+                _userProfile.value = _userProfile.value.copy(
+                    name = name,
+                    bio = bio
+                )
+
+                // 2. نجاح العملية: إيقاف التحميل وتفعيل إشارة النجاح
+                _uiState.value = AuthUiState(isLoading = false, isUpdateSuccess = true)
+
+            } catch (e: Exception) {
+                Log.e("AuthViewModel", "Error updating profile", e)
+                _uiState.value = AuthUiState(error = e.message ?: "Unknown Error", isLoading = false)
+            } finally {
+                // ضمان إيقاف التحميل في حال حدوث أي خطأ غير متوقع
+                if (_uiState.value.isLoading) {
+                    _uiState.value = _uiState.value.copy(isLoading = false)
+                }
+            }
+        }
+    }
+
+    // دالة لإعادة ضبط الحالة بعد الخروج من الصفحة
+    fun resetState() {
+        _uiState.value = AuthUiState()
+    }
+
+    // ... دوال تسجيل الدخول والتسجيل القديمة ...
 
     fun login(email: String, password: String) {
         if (!validateEmail(email)) {
@@ -39,6 +141,7 @@ class AuthViewModel : ViewModel() {
                 if (result.isSuccess) {
                     _isLoggedIn.value = true
                     _uiState.value = AuthUiState()
+                    loadUserProfile()
                 } else {
                     _uiState.value = AuthUiState(error = "Login failed: ${result.exceptionOrNull()?.message}")
                 }
@@ -70,6 +173,7 @@ class AuthViewModel : ViewModel() {
                 if (result.isSuccess) {
                     _isLoggedIn.value = true
                     _uiState.value = AuthUiState()
+                    loadUserProfile()
                 } else {
                     _uiState.value = AuthUiState(error = "Registration failed: ${result.exceptionOrNull()?.message}")
                 }
@@ -88,6 +192,7 @@ class AuthViewModel : ViewModel() {
                 if (result.isSuccess) {
                     _isLoggedIn.value = true
                     _uiState.value = AuthUiState()
+                    loadUserProfile()
                 } else {
                     _uiState.value = AuthUiState(error = "Google Sign-In failed: ${result.exceptionOrNull()?.message}")
                 }
@@ -105,6 +210,7 @@ class AuthViewModel : ViewModel() {
             if (result.isSuccess) {
                 _isLoggedIn.value = true
                 _uiState.value = AuthUiState()
+                loadUserProfile()
             } else {
                 _uiState.value = AuthUiState(error = "Facebook Login Failed: ${result.exceptionOrNull()?.message}")
             }
@@ -114,6 +220,7 @@ class AuthViewModel : ViewModel() {
     fun onExternalSignInSuccess() {
         _isLoggedIn.value = true
         _uiState.value = AuthUiState()
+        loadUserProfile()
     }
 
     fun onExternalSignInFailure(error: String) {
@@ -123,6 +230,7 @@ class AuthViewModel : ViewModel() {
     fun logout() {
         repository.logout()
         _isLoggedIn.value = false
+        _userProfile.value = UserProfile()
         _uiState.value = AuthUiState()
     }
 
@@ -130,8 +238,3 @@ class AuthViewModel : ViewModel() {
         return Patterns.EMAIL_ADDRESS.matcher(email).matches()
     }
 }
-
-data class AuthUiState(
-    val isLoading: Boolean = false,
-    val error: String? = null
-)

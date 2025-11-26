@@ -33,4 +33,19 @@
     <string name="language">اللغة</string>
     <string name="language_arabic">العربية</string>
     <string name="language_english">English</string>
+
+    <!-- New Additions (الترجمات الجديدة) -->
+    <string name="account_section">الحساب</string>
+    <string name="preferences_section">التفضيلات</string>
+    <string name="privacy">الخصوصية</string>
+    <string name="support_section">الدعم</string>
+    <string name="delete_account">حذف الحساب</string>
+    <string name="reviews">المراجعات</string>
+    <string name="favorites">المفضلة</string>
+    <string name="followers">المتابعين</string>
+    <string name="following">المتابَعين</string>
+    <string name="no_items">لا توجد عناصر بعد</string>
+    <string name="explore_movies">استكشف الأفلام</string>
+    <string name="watchlist_empty">قائمة المشاهدة فارغة</string>
+    <string name="add_movies">أضف أفلاماً الآن</string>
 </resources>

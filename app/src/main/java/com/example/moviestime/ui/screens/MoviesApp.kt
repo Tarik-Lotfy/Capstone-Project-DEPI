@@ -3,7 +3,6 @@ package com.example.moviestime.ui.screens
 
 import android.Manifest
 import androidx.annotation.RequiresPermission
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,24 +11,17 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Explore
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource // إضافة Import
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.moviestime.R
+import com.example.moviestime.R // إضافة Import
 import com.example.moviestime.viewmodel.MainViewModel
 import com.example.moviestime.viewmodel.ThemeViewModel
 import com.example.moviestime.viewmodel.NotificationViewModel
@@ -44,74 +36,43 @@ fun MoviesApp(
     themeViewModel: ThemeViewModel,
     notificationViewModel: NotificationViewModel,
     languageViewModel: LanguageViewModel,
-    authViewModel: AuthViewModel = viewModel() // Added AuthViewModel
+    authViewModel: AuthViewModel = viewModel()
 ) {
     val navController = rememberNavController()
-
     val selectedTab by mainViewModel.uiState.collectAsState()
 
     LaunchedEffect(selectedTab.selectedTab) {
         when (selectedTab.selectedTab) {
-            0 -> navController.navigate("home") {
-                launchSingleTop = true
-                restoreState = true
-            }
-            1 -> navController.navigate("discover") {
-                launchSingleTop = true
-                restoreState = true
-            }
-            2 -> navController.navigate("profile") {
-                launchSingleTop = true
-                restoreState = true
-            }
+            0 -> navController.navigate("home") { launchSingleTop = true; restoreState = true }
+            1 -> navController.navigate("discover") { launchSingleTop = true; restoreState = true }
+            2 -> navController.navigate("profile") { launchSingleTop = true; restoreState = true }
         }
     }
 
-    val tabs = listOf("Home", "Discover", "Profile")
+    // استخدام stringResource للنصوص السفلية
+    val tabs = listOf(
+        stringResource(R.string.home),
+        stringResource(R.string.discover),
+        stringResource(R.string.profile)
+    )
     val icons = listOf(Icons.Default.Home, Icons.Default.Explore, Icons.Default.Person)
+
     Scaffold(
         topBar = {
-            // Hide TopBar on Settings screen if desired, or keep it consistent
-            // Currently, it shows everywhere inside this Scaffold
             CenterAlignedTopAppBar(
-                title = {
-                    Text(
-                        "CineVault",
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
-                    )
-                },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = Color.Transparent
-                ),
+                title = { Text(stringResource(R.string.app_name), fontWeight = FontWeight.Bold, color = Color.White) },
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = Color.Transparent),
             )
         },
         bottomBar = {
-            // Check current route to optionally hide bottom bar on Settings
-            // For now, keeping it simple as per original structure
-            NavigationBar(
-                containerColor = Color.Black.copy(alpha = 0.7f)
-            ) {
+            NavigationBar(containerColor = Color.Black.copy(alpha = 0.7f)) {
                 tabs.forEachIndexed { index, title ->
                     NavigationBarItem(
-                        icon = {
-                            Icon(
-                                icons[index],
-                                contentDescription = title,
-                                tint = if (selectedTab.selectedTab == index) MaterialTheme.colorScheme.primary else Color.White.copy(alpha = 0.7f)
-                            )
-                        },
-                        label = {
-                            Text(
-                                title,
-                                color = if (selectedTab.selectedTab == index) MaterialTheme.colorScheme.primary else Color.White.copy(alpha = 0.7f)
-                            )
-                        },
+                        icon = { Icon(icons[index], contentDescription = title, tint = if (selectedTab.selectedTab == index) MaterialTheme.colorScheme.primary else Color.White.copy(alpha = 0.7f)) },
+                        label = { Text(title, color = if (selectedTab.selectedTab == index) MaterialTheme.colorScheme.primary else Color.White.copy(alpha = 0.7f)) },
                         selected = selectedTab.selectedTab == index,
                         onClick = { mainViewModel.selectTab(index) },
-                        colors = NavigationBarItemDefaults.colors(
-                            indicatorColor = Color.White.copy(alpha = 0.2f)
-                        )
+                        colors = NavigationBarItemDefaults.colors(indicatorColor = Color.White.copy(alpha = 0.2f))
                     )
                 }
             }
@@ -126,49 +87,45 @@ fun MoviesApp(
         ) {
             NavHost(navController = navController, startDestination = "home") {
                 composable("home") {
-                    HomeScreen(
-                        navController = navController,
-                        homeViewModel = viewModel(),
-                        mainViewModel = mainViewModel
-                    )
+                    HomeScreen(navController = navController, homeViewModel = viewModel(), mainViewModel = mainViewModel)
                 }
                 composable("discover") {
-                    DiscoverScreen(
-                        navController = navController,
-                        searchViewModel = viewModel()
-                    )
+                    DiscoverScreen(navController = navController, searchViewModel = viewModel())
                 }
+
                 composable("profile") {
                     ProfileScreen(
                         mainViewModel = mainViewModel,
                         themeViewModel = themeViewModel,
                         languageViewModel = languageViewModel,
-                        onMovieClick = { movieId ->
-                            navController.navigate("movie/$movieId")
-                        },
-                        onSettingsClick = {
-                            // This triggered the crash before because "settings" route didn't exist
-                            navController.navigate("settings")
-                        }
+                        authViewModel = authViewModel,
+                        onMovieClick = { movieId -> navController.navigate("movie/$movieId") },
+                        onSettingsClick = { navController.navigate("settings") },
+                        onEditProfileClick = { navController.navigate("edit_profile") }
                     )
                 }
-                // --- ADDED SETTINGS ROUTE HERE ---
+
                 composable("settings") {
+                    val currentLanguage by languageViewModel.currentLanguage.collectAsState()
+
                     SettingsScreen(
                         onBack = { navController.popBackStack() },
-                        onSignOut = {
-                            authViewModel.logout()
-                            // Assuming your MainActivity observes isLoggedIn and switches
-                            // to LoginScreen automatically when this happens.
-                        }
+                        onSignOut = { authViewModel.logout() },
+                        onEditProfile = { navController.navigate("edit_profile") },
+                        onLanguageChange = { languageViewModel.toggleLanguage() },
+                        currentLanguage = currentLanguage
+                    )
+                }
+
+                composable("edit_profile") {
+                    EditProfileScreen(
+                        onBackClick = { navController.popBackStack() },
+                        authViewModel = authViewModel
                     )
                 }
 
                 composable("search") {
-                    SearchScreen(
-                        navController = navController,
-                        searchViewModel = viewModel()
-                    )
+                    SearchScreen(navController = navController, searchViewModel = viewModel())
                 }
                 composable("movie/{movieId}") { backStackEntry ->
                     val movieId = backStackEntry.arguments?.getString("movieId")?.toInt() ?: 1
@@ -176,11 +133,8 @@ fun MoviesApp(
                         movieId = movieId,
                         mainViewModel = mainViewModel,
                         onBack = { navController.popBackStack() },
-                        onPlayClick = { movie ->
-                            navController.navigate("video/${movie.id}")
-                        },
-                        onShareClick = { movie ->
-                        }
+                        onPlayClick = { movie -> navController.navigate("video/${movie.id}") },
+                        onShareClick = { }
                     )
                 }
             }

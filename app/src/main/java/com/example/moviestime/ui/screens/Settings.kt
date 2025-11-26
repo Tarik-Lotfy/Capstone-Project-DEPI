@@ -21,6 +21,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -33,9 +34,10 @@ fun SettingsScreen(
     onBack: () -> Unit,
     onSignOut: () -> Unit,
     onEditProfile: () -> Unit = {},
-    onDeleteAccount: () -> Unit = {}
+    onDeleteAccount: () -> Unit = {},
+    onLanguageChange: () -> Unit = {},
+    currentLanguage: String = "en"
 ) {
-    // ألوان الثيم
     val backgroundColor = colorResource(R.color.background)
     val cardColor = colorResource(R.color.card)
     val textColor = colorResource(R.color.foreground)
@@ -66,7 +68,7 @@ fun SettingsScreen(
             }
 
             Text(
-                text = "Settings",
+                text = stringResource(R.string.settings), // ترجمة العنوان
                 fontFamily = PlayFair,
                 fontWeight = FontWeight.Bold,
                 fontSize = 26.sp,
@@ -76,11 +78,11 @@ fun SettingsScreen(
         }
 
         // --- Account Section ---
-        SectionHeader(title = "ACCOUNT", color = mutedColor)
+        SectionHeader(title = "ACCOUNT", color = mutedColor) // يمكن إضافتها لملف strings لاحقاً
         SettingsGroup(cardColor = cardColor) {
             SettingsItem(
                 icon = Icons.Outlined.Person,
-                title = "Edit Profile",
+                title = stringResource(R.string.edit_profile), // ترجمة
                 textColor = textColor,
                 onClick = onEditProfile
             )
@@ -93,15 +95,11 @@ fun SettingsScreen(
         SettingsGroup(cardColor = cardColor) {
             SettingsItem(
                 icon = Icons.Outlined.Notifications,
-                title = "Notifications",
+                title = stringResource(R.string.notifications), // ترجمة
                 textColor = textColor,
                 showDivider = true
             )
-            SettingsItem(
-                icon = Icons.Outlined.Security,
-                title = "Privacy",
-                textColor = textColor
-            )
+
         }
 
         Spacer(Modifier.height(24.dp))
@@ -111,17 +109,29 @@ fun SettingsScreen(
         SettingsGroup(cardColor = cardColor) {
             SettingsItem(
                 icon = Icons.Outlined.HelpOutline,
-                title = "Help & Feedback",
+                title = stringResource(R.string.help_support), // ترجمة
                 textColor = textColor
             )
         }
 
         Spacer(Modifier.height(40.dp))
 
-        // --- Actions (Sign Out & Delete) ---
+        // --- Language Switcher ---
+        SettingsButton(
+            icon = Icons.Default.Language,
+            // عرض النص بناءً على اللغة الحالية
+            title = if (currentLanguage == "ar") stringResource(R.string.language_english) else stringResource(R.string.language_arabic),
+            color = textColor,
+            borderColor = textColor.copy(alpha = 0.3f),
+            onClick = onLanguageChange
+        )
+
+        Spacer(Modifier.height(16.dp))
+
+        // --- Actions ---
         SettingsButton(
             icon = Icons.AutoMirrored.Filled.Logout,
-            title = "Sign Out",
+            title = stringResource(R.string.logout), // ترجمة
             color = textColor,
             borderColor = textColor.copy(alpha = 0.3f),
             onClick = onSignOut
@@ -131,16 +141,15 @@ fun SettingsScreen(
 
         SettingsButton(
             icon = Icons.Outlined.Delete,
-            title = "Delete Account",
-            color = Color(0xFFE53935), // لون أحمر للحذف
+            title = "Delete Account", // تحتاج لإضافة في strings.xml
+            color = Color(0xFFE53935),
             borderColor = Color(0xFFE53935).copy(alpha = 0.5f),
             onClick = onDeleteAccount
         )
     }
 }
 
-// --- Helper Composables ---
-
+// ... (Helper Composables remain the same)
 @Composable
 fun SectionHeader(title: String, color: Color) {
     Text(

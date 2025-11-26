@@ -21,6 +21,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource // إضافة Import
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -31,23 +32,27 @@ import com.example.moviestime.R
 import com.example.moviestime.data.model.Movie
 import com.example.moviestime.ui.theme.Inter
 import com.example.moviestime.ui.theme.PlayFair
- import com.example.moviestime.viewmodel.LanguageViewModel
+import com.example.moviestime.viewmodel.LanguageViewModel
 import com.example.moviestime.viewmodel.MainViewModel
 import com.example.moviestime.viewmodel.ThemeViewModel
-import com.google.firebase.auth.FirebaseAuth
+import com.example.moviestime.viewmodel.AuthViewModel
 
 @Composable
 fun ProfileScreen(
     mainViewModel: MainViewModel = viewModel(),
     themeViewModel: ThemeViewModel = viewModel(),
     languageViewModel: LanguageViewModel = viewModel(),
-    onMovieClick: (Int) -> Unit, // للتنقل لصفحة الفيلم
-    onSettingsClick: () -> Unit // للتنقل لصفحة الإعدادات
+    authViewModel: AuthViewModel = viewModel(),
+    onMovieClick: (Int) -> Unit,
+    onSettingsClick: () -> Unit,
+    onEditProfileClick: () -> Unit
 ) {
     val watchlist by mainViewModel.favorites.collectAsState()
-    val user = FirebaseAuth.getInstance().currentUser
-    val userName = user?.displayName ?: "Movie Lover"
-    val userEmail = user?.email ?: "@movielover"
+    val userProfile by authViewModel.userProfile.collectAsState()
+
+    val userName = if (userProfile.name.isNotEmpty()) userProfile.name else "Movie Lover"
+    val userEmail = if (userProfile.email.isNotEmpty()) userProfile.email else "user@example.com"
+    val userBio = if (userProfile.bio.isNotEmpty()) userProfile.bio else "Tell us about your love for cinema..."
 
     val backgroundColor = colorResource(R.color.background)
     val primaryColor = colorResource(R.color.primary)
@@ -56,8 +61,13 @@ fun ProfileScreen(
     val cardColor = colorResource(R.color.card)
     val goldColor = colorResource(R.color.secondary)
 
-    var selectedTabIndex by remember { mutableIntStateOf(1) } // Default to Watchlist
-    val tabs = listOf("Reviews", "Watchlist", "Favorites")
+    var selectedTabIndex by remember { mutableIntStateOf(1) }
+    // ترجمة التابات
+    val tabs = listOf(
+        "Reviews", // غير موجودة في strings.xml
+        stringResource(R.string.watchlist),
+        "Favorites" // غير موجودة في strings.xml
+    )
 
     Column(
         modifier = Modifier
@@ -73,7 +83,7 @@ fun ProfileScreen(
                 .padding(top = 12.dp, bottom = 24.dp)
         ) {
             Text(
-                text = "Profile",
+                text = stringResource(R.string.profile), // ترجمة
                 fontFamily = PlayFair,
                 fontWeight = FontWeight.Bold,
                 fontSize = 24.sp,
@@ -81,7 +91,6 @@ fun ProfileScreen(
                 modifier = Modifier.align(Alignment.Center)
             )
 
-            // زر الإعدادات (مفعل)
             Box(
                 modifier = Modifier
                     .align(Alignment.CenterEnd)
@@ -100,7 +109,7 @@ fun ProfileScreen(
             }
         }
 
-        // --- Profile Image ---
+        // ... (Profile Image & Stats remain the same code)
         Box(
             modifier = Modifier
                 .size(100.dp)
@@ -110,19 +119,26 @@ fun ProfileScreen(
                 .background(primaryColor),
             contentAlignment = Alignment.Center
         ) {
-            // استخدام الحرف الأول من الاسم
-            Text(
-                text = userName.take(1).uppercase(),
-                fontFamily = Inter,
-                fontWeight = FontWeight.Bold,
-                fontSize = 40.sp,
-                color = textColor
-            )
+            if (userProfile.photoUrl != null) {
+                AsyncImage(
+                    model = userProfile.photoUrl,
+                    contentDescription = "Profile Picture",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize()
+                )
+            } else {
+                Text(
+                    text = userName.take(1).uppercase(),
+                    fontFamily = Inter,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 40.sp,
+                    color = textColor
+                )
+            }
         }
 
         Spacer(Modifier.height(16.dp))
 
-        // Name & Email
         Text(
             text = userName,
             fontFamily = PlayFair,
@@ -140,23 +156,32 @@ fun ProfileScreen(
             textAlign = TextAlign.Center
         )
 
+        Spacer(Modifier.height(12.dp))
+        Text(
+            text = userBio,
+            fontFamily = Inter,
+            fontSize = 13.sp,
+            color = textColor.copy(alpha = 0.8f),
+            textAlign = TextAlign.Center,
+            modifier = Modifier.padding(horizontal = 24.dp)
+        )
+
         Spacer(Modifier.height(24.dp))
 
-        // --- Stats (تم ربط رقم الـ Watchlist) ---
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             ProfileStat(number = "0", label = "Followers", textColor, mutedColor)
             ProfileStat(number = "0", label = "Following", textColor, mutedColor)
-            ProfileStat(number = "${watchlist.size}", label = "Watchlist", textColor, mutedColor)
+            ProfileStat(number = "${watchlist.size}", label = stringResource(R.string.watchlist), textColor, mutedColor)
         }
 
         Spacer(Modifier.height(24.dp))
 
-        // Edit Button
+        // Edit Button (Translated)
         OutlinedButton(
-            onClick = { /* TODO */ },
+            onClick = onEditProfileClick,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(48.dp),
@@ -167,7 +192,7 @@ fun ProfileScreen(
             )
         ) {
             Text(
-                text = "Edit Profile",
+                text = stringResource(R.string.edit_profile), // ترجمة
                 fontFamily = Inter,
                 fontWeight = FontWeight.SemiBold,
                 color = textColor
@@ -204,19 +229,19 @@ fun ProfileScreen(
             }
         }
 
+        // ... (Rest of content logic remains same)
         Spacer(Modifier.height(20.dp))
 
         // --- Content ---
         if (selectedTabIndex == 1) { // Watchlist Tab
             if (watchlist.isEmpty()) {
                 EmptyTabState(
-                    message = "Your watchlist is empty",
-                    actionText = "Add movies now",
+                    message = stringResource(R.string.no_results), // استخدام نص "لا نتائج" مؤقتاً
+                    actionText = stringResource(R.string.discover),
                     mutedColor = mutedColor,
                     goldColor = goldColor
                 )
             } else {
-                // عرض الأفلام المضافة
                 LazyVerticalGrid(
                     columns = GridCells.Fixed(3),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -233,8 +258,8 @@ fun ProfileScreen(
             }
         } else {
             EmptyTabState(
-                message = "No items yet",
-                actionText = "Explore movies",
+                message = stringResource(R.string.no_results),
+                actionText = stringResource(R.string.discover),
                 mutedColor = mutedColor,
                 goldColor = goldColor
             )
@@ -242,6 +267,7 @@ fun ProfileScreen(
     }
 }
 
+// ... (Helper Composables remain the same)
 @Composable
 fun ProfileMovieItem(movie: Movie, onClick: () -> Unit) {
     Card(

@@ -33,4 +33,19 @@
     <string name="language">Language</string>
     <string name="language_arabic">العربية</string>
     <string name="language_english">English</string>
+
+    <!-- New Additions -->
+    <string name="account_section">ACCOUNT</string>
+    <string name="preferences_section">PREFERENCES</string>
+    <string name="privacy">Privacy</string>
+    <string name="support_section">SUPPORT</string>
+    <string name="delete_account">Delete Account</string>
+    <string name="reviews">Reviews</string>
+    <string name="favorites">Favorites</string>
+    <string name="followers">Followers</string>
+    <string name="following">Following</string>
+    <string name="no_items">No items yet</string>
+    <string name="explore_movies">Explore movies</string>
+    <string name="watchlist_empty">Your watchlist is empty</string>
+    <string name="add_movies">Add movies now</string>
 </resources>
