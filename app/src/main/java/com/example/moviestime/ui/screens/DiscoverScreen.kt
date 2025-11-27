@@ -54,8 +54,8 @@ fun ShimmerMovieGrid() {
 
 @Composable
 fun DiscoverScreen(
-    navController: NavHostController,
-    searchViewModel: SearchViewModel = viewModel()
+    searchViewModel: SearchViewModel = viewModel(),
+    onMovieClick: (Int) -> Unit
 ) {
     val query by searchViewModel.searchQuery.collectAsState()
     val results by searchViewModel.searchResults.collectAsState()
@@ -231,7 +231,7 @@ fun DiscoverScreen(
                                     MovieRowCard(
                                         movie = movie,
                                         onMovieClick = { selectedMovie ->
-                                            navController.navigate("movie/${selectedMovie.id}")
+                                            onMovieClick(selectedMovie.id)
                                         }
                                     )
                                 }

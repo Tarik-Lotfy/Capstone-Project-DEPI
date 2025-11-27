@@ -200,10 +200,10 @@ data class MovieDetailsScreenRoute(
             mainViewModel = mainViewModel,
             onBack = { navigator.pop() },
             onPlayClick = { _: Movie -> },
-//            onFavoriteClick = { movie ->
-//                mainViewModel.toggleFavorite(movie)
-//            },
-            onShareClick = { _ -> }
+            onShareClick = { _ -> },
+            onMovieClick = { id ->
+                navigator.push(MovieDetailsScreenRoute(id))
+            }
         )
     }
 }

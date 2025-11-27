@@ -109,6 +109,7 @@ dependencies {
 
     // Youtube Player
     implementation("com.pierfrancescosoffritti.androidyoutubeplayer:core:12.0.0")
+    implementation("androidx.compose.ui:ui-viewbinding:1.6.0")
 
     val voyagerVersion = "1.1.0-beta02"
 
