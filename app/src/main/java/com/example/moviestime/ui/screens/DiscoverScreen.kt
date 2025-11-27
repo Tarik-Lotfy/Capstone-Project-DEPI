@@ -20,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -112,8 +113,9 @@ fun DiscoverScreen(
             ) {
                 Text(
                     text = if (isSearchTyping) "Searching..." else "Discover",
+                    fontFamily = PlayFair,
                     fontSize = 28.sp,
-                    fontWeight = FontWeight.ExtraBold,
+                    fontWeight = FontWeight.Bold,
                     color = Color.White
                 )
                 if (!isSearchTyping) {
@@ -135,6 +137,10 @@ fun DiscoverScreen(
             TextField(
                 value = query,
                 onValueChange = { searchViewModel.onSearchQueryChanged(it) },
+                textStyle = TextStyle(
+                    fontFamily = Inter,
+                    fontSize = 16.sp
+                ),
                 leadingIcon = {
                     Icon(
                         Icons.Default.Search,
@@ -145,6 +151,7 @@ fun DiscoverScreen(
                 placeholder = {
                     Text(
                         "Search for films, series, genres...",
+                        fontFamily = Inter,
                         color = Color.White.copy(alpha = 0.5f),
                         fontSize = 16.sp
                     )
@@ -170,6 +177,7 @@ fun DiscoverScreen(
 
                 Text(
                     "Genre",
+                    fontFamily = PlayFair,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = Color.White
@@ -195,6 +203,7 @@ fun DiscoverScreen(
                         ) {
                             Text(
                                 genre.name,
+                                fontFamily = Inter,
                                 color = if (isSelected) Color.White else Color.Black,
                                 fontWeight = FontWeight.Medium,
                                 fontSize = 14.sp
@@ -248,6 +257,7 @@ fun DiscoverScreen(
                                 Spacer(Modifier.height(8.dp))
                                 Text(
                                     "No films matched your search.",
+                                    fontFamily = Inter,
                                     color = Color.White.copy(alpha = 0.7f),
                                     fontSize = 16.sp,
                                     fontWeight = FontWeight.Medium
@@ -265,6 +275,7 @@ fun DiscoverScreen(
                                 Spacer(Modifier.height(8.dp))
                                 Text(
                                     "No movies available in this category.",
+                                    fontFamily = Inter,
                                     color = Color.White.copy(alpha = 0.7f),
                                     fontSize = 16.sp,
                                     fontWeight = FontWeight.Medium

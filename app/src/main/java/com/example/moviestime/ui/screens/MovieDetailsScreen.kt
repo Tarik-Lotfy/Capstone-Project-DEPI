@@ -35,6 +35,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.example.moviestime.R
 import com.example.moviestime.data.model.Movie
+import com.example.moviestime.data.model.CastMember
+import com.example.moviestime.data.model.Director
 import com.example.moviestime.ui.components.SectionWithRow
 import com.example.moviestime.ui.theme.Inter
 import com.example.moviestime.ui.theme.PlayFair
@@ -395,9 +397,27 @@ fun MovieDetailsContent(
 
                         Spacer(Modifier.height(16.dp))
 
-                        DetailItem(label = "Director", value = movie.director, textColor = textColor)
+                        // Director with image
+                        if (movie.directorInfo != null) {
+                            DirectorItem(
+                                director = movie.directorInfo,
+                                textColor = textColor
+                            )
+                        } else {
+                            DetailItem(label = "Director", value = movie.director, textColor = textColor)
+                        }
+                        
                         Spacer(Modifier.height(16.dp))
-                        DetailItem(label = "Cast", value = movie.cast, textColor = textColor)
+                        
+                        // Cast with images
+                        if (movie.castMembers.isNotEmpty()) {
+                            CastSection(
+                                castMembers = movie.castMembers,
+                                textColor = textColor
+                            )
+                        } else {
+                            DetailItem(label = "Cast", value = movie.cast, textColor = textColor)
+                        }
 
                         Spacer(Modifier.height(16.dp))
 
@@ -516,11 +536,124 @@ fun DetailItem(label: String, value: String, textColor: Color) {
         )
         Spacer(Modifier.height(4.dp))
         Text(
-            text = value,
+            text = value.ifEmpty { "N/A" },
             fontFamily = Inter,
             fontWeight = FontWeight.SemiBold,
             fontSize = 16.sp,
             color = textColor
         )
+    }
+}
+
+@Composable
+fun DirectorItem(
+    director: Director,
+    textColor: Color
+) {
+    Column {
+        Text(
+            text = "Director",
+            fontFamily = Inter,
+            fontWeight = FontWeight.Medium,
+            fontSize = 13.sp,
+            color = textColor.copy(alpha = 0.5f)
+        )
+        Spacer(Modifier.height(8.dp))
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            AsyncImage(
+                model = director.profilePath,
+                contentDescription = director.name,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .size(60.dp)
+                    .clip(CircleShape)
+                    .border(2.dp, textColor.copy(alpha = 0.2f), CircleShape),
+                placeholder = painterResource(R.drawable.ic_launcher_background),
+                error = painterResource(R.drawable.ic_launcher_background)
+            )
+            Column {
+                Text(
+                    text = director.name,
+                    fontFamily = Inter,
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 16.sp,
+                    color = textColor
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun CastSection(
+    castMembers: List<CastMember>,
+    textColor: Color
+) {
+    Column {
+        Text(
+            text = "Cast",
+            fontFamily = Inter,
+            fontWeight = FontWeight.Medium,
+            fontSize = 13.sp,
+            color = textColor.copy(alpha = 0.5f)
+        )
+        Spacer(Modifier.height(12.dp))
+        LazyRow(
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            items(castMembers.size) { index ->
+                val castMember = castMembers[index]
+                CastMemberItem(
+                    castMember = castMember,
+                    textColor = textColor
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun CastMemberItem(
+    castMember: CastMember,
+    textColor: Color
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.width(80.dp)
+    ) {
+        AsyncImage(
+            model = castMember.profilePath,
+            contentDescription = castMember.name,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .size(80.dp)
+                .clip(CircleShape)
+                .border(2.dp, textColor.copy(alpha = 0.2f), CircleShape),
+            placeholder = painterResource(R.drawable.ic_launcher_background),
+            error = painterResource(R.drawable.ic_launcher_background)
+        )
+        Spacer(Modifier.height(8.dp))
+        Text(
+            text = castMember.name,
+            fontFamily = Inter,
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 12.sp,
+            color = textColor,
+            textAlign = TextAlign.Center,
+            maxLines = 2
+        )
+        if (castMember.character.isNotEmpty()) {
+            Text(
+                text = castMember.character,
+                fontFamily = Inter,
+                fontSize = 10.sp,
+                color = textColor.copy(alpha = 0.7f),
+                textAlign = TextAlign.Center,
+                maxLines = 1
+            )
+        }
     }
 }

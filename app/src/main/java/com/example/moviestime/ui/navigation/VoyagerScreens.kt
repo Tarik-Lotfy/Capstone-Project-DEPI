@@ -27,6 +27,7 @@ import com.example.moviestime.ui.screens.ProfileScreen
 import com.example.moviestime.ui.screens.SearchScreen
 import com.example.moviestime.ui.screens.SeeAllMoviesScreen
 import com.example.moviestime.ui.screens.SettingsScreen
+import com.example.moviestime.ui.screens.VideoPlayerScreen
 import com.example.moviestime.viewmodel.AuthViewModel
 import com.example.moviestime.viewmodel.HomeViewModel
 import com.example.moviestime.viewmodel.LanguageViewModel
@@ -199,7 +200,11 @@ data class MovieDetailsScreenRoute(
             movieId = movieId,
             mainViewModel = mainViewModel,
             onBack = { navigator.pop() },
-            onPlayClick = { _: Movie -> },
+            onPlayClick = { movie: Movie ->
+                movie.trailerKey?.let { trailerKey ->
+                    navigator.push(VideoPlayerScreenRoute(trailerKey))
+                }
+            },
             onShareClick = { _ -> },
             onMovieClick = { id ->
                 navigator.push(MovieDetailsScreenRoute(id))
@@ -287,6 +292,20 @@ object LoginScreenRoute : Screen {
         val authViewModel: AuthViewModel = viewModel()
 
         LoginScreen(authViewModel = authViewModel)
+    }
+}
+
+data class VideoPlayerScreenRoute(
+    val trailerKey: String
+) : Screen {
+    @Composable
+    override fun Content() {
+        val navigator = LocalNavigator.currentOrThrow
+
+        VideoPlayerScreen(
+            trailerKey = trailerKey,
+            onBack = { navigator.pop() }
+        )
     }
 }
 

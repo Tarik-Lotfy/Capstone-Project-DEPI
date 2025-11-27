@@ -12,5 +12,7 @@ data class Movie(
     val overview: String = "",
     val director: String = "",
     val cast: String = "",
-    val trailerKey: String? = null
+    val trailerKey: String? = null,
+    val directorInfo: Director? = null,
+    val castMembers: List<CastMember> = emptyList()
 )
