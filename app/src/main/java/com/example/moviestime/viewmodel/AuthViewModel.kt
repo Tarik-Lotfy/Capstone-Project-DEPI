@@ -13,9 +13,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
+import com.google.firebase.auth.FirebaseAuth.AuthStateListener
 
 data class UserProfile(
     val name: String = "",
@@ -44,10 +46,26 @@ class AuthViewModel : ViewModel() {
     private val _userProfile = MutableStateFlow(UserProfile())
     val userProfile: StateFlow<UserProfile> = _userProfile.asStateFlow()
 
+    private val authStateListener = AuthStateListener { firebaseAuth ->
+        val user = firebaseAuth.currentUser
+        _isLoggedIn.value = user != null
+        if (user != null) {
+            loadUserProfile()
+        } else {
+            _userProfile.value = UserProfile()
+        }
+    }
+
     init {
+        auth.addAuthStateListener(authStateListener)
         if (auth.currentUser != null) {
             loadUserProfile()
         }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        auth.removeAuthStateListener(authStateListener)
     }
 
     fun loadUserProfile() {

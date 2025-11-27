@@ -85,7 +85,7 @@ class MainActivity : ComponentActivity() {
                         )
                     }
                     !isLoggedIn -> {
-                        LoginScreen()
+                        LoginScreen().Content()
                     }
                     else -> {
                         val mainViewModel: MainViewModel = viewModel { MainViewModel(application) }
