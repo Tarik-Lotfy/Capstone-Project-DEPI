@@ -1,5 +1,6 @@
 package com.example.moviestime.ui.screens
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -15,46 +16,78 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
+import coil.compose.AsyncImage
+import com.example.moviestime.R
 import com.example.moviestime.ui.theme.Inter
-import com.example.moviestime.ui.theme.MovieMiniTheme
 import com.example.moviestime.ui.theme.PlayFair
+import com.example.moviestime.viewmodel.AuthViewModel
 
-// -----------------------------------------------------
-// 🎨 تعريفات الألوان الدقيقة (من ملف colors.xml)
-// -----------------------------------------------------
+class EditProfileScreen : Screen {
+    @Composable
+    override fun Content() {
+        val navigator = LocalNavigator.currentOrThrow
+        // Fix: Use standard viewModel() to avoid unresolved reference errors
+        val authViewModel: AuthViewModel = viewModel()
 
-val BackgroundColor = Color(0xFF171311)
-val PrimaryColor = Color(0xFF9E1938)
-val TextColor = Color(0xFFF5F1E8)
-val GoldColor = Color(0xFFE8C547)
-val CardColor = Color(0xFF231F1C)
-val MutedColor = Color(0xFFB5AA9C)
-val BorderColor = Color(0xFF403935)
-
-// -----------------------------------------------------
-// 🛠️ شاشة تعديل الملف الشخصي (EditProfileScreen)
-// -----------------------------------------------------
+        EditProfileScreenContent(
+            authViewModel = authViewModel,
+            onBackClick = { navigator.pop() }
+        )
+    }
+}
 
 @Composable
-fun EditProfileScreen(
-    onBackClick: () -> Unit = {},
+fun EditProfileScreenContent(
+    authViewModel: AuthViewModel,
+    onBackClick: () -> Unit
 ) {
-    var username by remember { mutableStateOf("yousef") }
-    var fullName by remember { mutableStateOf("John Doe") }
-    var bio by remember { mutableStateOf("Tell us about your love for cinema...") }
+    val userProfile by authViewModel.userProfile.collectAsState()
+    val uiState by authViewModel.uiState.collectAsState()
+    val context = LocalContext.current
+
+    var fullName by remember(userProfile) { mutableStateOf(userProfile.name) }
+    var bio by remember(userProfile) { mutableStateOf(userProfile.bio) }
+
+    val colorScheme = MaterialTheme.colorScheme
+    val backgroundColor = colorScheme.background
+    val primaryColor = colorScheme.primary
+    val cardColor = colorScheme.surface
+    val textColor = colorScheme.onBackground
+    val mutedColor = textColor.copy(alpha = 0.7f)
+    val borderColor = colorScheme.outline.copy(alpha = 0.6f)
+    val goldColor = colorScheme.secondary
+
+    val successMsg = stringResource(R.string.profile_updated_success)
+
+    LaunchedEffect(uiState.isUpdateSuccess) {
+        if (uiState.isUpdateSuccess) {
+            Toast.makeText(context, successMsg, Toast.LENGTH_SHORT).show()
+            authViewModel.resetState()
+            onBackClick()
+        }
+    }
+
     val maxBioLength = 300
 
     Scaffold(
         topBar = {
-            ProfileScreenTopBar(title = "Edit Profile", onBackClick = onBackClick)
+            ProfileScreenTopBar(
+                title = stringResource(R.string.edit_profile),
+                onBackClick = onBackClick
+            )
         },
-        containerColor = BackgroundColor
+        containerColor = backgroundColor
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -66,9 +99,11 @@ fun EditProfileScreen(
             Spacer(Modifier.height(16.dp))
 
             AvatarSection(
-                initials = username.firstOrNull()?.uppercase() ?: "Y",
-                goldColor = GoldColor,
-                primaryColor = PrimaryColor
+                initials = if (fullName.isNotEmpty()) fullName.take(1).uppercase() else "U",
+                imageUrl = userProfile.photoUrl,
+                goldColor = goldColor,
+                primaryColor = primaryColor,
+                textColor = textColor
             )
 
             Spacer(Modifier.height(32.dp))
@@ -80,50 +115,80 @@ fun EditProfileScreen(
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 EditProfileTextField(
-                    value = username, onValueChange = { username = it }, label = "Username", placeholder = "yousef", supportingText = "Your unique username visible to others",
-                    cardColor = CardColor, textColor = TextColor, mutedColor = MutedColor, borderColor = BorderColor
+                    value = userProfile.email,
+                    onValueChange = { },
+                    label = stringResource(R.string.email),
+                    placeholder = stringResource(R.string.email),
+                    supportingText = stringResource(R.string.email_read_only),
+                    cardColor = cardColor,
+                    textColor = mutedColor,
+                    mutedColor = mutedColor,
+                    borderColor = borderColor,
+                    readOnly = true
                 )
 
                 EditProfileTextField(
-                    value = fullName, onValueChange = { fullName = it }, label = "Full Name", placeholder = "John Doe", supportingText = "Your display name (optional)",
-                    cardColor = CardColor, textColor = TextColor, mutedColor = MutedColor, borderColor = BorderColor
+                    value = fullName,
+                    onValueChange = { fullName = it },
+                    label = stringResource(R.string.name),
+                    placeholder = "John Doe",
+                    supportingText = stringResource(R.string.display_name_desc),
+                    cardColor = cardColor,
+                    textColor = textColor,
+                    mutedColor = mutedColor,
+                    borderColor = borderColor
                 )
 
                 EditProfileBioField(
-                    value = bio, onValueChange = { if (it.length <= maxBioLength) bio = it }, label = "Bio", placeholder = "Tell us about your love for cinema...", maxBioLength = maxBioLength,
-                    cardColor = CardColor, textColor = TextColor, mutedColor = MutedColor, borderColor = BorderColor
+                    value = bio,
+                    onValueChange = { if (it.length <= maxBioLength) bio = it },
+                    label = stringResource(R.string.bio),
+                    placeholder = stringResource(R.string.bio_placeholder),
+                    maxBioLength = maxBioLength,
+                    cardColor = cardColor,
+                    textColor = textColor,
+                    mutedColor = mutedColor,
+                    borderColor = borderColor
                 )
             }
 
-            Button(
-                onClick = { /* Handle Save Changes */ },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp)
-                    .padding(vertical = 8.dp),
-                shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = PrimaryColor,
-                    contentColor = TextColor
-                )
-            ) {
-                Text(
-                    text = "Save Changes",
-                    fontFamily = Inter,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp
-                )
+            if (uiState.isLoading) {
+                CircularProgressIndicator(color = goldColor)
+            } else {
+                Button(
+                    onClick = {
+                        authViewModel.updateUserProfile(
+                            name = fullName,
+                            bio = bio
+                        )
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp)
+                        .padding(vertical = 8.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = primaryColor,
+                        contentColor = textColor
+                    )
+                ) {
+                    Text(
+                        text = stringResource(R.string.save_changes),
+                        fontFamily = Inter,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 16.sp,
+                        color = textColor
+                    )
+                }
             }
         }
     }
 }
 
-// -----------------------------------------------------
-// الدوال المساعدة (Composable Functions)
-// -----------------------------------------------------
-
 @Composable
 fun ProfileScreenTopBar(title: String, onBackClick: () -> Unit) {
+    val textColor = MaterialTheme.colorScheme.onBackground
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -138,7 +203,7 @@ fun ProfileScreenTopBar(title: String, onBackClick: () -> Unit) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                 contentDescription = "Back",
-                tint = TextColor,
+                tint = textColor,
                 modifier = Modifier.size(24.dp)
             )
         }
@@ -148,7 +213,7 @@ fun ProfileScreenTopBar(title: String, onBackClick: () -> Unit) {
             fontFamily = PlayFair,
             fontWeight = FontWeight.Bold,
             fontSize = 24.sp,
-            color = TextColor,
+            color = textColor,
             textAlign = TextAlign.Center,
             modifier = Modifier.align(Alignment.Center)
         )
@@ -156,7 +221,13 @@ fun ProfileScreenTopBar(title: String, onBackClick: () -> Unit) {
 }
 
 @Composable
-fun AvatarSection(initials: String, goldColor: Color, primaryColor: Color) {
+fun AvatarSection(
+    initials: String,
+    imageUrl: String?,
+    goldColor: Color,
+    primaryColor: Color,
+    textColor: Color
+) {
     Box(modifier = Modifier.size(100.dp)) {
         Box(
             modifier = Modifier
@@ -167,72 +238,97 @@ fun AvatarSection(initials: String, goldColor: Color, primaryColor: Color) {
                 .background(primaryColor),
             contentAlignment = Alignment.Center
         ) {
-            Text(
-                text = initials,
-                fontFamily = Inter,
-                fontWeight = FontWeight.Bold,
-                fontSize = 40.sp,
-                color = TextColor
-            )
-        }
-        Box(
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .offset(x = 4.dp, y = 4.dp)
-                .size(32.dp)
-                .clip(CircleShape)
-                .background(goldColor)
-                .clickable { /* Handle image upload */ },
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                imageVector = Icons.Filled.CameraAlt,
-                contentDescription = "Change Avatar",
-                tint = BackgroundColor,
-                modifier = Modifier.size(18.dp)
-            )
+            if (imageUrl != null) {
+                AsyncImage(
+                    model = imageUrl,
+                    contentDescription = "Profile",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .clip(CircleShape)
+                )
+            } else {
+                Text(
+                    text = initials,
+                    fontFamily = Inter,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 40.sp,
+                    color = textColor
+                )
+            }
         }
     }
 }
 
 @Composable
 fun EditProfileTextField(
-    value: String, onValueChange: (String) -> Unit, label: String, placeholder: String, supportingText: String?,
-    cardColor: Color, textColor: Color, mutedColor: Color, borderColor: Color
+    value: String,
+    onValueChange: (String) -> Unit,
+    label: String,
+    placeholder: String,
+    supportingText: String?,
+    cardColor: Color,
+    textColor: Color,
+    mutedColor: Color,
+    borderColor: Color,
+    readOnly: Boolean = false
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
-            text = label, fontFamily = Inter, fontWeight = FontWeight.SemiBold, fontSize = 16.sp, color = textColor,
+            text = label,
+            fontFamily = Inter,
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 16.sp,
+            color = textColor,
             modifier = Modifier.padding(bottom = 4.dp)
         )
         OutlinedTextField(
             value = value, onValueChange = onValueChange, singleLine = true,
+            readOnly = readOnly,
             placeholder = { Text(text = placeholder, fontFamily = Inter, color = mutedColor) },
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedContainerColor = cardColor, unfocusedContainerColor = cardColor,
-                focusedBorderColor = borderColor, unfocusedBorderColor = borderColor.copy(alpha = 0.5f),
-                cursorColor = textColor, focusedTextColor = textColor, unfocusedTextColor = textColor
-            )
+                focusedContainerColor = cardColor,
+                unfocusedContainerColor = cardColor,
+                focusedBorderColor = if (readOnly) borderColor.copy(alpha = 0.2f) else borderColor,
+                unfocusedBorderColor = borderColor.copy(alpha = 0.5f),
+                cursorColor = textColor,
+                focusedTextColor = textColor,
+                unfocusedTextColor = textColor
+            ),
+            supportingText = {
+                Text(
+                    text = supportingText ?: "",
+                    fontFamily = Inter,
+                    fontSize = 12.sp,
+                    color = mutedColor,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
         )
-        if (supportingText != null) {
-            Text(
-                text = supportingText, fontFamily = Inter, fontSize = 12.sp, color = mutedColor,
-                modifier = Modifier.padding(top = 4.dp, start = 16.dp)
-            )
-        }
     }
 }
 
 @Composable
 fun EditProfileBioField(
-    value: String, onValueChange: (String) -> Unit, label: String, placeholder: String, maxBioLength: Int,
-    cardColor: Color, textColor: Color, mutedColor: Color, borderColor: Color
+    value: String,
+    onValueChange: (String) -> Unit,
+    label: String,
+    placeholder: String,
+    maxBioLength: Int,
+    cardColor: Color,
+    textColor: Color,
+    mutedColor: Color,
+    borderColor: Color
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
-            text = label, fontFamily = Inter, fontWeight = FontWeight.SemiBold, fontSize = 16.sp, color = textColor,
+            text = label,
+            fontFamily = Inter,
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 16.sp,
+            color = textColor,
             modifier = Modifier.padding(bottom = 4.dp)
         )
         OutlinedTextField(
@@ -241,24 +337,23 @@ fun EditProfileBioField(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedContainerColor = cardColor, unfocusedContainerColor = cardColor,
-                focusedBorderColor = borderColor, unfocusedBorderColor = borderColor.copy(alpha = 0.5f),
-                cursorColor = textColor, focusedTextColor = textColor, unfocusedTextColor = textColor
+                focusedContainerColor = cardColor,
+                unfocusedContainerColor = cardColor,
+                focusedBorderColor = borderColor,
+                unfocusedBorderColor = borderColor.copy(alpha = 0.5f),
+                cursorColor = textColor,
+                focusedTextColor = textColor,
+                unfocusedTextColor = textColor
             ),
             supportingText = {
                 Text(
-                    text = "${value.length}/$maxBioLength characters", fontFamily = Inter, fontSize = 12.sp, color = mutedColor,
+                    text = "${value.length}/$maxBioLength characters",
+                    fontFamily = Inter,
+                    fontSize = 12.sp,
+                    color = mutedColor,
                     modifier = Modifier.fillMaxWidth()
                 )
             }
         )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun EditProfilePreview() {
-    MovieMiniTheme(darkTheme = true) {
-        EditProfileScreen(onBackClick = {})
     }
 }

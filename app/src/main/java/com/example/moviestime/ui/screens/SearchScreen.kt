@@ -22,6 +22,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import coil.compose.AsyncImage
 import com.example.moviestime.R
 import com.example.moviestime.data.model.Movie
@@ -29,8 +32,31 @@ import com.example.moviestime.ui.components.EmptyState
 import com.example.moviestime.ui.components.ShimmerMovieCard
 import com.example.moviestime.viewmodel.SearchViewModel
 
+object SearchScreen : Screen {
+    @Composable
+    override fun Content() {
+        val navigator = LocalNavigator.currentOrThrow
+        val topBarState = LocalAppTopBarState.current
+        val searchViewModel: SearchViewModel = viewModel()
+
+        LaunchedEffect(Unit) {
+            topBarState.value = AppTopBarConfig(
+                title = "Discover",
+                showBack = false,
+                onBack = null,
+                trailingContent = null
+            )
+        }
+
+        SearchScreenContent(
+            searchViewModel = searchViewModel,
+            onMovieClick = { navigator.push(MovieDetailsScreen(it.id)) }
+        )
+    }
+}
+
 @Composable
-fun SearchScreen(
+fun SearchScreenContent(
     searchViewModel: SearchViewModel = viewModel(),
     onMovieClick: (Movie) -> Unit,
     onFavoriteClick: (Movie) -> Unit = {}

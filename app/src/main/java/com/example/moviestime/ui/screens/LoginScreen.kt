@@ -1,32 +1,20 @@
 package com.example.moviestime.ui.screens
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Movie
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -35,6 +23,8 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import cafe.adriel.voyager.core.screen.Screen
+import com.example.moviestime.R
 import com.example.moviestime.ui.components.login.CinematicCard
 import com.example.moviestime.ui.components.login.LoginAccentColor
 import com.example.moviestime.ui.components.login.LoginOnAccentColor
@@ -42,10 +32,18 @@ import com.example.moviestime.ui.components.login.LoginOnSurfaceColor
 import com.example.moviestime.ui.components.login.NeonTextField
 import com.example.moviestime.viewmodel.AuthViewModel
 
-@Composable
+class LoginScreen : Screen {
+    @Composable
+    override fun Content() {
+        // يمكننا استخدام viewModel() هنا كما هو معتاد
+        val authViewModel: AuthViewModel = viewModel()
+        LoginScreenContent(authViewModel)
+    }
+}
 
-fun LoginScreen(
-    authViewModel: AuthViewModel = viewModel()
+@Composable
+fun LoginScreenContent(
+    authViewModel: AuthViewModel
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -53,11 +51,12 @@ fun LoginScreen(
     var isRegisterMode by remember { mutableStateOf(false) }
 
     val uiState by authViewModel.uiState.collectAsState()
-    val heroTitle = if (isRegisterMode) "Create Account" else "Welcome Back"
+
+    val heroTitle = if (isRegisterMode) stringResource(R.string.create_account) else stringResource(R.string.welcome_back)
     val heroSubtitle = if (isRegisterMode) {
-        "Step into the theater of stories."
+        stringResource(R.string.register_subtitle)
     } else {
-        "Log in to continue your cinematic journey."
+        stringResource(R.string.login_subtitle)
     }
 
     val colorScheme = MaterialTheme.colorScheme
@@ -114,7 +113,7 @@ fun LoginScreen(
                         NeonTextField(
                             value = name,
                             onValueChange = { name = it },
-                            label = "Full Name",
+                            label = stringResource(R.string.name),
                             icon = Icons.Default.Person,
                             modifier = Modifier.fillMaxWidth()
                         )
@@ -124,7 +123,7 @@ fun LoginScreen(
                     NeonTextField(
                         value = email,
                         onValueChange = { email = it },
-                        label = "Email",
+                        label = stringResource(R.string.email),
                         icon = Icons.Default.Email,
                         keyboardType = KeyboardType.Email,
                         modifier = Modifier.fillMaxWidth()
@@ -135,7 +134,7 @@ fun LoginScreen(
                     NeonTextField(
                         value = password,
                         onValueChange = { password = it },
-                        label = "Password",
+                        label = stringResource(R.string.password),
                         icon = Icons.Default.Lock,
                         keyboardType = KeyboardType.Password,
                         isPassword = true,
@@ -180,7 +179,7 @@ fun LoginScreen(
                             elevation = ButtonDefaults.buttonElevation(10.dp)
                         ) {
                             Text(
-                                text = if (isRegisterMode) "Sign Up" else "Login",
+                                text = if (isRegisterMode) stringResource(R.string.sign_up) else stringResource(R.string.login),
                                 color = LoginOnAccentColor,
                                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
                             )
@@ -191,7 +190,7 @@ fun LoginScreen(
 
                     TextButton(onClick = { isRegisterMode = !isRegisterMode }) {
                         Text(
-                            text = if (isRegisterMode) "Already have an account? Login" else "No account? Register",
+                            text = if (isRegisterMode) stringResource(R.string.already_have_account) else stringResource(R.string.no_account_register),
                             color = LoginAccentColor,
                             style = MaterialTheme.typography.bodyMedium
                         )
@@ -242,7 +241,7 @@ private fun LoginBranding() {
                         fontWeight = FontWeight.Bold
                     )
                 ) {
-                    append("CineVault")
+                    append(stringResource(R.string.app_name))
                 }
             },
             style = MaterialTheme.typography.headlineLarge
@@ -251,7 +250,7 @@ private fun LoginBranding() {
         Spacer(Modifier.height(4.dp))
 
         Text(
-            text = "Your personal cinema companion",
+            text = stringResource(R.string.app_slogan),
             style = MaterialTheme.typography.bodyMedium,
             color = Color(0xFFE7CFA3)
         )

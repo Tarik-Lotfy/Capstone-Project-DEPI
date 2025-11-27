@@ -33,4 +33,67 @@
     <string name="language">Language</string>
     <string name="language_arabic">العربية</string>
     <string name="language_english">English</string>
+
+    <!-- Account & Settings -->
+    <string name="account_section">ACCOUNT</string>
+    <string name="preferences_section">PREFERENCES</string>
+    <string name="privacy">Privacy</string>
+    <string name="support_section">SUPPORT</string>
+    <string name="tap_to_expand">Tap to expand</string>
+    <string name="tap_to_hide">Tap to hide</string>
+    <string name="delete_account">Delete Account</string>
+
+    <!-- Profile & Edit Profile -->
+    <string name="reviews">Reviews</string>
+    <string name="favorites">Favorites</string>
+    <string name="followers">Followers</string>
+    <string name="following">Following</string>
+    <string name="no_items">No items yet</string>
+    <string name="explore_movies">Explore movies</string>
+    <string name="watchlist_empty">Your watchlist is empty</string>
+    <string name="add_movies">Add movies now</string>
+    <string name="profile_updated_success">Profile updated successfully!</string>
+    <string name="email_read_only">Email cannot be changed directly.</string>
+    <string name="display_name_desc">Your display name</string>
+    <string name="bio">Bio</string>
+    <string name="bio_placeholder">Tell us about your love for cinema...</string>
+    <string name="save_changes">Save Changes</string>
+    <string name="default_user_name">Movie Lover</string>
+
+    <!-- Login Screen -->
+    <string name="create_account">Create Account</string>
+    <string name="welcome_back">Welcome Back</string>
+    <string name="register_subtitle">Step into the theater of stories.</string>
+    <string name="login_subtitle">Log in to continue your cinematic journey.</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="no_account_register">No account? Register</string>
+    <string name="app_slogan">Your personal cinema companion</string>
+
+    <!-- Search & Discover -->
+    <string name="search_title">Search Films &amp; Series</string>
+    <string name="search_placeholder">Search by title, director, year...</string>
+    <string name="start_searching">Start Searching</string>
+    <string name="find_millions">Find millions of films and series easily.</string>
+    <string name="no_results_for">No results found for</string>
+    <string name="search_results">Search Results</string>
+    <string name="recommended_movies">Recommended Movies</string>
+    <string name="movies">Movies</string>
+    <string name="searching">Searching...</string>
+    <string name="search_placeholder_genres">Search for films, series, genres...</string>
+    <string name="genre">Genre</string>
+    <string name="no_films_matched">No films matched your search.</string>
+    <string name="no_movies_category">No movies available in this category.</string>
+
+    <!-- Movie Details -->
+    <string name="failed_load_details">Failed to load movie details</string>
+    <string name="play_trailer">Play Trailer</string>
+    <string name="overview">Overview</string>
+    <string name="no_overview">No overview available.</string>
+    <string name="details">Details</string>
+    <string name="director">Director</string>
+    <string name="cast">Cast</string>
+    <string name="release_date">Release date</string>
+    <string name="more_like_this">More Like This</string>
+    <string name="min">min</string>
+    <string name="movie_default">Movie</string>
 </resources>

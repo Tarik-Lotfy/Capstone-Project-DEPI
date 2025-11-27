@@ -26,21 +26,53 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import coil.compose.AsyncImage
 import com.example.moviestime.R
 import com.example.moviestime.data.model.Movie
 import com.example.moviestime.ui.theme.Inter
 import com.example.moviestime.ui.theme.PlayFair
- import com.example.moviestime.viewmodel.LanguageViewModel
 import com.example.moviestime.viewmodel.MainViewModel
-import com.example.moviestime.viewmodel.ThemeViewModel
+
+object ProfileScreen : Screen {
+    @Composable
+    override fun Content() {
+        val navigator = LocalNavigator.currentOrThrow
+        val topBarState = LocalAppTopBarState.current
+        val mainViewModel: MainViewModel = viewModel()
+
+        LaunchedEffect(Unit) {
+            topBarState.value = AppTopBarConfig(
+                title = "Profile",
+                showBack = false,
+                onBack = null,
+                trailingContent = {
+                    IconButton(onClick = { navigator.push(SettingsScreen) }) {
+                        Icon(
+                            imageVector = Icons.Outlined.Settings,
+                            contentDescription = "Settings",
+                            tint = Color.White
+                        )
+                    }
+                }
+            )
+        }
+
+        ProfileScreenContent(
+            mainViewModel = mainViewModel,
+            onMovieClick = { navigator.push(MovieDetailsScreen(it)) },
+            onEditProfile = { navigator.push(EditProfileScreen()) }
+        )
+    }
+}
 
 @Composable
-fun ProfileScreen(
+fun ProfileScreenContent(
     mainViewModel: MainViewModel = viewModel(),
-    themeViewModel: ThemeViewModel = viewModel(),
-    languageViewModel: LanguageViewModel = viewModel(),
-    onMovieClick: (Int) -> Unit
+    onMovieClick: (Int) -> Unit,
+    onEditProfile: () -> Unit
 ) {
     val watchlist by mainViewModel.favorites.collectAsState()
 
@@ -112,7 +144,7 @@ fun ProfileScreen(
         Spacer(Modifier.height(24.dp))
 
         OutlinedButton(
-            onClick = {   },
+            onClick = onEditProfile,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(48.dp),
