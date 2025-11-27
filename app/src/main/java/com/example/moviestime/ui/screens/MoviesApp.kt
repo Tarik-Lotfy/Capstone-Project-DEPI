@@ -96,6 +96,7 @@ fun MoviesApp(
             Scaffold(
                 topBar = {
                     val config = topBarState.value
+                    val canPop = navigator.canPop
                     CenterAlignedTopAppBar(
                         title = {
                             Text(
@@ -105,8 +106,16 @@ fun MoviesApp(
                             )
                         },
                         navigationIcon = {
-                            if (config.showBack && config.onBack != null) {
+                            if (canPop && config.onBack != null) {
                                 IconButton(onClick = config.onBack) {
+                                    Icon(
+                                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                        contentDescription = "Back",
+                                        tint = Color.White
+                                    )
+                                }
+                            } else if (canPop) {
+                                IconButton(onClick = { navigator.pop() }) {
                                     Icon(
                                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                                         contentDescription = "Back",

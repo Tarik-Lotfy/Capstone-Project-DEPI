@@ -105,32 +105,6 @@ fun DiscoverScreen(
     ) {
         item {
             Spacer(Modifier.height(20.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth().height(48.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = if (isSearchTyping) "Searching..." else "Discover",
-                    fontFamily = PlayFair,
-                    fontSize = 28.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
-                )
-                if (!isSearchTyping) {
-                    IconButton(onClick = { /* TODO: Implement filter/sort options */ }) {
-                        Icon(
-                            Icons.Default.FilterList,
-                            contentDescription = "Filter",
-                            tint = accentYellow,
-                            modifier = Modifier.size(28.dp)
-                        )
-                    }
-                }
-            }
-
-            Spacer(Modifier.height(18.dp))
         }
 
         item {

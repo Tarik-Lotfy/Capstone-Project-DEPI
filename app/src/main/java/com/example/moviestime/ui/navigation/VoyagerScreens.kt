@@ -8,6 +8,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.viewmodel.compose.viewModel
 import cafe.adriel.voyager.core.screen.Screen
@@ -87,10 +89,14 @@ object DiscoverScreenRoute : Screen {
         val navigator = LocalNavigator.currentOrThrow
         val topBarState = LocalAppTopBarState.current
         val searchViewModel: SearchViewModel = viewModel()
+        val query by searchViewModel.searchQuery.collectAsState()
+        
+        val isSearchTyping = query.isNotEmpty()
+        val title = if (isSearchTyping) "Searching..." else "Discover"
 
-        LaunchedEffect(Unit) {
+        LaunchedEffect(query) {
             topBarState.value = AppTopBarConfig(
-                title = "Discover",
+                title = title,
                 showBack = false,
                 onBack = null,
                 trailingContent = null
@@ -187,8 +193,8 @@ data class MovieDetailsScreenRoute(
         LaunchedEffect(Unit) {
             topBarState.value = AppTopBarConfig(
                 title = "Movie Details",
-                showBack = false,
-                onBack = null,
+                showBack = true,
+                onBack = { navigator.pop() },
                 trailingContent = null
             )
         }
