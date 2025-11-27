@@ -19,6 +19,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.example.moviestime.ui.components.MovieRowCard
+import com.example.moviestime.ui.navigation.MovieDetailsScreenRoute
 import com.example.moviestime.ui.navigation.SeeAllCategory
 import com.example.moviestime.viewmodel.HomeViewModel
 
@@ -48,7 +49,7 @@ data class SeeAllMoviesScreen(
         SeeAllMoviesScreenContent(
             category = category,
             homeViewModel = homeViewModel,
-            onMovieClick = { navigator.push(MovieDetailsScreen(it)) }
+            onMovieClick = { navigator.push(MovieDetailsScreenRoute(it)) }
         )
     }
 }

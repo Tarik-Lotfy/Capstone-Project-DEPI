@@ -23,7 +23,10 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.example.moviestime.ui.components.*
+import com.example.moviestime.ui.navigation.MovieDetailsScreenRoute
 import com.example.moviestime.ui.navigation.SeeAllCategory
+import com.example.moviestime.ui.navigation.SeeAllScreenRoute
+import com.example.moviestime.ui.navigation.SettingsScreenRoute
 import com.example.moviestime.viewmodel.HomeViewModel
 import com.example.moviestime.viewmodel.MainViewModel
 import com.google.accompanist.swiperefresh.SwipeRefresh
@@ -45,7 +48,7 @@ object HomeScreen : Screen {
                 showBack = false,
                 onBack = null,
                 trailingContent = {
-                    IconButton(onClick = { navigator.push(SettingsScreen) }) {
+                    IconButton(onClick = { navigator.push(SettingsScreenRoute) }) {
                         Icon(
                             imageVector = Icons.Outlined.Settings,
                             contentDescription = "Settings",
@@ -59,8 +62,8 @@ object HomeScreen : Screen {
         HomeScreenContent(
             homeViewModel = homeViewModel,
             mainViewModel = mainViewModel,
-            onMovieClick = { navigator.push(MovieDetailsScreen(it)) },
-            onSeeAllClick = { navigator.push(SeeAllMoviesScreen(it)) }
+            onMovieClick = { navigator.push(MovieDetailsScreenRoute(it)) },
+            onSeeAllClick = { navigator.push(SeeAllScreenRoute(it)) }
         )
     }
 }
@@ -76,7 +79,6 @@ fun HomeScreenContent(
     val topRated by homeViewModel.topRated.collectAsState()
     val nowPlaying by homeViewModel.nowPlaying.collectAsState()
     val upcoming by homeViewModel.upcoming.collectAsState()
-    val favorites by mainViewModel.favorites.collectAsState()
 
     val isLoading = popular.isEmpty() && topRated.isEmpty() && nowPlaying.isEmpty() && upcoming.isEmpty()
 
