@@ -66,9 +66,8 @@ fun MovieDetailsScreen(
     val isLoading by viewModel.isLoading.collectAsState()
     val favorites by mainViewModel.favorites.collectAsState()
 
-    val isWatchedState = remember(movieState) {
-        mutableStateOf(false)
-    }
+    val watchedList by mainViewModel.watched.collectAsState()
+    val watchlist by mainViewModel.watchlist.collectAsState()
 
     LaunchedEffect(movieId) {
         viewModel.loadMovieDetails(movieId)
@@ -92,19 +91,20 @@ fun MovieDetailsScreen(
     } else {
         movieState?.let { movie ->
             val isFav = favorites.any { it.id == movie.id }
+            val isWatched = watchedList.any { it.id == movie.id }
+            val isInWatchlist = watchlist.any { it.id == movie.id }
 
             MovieDetailsContent(
                 movie = movie,
                 similarMovies = similarMovies,
                 isFavorite = isFav,
-                isWatched = isWatchedState.value,
+                isWatched = isWatched,
+                isInWatchlist = isInWatchlist,
                 onBack = onBack,
                 onPlayClick = { onPlayClick(movie) },
                 onFavoriteClick = { mainViewModel.toggleFavorite(movie) },
-                onWatchedClick = {
-                    isWatchedState.value = !isWatchedState.value
-                },
-                onWatchlistClick = { mainViewModel.toggleFavorite(movie) },
+                onWatchedClick = { mainViewModel.toggleWatched(movie) },
+                onWatchlistClick = { mainViewModel.toggleWatchlist(movie) },
                 onMovieClick = onMovieClick,
                 onFavoriteMovieClick = { movieToFav -> mainViewModel.toggleFavorite(movieToFav) },
                 backgroundColor = backgroundColor,
@@ -132,6 +132,7 @@ fun MovieDetailsContent(
     similarMovies: List<Movie>,
     isFavorite: Boolean,
     isWatched: Boolean,
+    isInWatchlist: Boolean,
     onBack: () -> Unit,
     onPlayClick: () -> Unit,
     onFavoriteClick: () -> Unit,
@@ -329,7 +330,7 @@ fun MovieDetailsContent(
                     CircularToggleButton(
                         icon = Icons.Default.List,
                         contentDescription = "Watchlist",
-                        isActive = isFavorite,
+                        isActive = isInWatchlist,
                         onClick = onWatchlistClick,
                         activeColor = primaryColor,
                         cardColor = cardColor,

@@ -34,7 +34,7 @@ import com.example.moviestime.ui.theme.PlayFair
 import com.example.moviestime.viewmodel.AuthViewModel
 import com.example.moviestime.viewmodel.LanguageViewModel
 import com.example.moviestime.viewmodel.ThemeViewModel
-
+//
 object SettingsScreen : Screen {
     @Composable
     override fun Content() {
