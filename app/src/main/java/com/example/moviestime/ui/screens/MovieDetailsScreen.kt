@@ -5,6 +5,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -298,8 +299,9 @@ fun MovieDetailsContent(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 90.dp),
-                    horizontalArrangement = Arrangement.spacedBy(20.dp),
+                        .padding(horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(20.dp,
+                        alignment = Alignment.CenterHorizontally),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     CircularToggleButton(
