@@ -18,6 +18,7 @@ import com.example.moviestime.ui.screens.AppTopBarConfig
 import com.example.moviestime.ui.screens.DiscoverScreen
 import com.example.moviestime.ui.screens.HomeScreenContent
 import com.example.moviestime.ui.screens.LocalAppTopBarState
+import com.example.moviestime.ui.screens.LocalMainViewModel
 import com.example.moviestime.ui.screens.LoginScreenContent
 import com.example.moviestime.ui.screens.MovieDetailsScreen
 import com.example.moviestime.ui.screens.ProfileScreenContent
@@ -46,7 +47,7 @@ object HomeScreenRoute : Screen {
         val navigator = LocalNavigator.currentOrThrow
         val topBarState = LocalAppTopBarState.current
         val homeViewModel: HomeViewModel = viewModel()
-        val mainViewModel: MainViewModel = viewModel()
+        val mainViewModel = LocalMainViewModel.current
 
         LaunchedEffect(Unit) {
             topBarState.value = AppTopBarConfig(
@@ -139,7 +140,7 @@ object ProfileScreenRoute : Screen {
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val topBarState = LocalAppTopBarState.current
-        val mainViewModel: MainViewModel = viewModel()
+        val mainViewModel = LocalMainViewModel.current
         val themeViewModel: ThemeViewModel = viewModel()
         val languageViewModel: LanguageViewModel = viewModel()
 
@@ -181,7 +182,7 @@ data class MovieDetailsScreenRoute(
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val topBarState = LocalAppTopBarState.current
-        val mainViewModel: MainViewModel = viewModel()
+        val mainViewModel = LocalMainViewModel.current
 
         LaunchedEffect(Unit) {
             topBarState.value = AppTopBarConfig(

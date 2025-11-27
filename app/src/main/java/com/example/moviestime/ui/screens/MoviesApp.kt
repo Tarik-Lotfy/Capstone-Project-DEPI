@@ -55,6 +55,10 @@ val LocalAppTopBarState = compositionLocalOf<MutableState<AppTopBarConfig>> {
     mutableStateOf(AppTopBarConfig())
 }
 
+val LocalMainViewModel = compositionLocalOf<MainViewModel> {
+    error("MainViewModel not provided")
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MoviesApp(
@@ -75,7 +79,10 @@ fun MoviesApp(
         )
     }
 
-    CompositionLocalProvider(LocalAppTopBarState provides topBarState) {
+    CompositionLocalProvider(
+        LocalAppTopBarState provides topBarState,
+        LocalMainViewModel provides mainViewModel
+    ) {
         Navigator(HomeScreenRoute) { navigator ->
 
             LaunchedEffect(selectedTabState.selectedTab) {
