@@ -22,7 +22,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.example.moviestime.R
 import com.example.moviestime.data.model.Movie
@@ -32,9 +31,8 @@ import com.example.moviestime.viewmodel.SearchViewModel
 
 @Composable
 fun SearchScreen(
-    navController: NavHostController,
     searchViewModel: SearchViewModel = viewModel(),
-    onMovieClick: (Movie) -> Unit = {},
+    onMovieClick: (Movie) -> Unit,
     onFavoriteClick: (Movie) -> Unit = {}
 ) {
 
@@ -166,7 +164,7 @@ fun SearchScreen(
                             MovieGridItem(
                                 movie = movie,
                                 onClick = {
-                                    navController.navigate("movie/${movie.id}")
+                                    onMovieClick(movie)
                                 },
                                 onFavoriteClick = { onFavoriteClick(movie) }
                             )

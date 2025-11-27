@@ -14,10 +14,9 @@ import com.example.moviestime.ui.screens.LoginScreen
 import com.example.moviestime.ui.screens.MoviesApp
 import com.example.moviestime.ui.theme.MovieMiniTheme
 import com.example.moviestime.viewmodel.AuthViewModel
-import com.example.moviestime.viewmodel.ThemeViewModel
 import com.example.moviestime.viewmodel.LanguageViewModel
 import com.example.moviestime.viewmodel.MainViewModel
-import com.example.moviestime.viewmodel.NotificationViewModel
+import com.example.moviestime.viewmodel.ThemeViewModel
 import com.google.firebase.FirebaseApp
 import java.util.Locale
 
@@ -61,11 +60,9 @@ class MainActivity : ComponentActivity() {
 
                 if (isLoggedIn) {
                     val mainViewModel: MainViewModel = viewModel { MainViewModel(application) }
-                    val notificationViewModel: NotificationViewModel = viewModel { NotificationViewModel(application) }
                     MoviesApp(
                         mainViewModel = mainViewModel,
                         themeViewModel = themeViewModel,
-                        notificationViewModel = notificationViewModel,
                         languageViewModel = languageViewModel,
                     )
                 } else {

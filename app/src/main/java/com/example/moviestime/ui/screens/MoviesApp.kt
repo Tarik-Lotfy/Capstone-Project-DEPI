@@ -1,189 +1,162 @@
+// ui/screens/MoviesApp.kt
 package com.example.moviestime.ui.screens
 
 import android.Manifest
-import androidx.annotation.RequiresPermission
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Explore
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
+import androidx.compose.ui.unit.dp
+import cafe.adriel.voyager.navigator.CurrentScreen
+import cafe.adriel.voyager.navigator.Navigator
+import com.example.moviestime.ui.navigation.DiscoverScreenRoute
+import com.example.moviestime.ui.navigation.HomeScreenRoute
+import com.example.moviestime.ui.navigation.ProfileScreenRoute
+import com.example.moviestime.viewmodel.LanguageViewModel
 import com.example.moviestime.viewmodel.MainViewModel
 import com.example.moviestime.viewmodel.ThemeViewModel
-import com.example.moviestime.viewmodel.NotificationViewModel
-import com.example.moviestime.viewmodel.LanguageViewModel
-import com.example.moviestime.viewmodel.AuthViewModel
-import android.content.Intent
-import android.net.Uri
-import android.content.ActivityNotFoundException
-import android.util.Log
+
+data class AppTopBarConfig(
+    val title: String = "",
+    val showBack: Boolean = false,
+    val onBack: (() -> Unit)? = null,
+    val trailingContent: (@Composable () -> Unit)? = null
+)
+
+val LocalAppTopBarState = compositionLocalOf<MutableState<AppTopBarConfig>> {
+    mutableStateOf(AppTopBarConfig())
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
-@RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
 @Composable
 fun MoviesApp(
     mainViewModel: MainViewModel,
     themeViewModel: ThemeViewModel,
-    notificationViewModel: NotificationViewModel,
-    languageViewModel: LanguageViewModel,
-    authViewModel: AuthViewModel = viewModel()
+    languageViewModel: LanguageViewModel
 ) {
-    val navController = rememberNavController()
-
-    val selectedTab by mainViewModel.uiState.collectAsState()
-
-    LaunchedEffect(selectedTab.selectedTab) {
-        when (selectedTab.selectedTab) {
-            0 -> navController.navigate("home") {
-                launchSingleTop = true
-                restoreState = true
-            }
-            1 -> navController.navigate("discover") {
-                launchSingleTop = true
-                restoreState = true
-            }
-            2 -> navController.navigate("profile") {
-                launchSingleTop = true
-                restoreState = true
-            }
-        }
-    }
-
+    val selectedTabState by mainViewModel.uiState.collectAsState()
     val tabs = listOf("Home", "Discover", "Profile")
     val icons = listOf(Icons.Default.Home, Icons.Default.Explore, Icons.Default.Person)
-    Scaffold(
-        topBar = {
-            CenterAlignedTopAppBar(
-                title = {
-                    Text(
-                        "CineVault",
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
-                    )
-                },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = Color.Transparent
-                ),
+
+    val topBarState = remember {
+        mutableStateOf(
+            AppTopBarConfig(
+                title = "CineVault",
+                showBack = false
             )
-        },
-        bottomBar = {
-            NavigationBar(
-                containerColor = Color.Black.copy(alpha = 0.7f)
-            ) {
-                tabs.forEachIndexed { index, title ->
-                    NavigationBarItem(
-                        icon = {
-                            Icon(
-                                icons[index],
-                                contentDescription = title,
-                                tint = if (selectedTab.selectedTab == index) MaterialTheme.colorScheme.primary else Color.White.copy(alpha = 0.7f)
-                            )
-                        },
-                        label = {
-                            Text(
-                                title,
-                                color = if (selectedTab.selectedTab == index) MaterialTheme.colorScheme.primary else Color.White.copy(alpha = 0.7f)
-                            )
-                        },
-                        selected = selectedTab.selectedTab == index,
-                        onClick = { mainViewModel.selectTab(index) },
-                        colors = NavigationBarItemDefaults.colors(
-                            indicatorColor = Color.White.copy(alpha = 0.2f)
-                        )
-                    )
+        )
+    }
+
+    CompositionLocalProvider(LocalAppTopBarState provides topBarState) {
+        Navigator(HomeScreenRoute) { navigator ->
+
+            LaunchedEffect(selectedTabState.selectedTab) {
+                when (selectedTabState.selectedTab) {
+                    0 -> navigator.replace(HomeScreenRoute)
+                    1 -> navigator.replace(DiscoverScreenRoute)
+                    2 -> navigator.replace(ProfileScreenRoute)
                 }
             }
-        },
-        containerColor = Color.Transparent
-    ) { padding ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background)
-                .padding(padding)
-        ) {
-            NavHost(navController = navController, startDestination = "home") {
-                composable("home") {
-                    HomeScreen(
-                        navController = navController,
-                        homeViewModel = viewModel(),
-                        mainViewModel = mainViewModel
-                    )
-                }
-                composable("discover") {
-                    DiscoverScreen(
-                        navController = navController,
-                        searchViewModel = viewModel()
-                    )
-                }
-                composable("profile") {
-                    ProfileScreen(
-                        mainViewModel = mainViewModel,
-                        themeViewModel = themeViewModel,
-                        languageViewModel = languageViewModel,
-                        onMovieClick = { movieId ->
-                            navController.navigate("movie/$movieId")
-                        },
-                        onSettingsClick = {
-                            navController.navigate("settings")
-                        }
-                    )
-                }
-                composable("settings") {
-                    SettingsScreen(
-                        onBack = { navController.popBackStack() },
-                        onSignOut = {
-                            authViewModel.logout()
-                        }
-                    )
-                }
 
-                composable("search") {
-                    SearchScreen(
-                        navController = navController,
-                        searchViewModel = viewModel()
-                    )
-                }
-                composable("movie/{movieId}") { backStackEntry ->
-                    val movieId = backStackEntry.arguments?.getString("movieId")?.toInt() ?: 1
-                    MovieDetailsScreen(
-                        movieId = movieId,
-                        mainViewModel = mainViewModel,
-                        onBack = { navController.popBackStack() },
-                        onPlayClick = { movie ->
-                            movie.trailerKey?.let { key ->
-                                val encodedKey = java.net.URLEncoder.encode(key, "UTF-8")
-                                navController.navigate("video_player_route/$encodedKey")
+            Scaffold(
+                topBar = {
+                    val config = topBarState.value
+                    CenterAlignedTopAppBar(
+                        title = {
+                            Text(
+                                config.title,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White
+                            )
+                        },
+                        navigationIcon = {
+                            if (config.showBack && config.onBack != null) {
+                                IconButton(onClick = config.onBack) {
+                                    Icon(
+                                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                        contentDescription = "Back",
+                                        tint = Color.White
+                                    )
+                                }
                             }
                         },
-                        onShareClick = { movie -> },
-
-                        // ✅ السطر اللي بيحل المشكلة:
-                        onMovieClick = { id ->
-                            navController.navigate("movie/$id")
+                        actions = {
+                            config.trailingContent?.invoke()
+                        },
+                        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                            containerColor = Color.Transparent
+                        ),
+                    )
+                },
+                bottomBar = {
+                    NavigationBar(
+                        containerColor = Color.Black.copy(alpha = 0.7f)
+                    ) {
+                        tabs.forEachIndexed { index, title ->
+                            NavigationBarItem(
+                                icon = {
+                                    Icon(
+                                        icons[index],
+                                        contentDescription = title,
+                                        tint = if (selectedTabState.selectedTab == index) androidx.compose.material3.MaterialTheme.colorScheme.primary else Color.White.copy(
+                                            alpha = 0.7f
+                                        )
+                                    )
+                                },
+                                label = {
+                                    Text(
+                                        title,
+                                        color = if (selectedTabState.selectedTab == index) androidx.compose.material3.MaterialTheme.colorScheme.primary else Color.White.copy(
+                                            alpha = 0.7f
+                                        )
+                                    )
+                                },
+                                selected = selectedTabState.selectedTab == index,
+                                onClick = { mainViewModel.selectTab(index) },
+                                colors = NavigationBarItemDefaults.colors(
+                                    indicatorColor = Color.White.copy(alpha = 0.2f)
+                                )
+                            )
                         }
-                    )
-                }
-
-                composable("video_player_route/{trailerKey}") { backStackEntry ->
-                    val trailerKey = backStackEntry.arguments?.getString("trailerKey") ?: "ERROR"
-
-                    VideoPlayerScreen(
-                        trailerKey = trailerKey,
-                        onBack = { navController.popBackStack() }
-                    )
+                    }
+                },
+                containerColor = Color.Transparent
+            ) { padding ->
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(androidx.compose.material3.MaterialTheme.colorScheme.background)
+                        .padding(padding)
+                ) {
+                    CurrentScreen()
                 }
             }
         }

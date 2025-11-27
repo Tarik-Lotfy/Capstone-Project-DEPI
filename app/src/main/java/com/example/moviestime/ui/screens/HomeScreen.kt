@@ -6,6 +6,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.*
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -14,20 +15,21 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavHostController
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.launch
 import com.example.moviestime.ui.components.*
+import com.example.moviestime.ui.navigation.SeeAllCategory
 import com.example.moviestime.viewmodel.HomeViewModel
 import com.example.moviestime.viewmodel.MainViewModel
 
 @androidx.annotation.RequiresPermission(android.Manifest.permission.POST_NOTIFICATIONS)
 @Composable
 fun HomeScreen(
-    navController: NavHostController,
     homeViewModel: HomeViewModel = viewModel(),
-    mainViewModel: MainViewModel = viewModel()
+    mainViewModel: MainViewModel = viewModel(),
+    onMovieClick: (Int) -> Unit,
+    onSeeAllClick: (SeeAllCategory) -> Unit
 ) {
     val popular by homeViewModel.popular.collectAsState()
     val topRated by homeViewModel.topRated.collectAsState()
@@ -45,11 +47,15 @@ fun HomeScreen(
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
             item {
-                Text("Now Playing")
+                Text(
+                    text = "Now Playing",
+                    style = MaterialTheme.typography.headlineMedium,
+                    color = MaterialTheme.colorScheme.onBackground
+                )
                 Spacer(Modifier.height(8.dp))
                 LazyRow(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                     items(5) {
-                        ShimmerMovieCard()
+                        ShimmerLargeMovieCard()
                     }
                 }
             }
@@ -129,12 +135,12 @@ fun HomeScreen(
                         contentPadding = PaddingValues(horizontal = 16.dp)
                     ) {
                         items(nowPlaying.take(5)) { movie ->
-                            FeaturedLargeCard(
-                                movie = movie,
-                                onMovieClick = { selectedMovie ->
-                                    navController.navigate("movie/${selectedMovie.id}")
-                                }
-                            )
+                                    FeaturedLargeCard(
+                                        movie = movie,
+                                        onMovieClick = { selectedMovie ->
+                                            onMovieClick(selectedMovie.id)
+                                        }
+                                    )
                         }
                     }
                 }
@@ -151,7 +157,7 @@ fun HomeScreen(
                                 style = MaterialTheme.typography.headlineMedium,
                                 color = MaterialTheme.colorScheme.onBackground
                             )
-                            TextButton(onClick = {}) {
+                            TextButton(onClick = { onSeeAllClick(SeeAllCategory.POPULAR) }) {
                                 Text(
                                     "See All",
                                     color = MaterialTheme.colorScheme.primary
@@ -175,7 +181,7 @@ fun HomeScreen(
                                 FeaturedCard(
                                     movie = movie,
                                     onMovieClick = { selectedMovie ->
-                                        navController.navigate("movie/${selectedMovie.id}")
+                                        onMovieClick(selectedMovie.id)
                                     }
                                 )
                             }
@@ -188,11 +194,23 @@ fun HomeScreen(
                 }
 
                 item {
-                    Text(
-                        text = "Top Rated",
-                        style = MaterialTheme.typography.headlineMedium,
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
+                    Row(
+                        Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "Top Rated",
+                            style = MaterialTheme.typography.headlineMedium,
+                            color = MaterialTheme.colorScheme.onBackground
+                        )
+                        TextButton(onClick = { onSeeAllClick(SeeAllCategory.TOP_RATED) }) {
+                            Text(
+                                "See All",
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                    }
                     Spacer(Modifier.height(16.dp))
                     LazyRow(
                         horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -201,7 +219,7 @@ fun HomeScreen(
                             MovieRowCard(
                                 movie = movie,
                                 onMovieClick = { selectedMovie ->
-                                    navController.navigate("movie/${selectedMovie.id}")
+                                    onMovieClick(selectedMovie.id)
                                 }
                             )
                         }
@@ -209,11 +227,23 @@ fun HomeScreen(
                 }
 
                 item {
-                    Text(
-                        text = "Upcoming",
-                        style = MaterialTheme.typography.headlineMedium,
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
+                    Row(
+                        Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "Upcoming",
+                            style = MaterialTheme.typography.headlineMedium,
+                            color = MaterialTheme.colorScheme.onBackground
+                        )
+                        TextButton(onClick = { onSeeAllClick(SeeAllCategory.UPCOMING) }) {
+                            Text(
+                                "See All",
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                    }
                     Spacer(Modifier.height(16.dp))
                     LazyRow(
                         horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -222,7 +252,7 @@ fun HomeScreen(
                             MovieRowCard(
                                 movie = movie,
                                 onMovieClick = { selectedMovie ->
-                                    navController.navigate("movie/${selectedMovie.id}")
+                                    onMovieClick(selectedMovie.id)
                                 }
                             )
                         }
@@ -234,7 +264,7 @@ fun HomeScreen(
 }
 
 @Composable
-fun SectionTitleWithSeeAll(title: String) {
+fun SectionTitleWithSeeAll(title: String, onClick: () -> Unit = {}) {
     Row(
         Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -242,11 +272,10 @@ fun SectionTitleWithSeeAll(title: String) {
     ) {
         Text(
             title,
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.White
+            style = MaterialTheme.typography.headlineMedium,
+            color = MaterialTheme.colorScheme.onBackground
         )
-        TextButton(onClick = {}) {
+        TextButton(onClick = onClick) {
             Text(
                 "See All",
                 color = MaterialTheme.colorScheme.primary

@@ -8,34 +8,41 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.moviestime.R
 import com.example.moviestime.ui.theme.Inter
 import com.example.moviestime.ui.theme.PlayFair
+import com.example.moviestime.viewmodel.AuthViewModel
+import com.example.moviestime.viewmodel.LanguageViewModel
+import com.example.moviestime.viewmodel.ThemeViewModel
 
 @Composable
 fun SettingsScreen(
-    onBack: () -> Unit,
-    onSignOut: () -> Unit,
+    authViewModel: AuthViewModel = viewModel(),
+    languageViewModel: LanguageViewModel = viewModel(),
+    themeViewModel: ThemeViewModel = viewModel(),
     onEditProfile: () -> Unit = {},
-    onDeleteAccount: () -> Unit = {}
+    onDeleteAccount: () -> Unit = {},
+    onSignOut: () -> Unit = {}
 ) {
-    // ألوان الثيم
+    val currentLanguage by languageViewModel.appLanguage.collectAsState()
+    val isDarkTheme by themeViewModel.isDarkThemeEnabled.collectAsState()
     val backgroundColor = colorResource(R.color.background)
     val cardColor = colorResource(R.color.card)
     val textColor = colorResource(R.color.foreground)
@@ -49,38 +56,21 @@ fun SettingsScreen(
             .verticalScroll(rememberScrollState())
     ) {
         // --- Header ---
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 12.dp, bottom = 24.dp)
-        ) {
-            IconButton(
-                onClick = onBack,
-                modifier = Modifier.align(Alignment.CenterStart)
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Back",
-                    tint = textColor
-                )
-            }
-
-            Text(
-                text = "Settings",
-                fontFamily = PlayFair,
-                fontWeight = FontWeight.Bold,
-                fontSize = 26.sp,
-                color = textColor,
-                modifier = Modifier.align(Alignment.Center)
-            )
-        }
+        Text(
+            text = stringResource(R.string.settings),
+            fontFamily = PlayFair,
+            fontWeight = FontWeight.Bold,
+            fontSize = 26.sp,
+            color = textColor,
+            modifier = Modifier.padding(top = 12.dp, bottom = 24.dp)
+        )
 
         // --- Account Section ---
-        SectionHeader(title = "ACCOUNT", color = mutedColor)
+        SectionHeader(title = "ACCOUNT", color = mutedColor) // يمكن إضافتها لملف strings لاحقاً
         SettingsGroup(cardColor = cardColor) {
             SettingsItem(
                 icon = Icons.Outlined.Person,
-                title = "Edit Profile",
+                title = stringResource(R.string.edit_profile), // ترجمة
                 textColor = textColor,
                 onClick = onEditProfile
             )
@@ -91,15 +81,46 @@ fun SettingsScreen(
         // --- Preferences Section ---
         SectionHeader(title = "PREFERENCES", color = mutedColor)
         SettingsGroup(cardColor = cardColor) {
-            SettingsItem(
-                icon = Icons.Outlined.Notifications,
-                title = "Notifications",
-                textColor = textColor,
-                showDivider = true
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 18.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        imageVector = Icons.Outlined.Palette,
+                        contentDescription = null,
+                        tint = textColor.copy(alpha = 0.7f),
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Spacer(Modifier.width(16.dp))
+                    Text(
+                        text = stringResource(R.string.dark_mode),
+                        fontFamily = Inter,
+                        fontWeight = FontWeight.Medium,
+                        fontSize = 16.sp,
+                        color = textColor
+                    )
+                }
+                Switch(
+                    checked = isDarkTheme,
+                    onCheckedChange = { themeViewModel.setDarkThemeEnabled(it) },
+                    colors = SwitchDefaults.colors(
+                        checkedThumbColor = colorResource(R.color.primary),
+                        checkedTrackColor = colorResource(R.color.primary).copy(alpha = 0.5f)
+                    )
+                )
+            }
+            HorizontalDivider(
+                color = Color.White.copy(alpha = 0.05f),
+                thickness = 1.dp,
+                modifier = Modifier.padding(horizontal = 16.dp)
             )
             SettingsItem(
-                icon = Icons.Outlined.Security,
-                title = "Privacy",
+                icon = Icons.Outlined.Notifications,
+                title = stringResource(R.string.notifications),
                 textColor = textColor
             )
         }
@@ -111,20 +132,35 @@ fun SettingsScreen(
         SettingsGroup(cardColor = cardColor) {
             SettingsItem(
                 icon = Icons.Outlined.HelpOutline,
-                title = "Help & Feedback",
+                title = stringResource(R.string.help_support), // ترجمة
                 textColor = textColor
             )
         }
 
         Spacer(Modifier.height(40.dp))
 
-        // --- Actions (Sign Out & Delete) ---
         SettingsButton(
-            icon = Icons.AutoMirrored.Filled.Logout,
-            title = "Sign Out",
+            icon = Icons.Default.Language,
+            title = if (currentLanguage == "ar") stringResource(R.string.language_english) else stringResource(R.string.language_arabic),
             color = textColor,
             borderColor = textColor.copy(alpha = 0.3f),
-            onClick = onSignOut
+            onClick = {
+                val newLanguage = if (currentLanguage == "ar") "en" else "ar"
+                languageViewModel.setAppLanguage(newLanguage)
+            }
+        )
+
+        Spacer(Modifier.height(16.dp))
+
+        SettingsButton(
+            icon = Icons.AutoMirrored.Filled.Logout,
+            title = stringResource(R.string.logout),
+            color = textColor,
+            borderColor = textColor.copy(alpha = 0.3f),
+            onClick = {
+                authViewModel.logout()
+                onSignOut()
+            }
         )
 
         Spacer(Modifier.height(16.dp))
@@ -132,14 +168,12 @@ fun SettingsScreen(
         SettingsButton(
             icon = Icons.Outlined.Delete,
             title = "Delete Account",
-            color = Color(0xFFE53935), // لون أحمر للحذف
+            color = Color(0xFFE53935),
             borderColor = Color(0xFFE53935).copy(alpha = 0.5f),
             onClick = onDeleteAccount
         )
     }
 }
-
-// --- Helper Composables ---
 
 @Composable
 fun SectionHeader(title: String, color: Color) {
