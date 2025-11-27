@@ -6,8 +6,8 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 
 @Database(
-    entities = [MovieEntity::class],
-    version = 1,
+    entities = [MovieEntity::class, WatchlistEntity::class, WatchedEntity::class],
+    version = 2,
     exportSchema = false
 )
 abstract class MovieDatabase : RoomDatabase() {
@@ -24,7 +24,7 @@ abstract class MovieDatabase : RoomDatabase() {
                     context.applicationContext,
                     MovieDatabase::class.java,
                     "movietime_database"
-                ).build()
+                ).fallbackToDestructiveMigration().build()
                 INSTANCE = instance
                 instance
             }

@@ -76,7 +76,9 @@ fun ProfileScreenContent(
     onMovieClick: (Int) -> Unit,
     onEditProfile: () -> Unit
 ) {
-    val watchlist by mainViewModel.favorites.collectAsState()
+    val favorites by mainViewModel.favorites.collectAsState()
+    val watchlist by mainViewModel.watchlist.collectAsState()
+    val watched by mainViewModel.watched.collectAsState()
 
     val backgroundColor = colorResource(R.color.background)
     val primaryColor = colorResource(R.color.primary)
@@ -85,8 +87,8 @@ fun ProfileScreenContent(
     val cardColor = colorResource(R.color.card)
     val goldColor = colorResource(R.color.secondary)
 
-    var selectedTabIndex by remember { mutableIntStateOf(1) }
-    val tabs = listOf("Reviews", "Watchlist", "Favorites")
+    var selectedTabIndex by remember { mutableIntStateOf(0) }
+    val tabs = listOf("Favorites", "Watchlist", "Watched")
 
     Column(
         modifier = Modifier
@@ -138,9 +140,9 @@ fun ProfileScreenContent(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            ProfileStat(number = "0", label = "Followers", textColor, mutedColor)
-            ProfileStat(number = "0", label = "Following", textColor, mutedColor)
+            ProfileStat(number = "${favorites.size}", label = "Favorites", textColor, mutedColor)
             ProfileStat(number = "${watchlist.size}", label = "Watchlist", textColor, mutedColor)
+            ProfileStat(number = "${watched.size}", label = "Watched", textColor, mutedColor)
         }
 
         Spacer(Modifier.height(24.dp))
@@ -195,36 +197,41 @@ fun ProfileScreenContent(
 
         Spacer(Modifier.height(20.dp))
 
-        if (selectedTabIndex == 1) {
-            if (watchlist.isEmpty()) {
-                EmptyTabState(
-                    message = "Your watchlist is empty",
-                    actionText = "Add movies now",
-                    mutedColor = mutedColor,
-                    goldColor = goldColor
-                )
-            } else {
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(3),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    items(watchlist) { movie ->
-                        ProfileMovieItem(
-                            movie = movie,
-                            onClick = { onMovieClick(movie.id) }
-                        )
-                    }
-                }
-            }
-        } else {
+        val currentList = when (selectedTabIndex) {
+            0 -> favorites
+            1 -> watchlist
+            2 -> watched
+            else -> emptyList()
+        }
+
+        val emptyMessage = when (selectedTabIndex) {
+            0 -> "No favorites yet"
+            1 -> "Your watchlist is empty"
+            2 -> "No watched movies yet"
+            else -> "No items yet"
+        }
+
+        if (currentList.isEmpty()) {
             EmptyTabState(
-                message = "No items yet",
+                message = emptyMessage,
                 actionText = "Explore movies",
                 mutedColor = mutedColor,
                 goldColor = goldColor
             )
+        } else {
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(3),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.fillMaxSize()
+            ) {
+                items(currentList) { movie ->
+                    ProfileMovieItem(
+                        movie = movie,
+                        onClick = { onMovieClick(movie.id) }
+                    )
+                }
+            }
         }
     }
 }

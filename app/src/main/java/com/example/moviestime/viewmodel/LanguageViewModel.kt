@@ -12,13 +12,20 @@ class LanguageViewModel(application: Application) : AndroidViewModel(application
 
     private val prefs = application.getSharedPreferences("settings", Context.MODE_PRIVATE)
 
-     private val _currentLanguage = MutableStateFlow(prefs.getString("language", "en") ?: "en")
+    private val _currentLanguage = MutableStateFlow(prefs.getString("language", "en") ?: "en")
     val currentLanguage: StateFlow<String> = _currentLanguage.asStateFlow()
 
-     fun toggleLanguage() {
+    private val _shouldRecreate = MutableStateFlow(false)
+    val shouldRecreate: StateFlow<Boolean> = _shouldRecreate.asStateFlow()
+
+    fun toggleLanguage() {
         val newLanguage = if (_currentLanguage.value == "en") "ar" else "en"
         _currentLanguage.value = newLanguage
+        prefs.edit().putString("language", newLanguage).apply()
+        _shouldRecreate.value = true
+    }
 
-         prefs.edit().putString("language", newLanguage).apply()
+    fun onRecreated() {
+        _shouldRecreate.value = false
     }
 }

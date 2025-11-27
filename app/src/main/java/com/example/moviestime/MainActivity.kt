@@ -1,6 +1,7 @@
 package com.example.moviestime
 
 import android.Manifest
+import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -12,6 +13,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.moviestime.ui.screens.LoginScreen
 import com.example.moviestime.ui.screens.MoviesApp
+import com.example.moviestime.ui.screens.OnboardingScreen
 import com.example.moviestime.ui.theme.MovieMiniTheme
 import com.example.moviestime.viewmodel.AuthViewModel
 import com.example.moviestime.viewmodel.LanguageViewModel
@@ -35,12 +37,20 @@ class MainActivity : ComponentActivity() {
             }
         }
 
+        val prefs = getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+
         setContent {
             val themeViewModel: ThemeViewModel = viewModel { ThemeViewModel(application) }
             val isDarkTheme by themeViewModel.isDarkThemeEnabled.collectAsState()
 
             val languageViewModel: LanguageViewModel = viewModel { LanguageViewModel(application) }
             val appLanguage by languageViewModel.currentLanguage.collectAsState()
+
+            val shouldRecreate by languageViewModel.shouldRecreate.collectAsState()
+
+            var hasSeenOnboarding by remember {
+                mutableStateOf(prefs.getBoolean("has_seen_onboarding", false))
+            }
 
             LaunchedEffect(appLanguage) {
                 val config = resources.configuration
@@ -52,21 +62,39 @@ class MainActivity : ComponentActivity() {
                 resources.updateConfiguration(config, resources.displayMetrics)
             }
 
+            LaunchedEffect(shouldRecreate) {
+                if (shouldRecreate) {
+                    languageViewModel.onRecreated()
+                    recreate()
+                }
+            }
+
             MovieMiniTheme(
                 darkTheme = isDarkTheme
             ) {
                 val authViewModel: AuthViewModel = viewModel()
                 val isLoggedIn by authViewModel.isLoggedIn.collectAsState()
 
-                if (isLoggedIn) {
-                    val mainViewModel: MainViewModel = viewModel { MainViewModel(application) }
-                    MoviesApp(
-                        mainViewModel = mainViewModel,
-                        themeViewModel = themeViewModel,
-                        languageViewModel = languageViewModel,
-                    )
-                } else {
-                    LoginScreen()
+                when {
+                    !hasSeenOnboarding -> {
+                        OnboardingScreen(
+                            onFinish = {
+                                prefs.edit().putBoolean("has_seen_onboarding", true).apply()
+                                hasSeenOnboarding = true
+                            }
+                        )
+                    }
+                    !isLoggedIn -> {
+                        LoginScreen()
+                    }
+                    else -> {
+                        val mainViewModel: MainViewModel = viewModel { MainViewModel(application) }
+                        MoviesApp(
+                            mainViewModel = mainViewModel,
+                            themeViewModel = themeViewModel,
+                            languageViewModel = languageViewModel,
+                        )
+                    }
                 }
             }
         }
