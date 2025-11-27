@@ -49,6 +49,8 @@ class EditProfileScreen : Screen {
                 onBack = { navigator.pop() },
                 trailingContent = null
             )
+            // Reload profile when opening edit screen
+            authViewModel.loadUserProfile()
         }
 
         EditProfileScreenContent(

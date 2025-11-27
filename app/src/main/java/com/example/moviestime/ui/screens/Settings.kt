@@ -88,15 +88,6 @@ fun SettingsScreenContent(
             .padding(16.dp)
             .verticalScroll(rememberScrollState())
     ) {
-        // --- Header ---
-        Text(
-            text = stringResource(R.string.settings),
-            fontFamily = PlayFair,
-            fontWeight = FontWeight.Bold,
-            fontSize = 26.sp,
-            color = textColor,
-            modifier = Modifier.padding(top = 12.dp, bottom = 24.dp)
-        )
 
         // --- Account Section ---
         SectionHeader(title = stringResource(R.string.account_section), color = mutedColor)

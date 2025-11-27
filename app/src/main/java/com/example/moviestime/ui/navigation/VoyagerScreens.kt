@@ -147,6 +147,7 @@ object ProfileScreenRoute : Screen {
         val navigator = LocalNavigator.currentOrThrow
         val topBarState = LocalAppTopBarState.current
         val mainViewModel = LocalMainViewModel.current
+        val authViewModel: AuthViewModel = viewModel()
         val themeViewModel: ThemeViewModel = viewModel()
         val languageViewModel: LanguageViewModel = viewModel()
 
@@ -168,6 +169,7 @@ object ProfileScreenRoute : Screen {
         }
 
         ProfileScreenContent(
+            authViewModel = authViewModel,
             mainViewModel = mainViewModel,
             onMovieClick = { movieId ->
                 navigator.push(MovieDetailsScreenRoute(movieId))

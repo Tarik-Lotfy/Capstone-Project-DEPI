@@ -36,6 +36,7 @@ import com.example.moviestime.ui.navigation.MovieDetailsScreenRoute
 import com.example.moviestime.ui.navigation.SettingsScreenRoute
 import com.example.moviestime.ui.theme.Inter
 import com.example.moviestime.ui.theme.PlayFair
+import com.example.moviestime.viewmodel.AuthViewModel
 import com.example.moviestime.viewmodel.MainViewModel
 
 object ProfileScreen : Screen {
@@ -44,6 +45,7 @@ object ProfileScreen : Screen {
         val navigator = LocalNavigator.currentOrThrow
         val topBarState = LocalAppTopBarState.current
         val mainViewModel: MainViewModel = viewModel()
+        val authViewModel: AuthViewModel = viewModel()
 
         LaunchedEffect(Unit) {
             topBarState.value = AppTopBarConfig(
@@ -51,7 +53,7 @@ object ProfileScreen : Screen {
                 showBack = false,
                 onBack = null,
                 trailingContent = {
-                    IconButton(onClick = { navigator.push(SettingsScreen) }) {
+                    IconButton(onClick = { navigator.push(SettingsScreenRoute) }) {
                         Icon(
                             imageVector = Icons.Outlined.Settings,
                             contentDescription = "Settings",
@@ -63,6 +65,7 @@ object ProfileScreen : Screen {
         }
 
         ProfileScreenContent(
+            authViewModel = authViewModel,
             mainViewModel = mainViewModel,
             onMovieClick = { navigator.push(MovieDetailsScreenRoute(it)) },
             onEditProfile = { navigator.push(EditProfileScreen()) }
@@ -72,10 +75,12 @@ object ProfileScreen : Screen {
 
 @Composable
 fun ProfileScreenContent(
+    authViewModel: AuthViewModel,
     mainViewModel: MainViewModel = viewModel(),
     onMovieClick: (Int) -> Unit,
     onEditProfile: () -> Unit
 ) {
+    val userProfile by authViewModel.userProfile.collectAsState()
     val favorites by mainViewModel.favorites.collectAsState()
     val watchlist by mainViewModel.watchlist.collectAsState()
     val watched by mainViewModel.watched.collectAsState()
@@ -89,6 +94,10 @@ fun ProfileScreenContent(
 
     var selectedTabIndex by remember { mutableIntStateOf(0) }
     val tabs = listOf("Favorites", "Watchlist", "Watched")
+
+    val displayName = userProfile.name.ifEmpty { "Movie Lover" }
+    val initials = if (displayName.isNotEmpty()) displayName.take(1).uppercase() else "U"
+    val username = if (userProfile.email.isNotEmpty()) userProfile.email.substringBefore("@") else displayName.lowercase()
 
     Column(
         modifier = Modifier
@@ -106,19 +115,30 @@ fun ProfileScreenContent(
                 .background(primaryColor),
             contentAlignment = Alignment.Center
         ) {
-            Text(
-                text = "Y",
-                fontFamily = Inter,
-                fontWeight = FontWeight.Bold,
-                fontSize = 40.sp,
-                color = textColor
-            )
+            if (userProfile.photoUrl != null && userProfile.photoUrl!!.isNotEmpty()) {
+                AsyncImage(
+                    model = userProfile.photoUrl,
+                    contentDescription = "Profile",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .clip(CircleShape)
+                )
+            } else {
+                Text(
+                    text = initials,
+                    fontFamily = Inter,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 40.sp,
+                    color = textColor
+                )
+            }
         }
 
         Spacer(Modifier.height(16.dp))
 
         Text(
-            text = "youssohuyuiyuiyh",
+            text = displayName,
             fontFamily = PlayFair,
             fontWeight = FontWeight.Bold,
             fontSize = 26.sp,
@@ -126,13 +146,28 @@ fun ProfileScreenContent(
             textAlign = TextAlign.Center
         )
 
-        Text(
-            text = "@youssohuyuiyuiyh",
-            fontFamily = Inter,
-            fontSize = 14.sp,
-            color = mutedColor,
-            textAlign = TextAlign.Center
-        )
+        if (userProfile.bio.isNotEmpty()) {
+            Spacer(Modifier.height(8.dp))
+            Text(
+                text = userProfile.bio,
+                fontFamily = Inter,
+                fontSize = 14.sp,
+                color = mutedColor,
+                textAlign = TextAlign.Center,
+                maxLines = 2
+            )
+        }
+
+        if (userProfile.email.isNotEmpty()) {
+            Spacer(Modifier.height(4.dp))
+            Text(
+                text = userProfile.email,
+                fontFamily = Inter,
+                fontSize = 12.sp,
+                color = mutedColor.copy(alpha = 0.7f),
+                textAlign = TextAlign.Center
+            )
+        }
 
         Spacer(Modifier.height(24.dp))
 
