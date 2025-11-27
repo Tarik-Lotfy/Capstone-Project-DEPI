@@ -211,7 +211,7 @@ fun HomeScreenContent(
                     }
                 }
 
-                itemsIndexed(popular.take(8).chunked(2)) { index, rowMovies ->
+                itemsIndexed(popular.take(6).chunked(2)) { index, rowMovies ->
                     if (index > 0) {
                         Spacer(Modifier.height(12.dp))
                     }
