@@ -1,7 +1,6 @@
 // ui/screens/MoviesApp.kt
 package com.example.moviestime.ui.screens
 
-import android.Manifest
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -37,9 +36,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.CurrentScreen
 import cafe.adriel.voyager.navigator.Navigator
-import com.example.moviestime.ui.navigation.DiscoverScreenRoute
-import com.example.moviestime.ui.navigation.HomeScreenRoute
-import com.example.moviestime.ui.navigation.ProfileScreenRoute
 import com.example.moviestime.viewmodel.LanguageViewModel
 import com.example.moviestime.viewmodel.MainViewModel
 import com.example.moviestime.viewmodel.ThemeViewModel
@@ -76,13 +72,13 @@ fun MoviesApp(
     }
 
     CompositionLocalProvider(LocalAppTopBarState provides topBarState) {
-        Navigator(HomeScreenRoute) { navigator ->
+        Navigator(HomeScreen) { navigator ->
 
             LaunchedEffect(selectedTabState.selectedTab) {
                 when (selectedTabState.selectedTab) {
-                    0 -> navigator.replace(HomeScreenRoute)
-                    1 -> navigator.replace(DiscoverScreenRoute)
-                    2 -> navigator.replace(ProfileScreenRoute)
+                    0 -> navigator.replace(HomeScreen)
+                    1 -> navigator.replace(DiscoverScreen)
+                    2 -> navigator.replace(ProfileScreen)
                 }
             }
 

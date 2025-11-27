@@ -9,7 +9,7 @@ plugins {
 
 android {
     namespace = "com.example.moviestime"
-    compileSdk = 35
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "com.example.moviestime"
@@ -95,10 +95,8 @@ dependencies {
     implementation("androidx.room:room-ktx:2.6.1")
     kapt("androidx.room:room-compiler:2.6.1")
 
-    // Firebase Auth
-    implementation("com.google.firebase:firebase-auth:23.0.0")
+    // Firebase Auth (Already defined above, but ensuring play-services-auth is here)
     implementation("com.google.android.gms:play-services-auth:21.0.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3")
 
     // --- Facebook SDK ---
     implementation("com.facebook.android:facebook-login:16.3.0")
@@ -120,13 +118,7 @@ dependencies {
 
     // Youtube Player
     implementation("com.pierfrancescosoffritti.androidyoutubeplayer:core:12.0.0")
+
     implementation("androidx.compose.ui:ui-viewbinding:1.6.0")
-
-    val voyagerVersion = "1.1.0-beta02"
-
-    // Navigator
-    implementation("cafe.adriel.voyager:voyager-navigator:$voyagerVersion")
-
-    // Screen Model
-    implementation("cafe.adriel.voyager:voyager-screenmodel:$voyagerVersion")
 }
+

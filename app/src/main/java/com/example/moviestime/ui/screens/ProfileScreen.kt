@@ -32,8 +32,6 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import coil.compose.AsyncImage
 import com.example.moviestime.R
 import com.example.moviestime.data.model.Movie
-import com.example.moviestime.ui.navigation.MovieDetailsScreenRoute
-import com.example.moviestime.ui.navigation.SettingsScreenRoute
 import com.example.moviestime.ui.theme.Inter
 import com.example.moviestime.ui.theme.PlayFair
 import com.example.moviestime.viewmodel.MainViewModel
@@ -64,7 +62,7 @@ object ProfileScreen : Screen {
 
         ProfileScreenContent(
             mainViewModel = mainViewModel,
-            onMovieClick = { navigator.push(MovieDetailsScreenRoute(it)) },
+            onMovieClick = { navigator.push(MovieDetailsScreen(it)) },
             onEditProfile = { navigator.push(EditProfileScreen()) }
         )
     }

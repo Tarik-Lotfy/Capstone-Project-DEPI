@@ -3,8 +3,7 @@ package com.example.moviestime.data.repository
 import com.example.moviestime.data.remote.RetrofitClient
 import com.example.moviestime.data.remote.MovieDetailsDto
 import com.example.moviestime.data.remote.MovieVideosResponse
-import com.example.moviestime.data.remote.MovieResponse
-import com.example.moviestime.data.remote.MovieCreditsResponse
+import com.example.moviestime.data.remote.MovieResponse // إضافة استيراد لـ MovieResponse
 
 class MovieDetailsRepository {
     private val api = RetrofitClient.apiService
@@ -20,9 +19,5 @@ class MovieDetailsRepository {
 
     suspend fun getSimilarMovies(movieId: Int): MovieResponse {
         return api.getSimilarMovies(movieId, API_KEY)
-    }
-
-    suspend fun getMovieCredits(movieId: Int): MovieCreditsResponse {
-        return api.getMovieCredits(movieId, API_KEY)
     }
 }

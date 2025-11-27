@@ -7,8 +7,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import com.example.moviestime.data.model.Movie
-import com.example.moviestime.data.model.CastMember
-import com.example.moviestime.data.model.Director
 import com.example.moviestime.data.remote.toMovie
 import com.example.moviestime.data.repository.MovieDetailsRepository
 
@@ -29,54 +27,11 @@ class MovieDetailsViewModel : ViewModel() {
 
                 val videosResponse = repository.getMovieVideos(movieId)
                 val similarMoviesResponse = repository.getSimilarMovies(movieId)
-                val creditsResponse = repository.getMovieCredits(movieId)
-                
                 val trailerKey = videosResponse.results.firstOrNull {
                     it.site == "YouTube" && it.type == "Trailer"
                 }?.key
 
-                // Extract director from crew
-                val directorCrew = creditsResponse.crew.firstOrNull { 
-                    it.job == "Director" 
-                }
-                val director = directorCrew?.name ?: ""
-                val directorInfo = directorCrew?.let {
-                    Director(
-                        id = it.id,
-                        name = it.name,
-                        profilePath = it.profile_path?.let { path -> 
-                            "https://image.tmdb.org/t/p/w185$path" 
-                        }
-                    )
-                }
-
-                // Extract top cast members (first 5) with images
-                val cast = creditsResponse.cast
-                    .sortedBy { it.order }
-                    .take(5)
-                    .joinToString(", ") { it.name }
-                
-                val castMembers = creditsResponse.cast
-                    .sortedBy { it.order }
-                    .take(5)
-                    .map {
-                        CastMember(
-                            id = it.id,
-                            name = it.name,
-                            character = it.character,
-                            profilePath = it.profile_path?.let { path -> 
-                                "https://image.tmdb.org/t/p/w185$path" 
-                            }
-                        )
-                    }
-
-                _movieDetails.value = details.toMovie(
-                    trailerKey = trailerKey,
-                    director = director,
-                    cast = cast,
-                    directorInfo = directorInfo,
-                    castMembers = castMembers
-                )
+                _movieDetails.value = details.toMovie(trailerKey = trailerKey)
                 _similarMovies.value = similarMoviesResponse.results.map { it.toMovie() }
 
             } catch (e: Exception) {

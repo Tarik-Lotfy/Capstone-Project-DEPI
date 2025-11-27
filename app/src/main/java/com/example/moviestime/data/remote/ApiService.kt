@@ -67,10 +67,4 @@ interface ApiService {
         @Query("api_key") apiKey: String,
         @Query("page") page: Int = 1
     ): MovieResponse
-
-    @GET("movie/{movie_id}/credits")
-    suspend fun getMovieCredits(
-        @Path("movie_id") movieId: Int,
-        @Query("api_key") apiKey: String
-    ): MovieCreditsResponse
 }
