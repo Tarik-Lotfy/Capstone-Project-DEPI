@@ -14,20 +14,17 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.example.moviestime.data.model.Movie
-import com.example.moviestime.ui.navigation.SeeAllCategory.POPULAR
-import com.example.moviestime.ui.navigation.SeeAllCategory.TOP_RATED
-import com.example.moviestime.ui.navigation.SeeAllCategory.UPCOMING
 import com.example.moviestime.ui.screens.AppTopBarConfig
 import com.example.moviestime.ui.screens.DiscoverScreen
-import com.example.moviestime.ui.screens.HomeScreen
+import com.example.moviestime.ui.screens.HomeScreenContent
 import com.example.moviestime.ui.screens.LocalAppTopBarState
-import com.example.moviestime.ui.screens.LoginScreen
+import com.example.moviestime.ui.screens.LoginScreenContent
 import com.example.moviestime.ui.screens.MovieDetailsScreen
-import com.example.moviestime.ui.screens.ProfileScreen
-import com.example.moviestime.ui.screens.SearchScreen
-import com.example.moviestime.ui.screens.SeeAllMoviesScreen
-import com.example.moviestime.ui.screens.SettingsScreen
-import com.example.moviestime.ui.screens.VideoPlayerScreen
+import com.example.moviestime.ui.screens.ProfileScreenContent
+import com.example.moviestime.ui.screens.EditProfileScreen
+import com.example.moviestime.ui.screens.SeeAllMoviesScreenContent
+import com.example.moviestime.ui.screens.SettingsScreenContent
+import com.example.moviestime.ui.screens.VideoPlayerScreenContent
 import com.example.moviestime.viewmodel.AuthViewModel
 import com.example.moviestime.viewmodel.HomeViewModel
 import com.example.moviestime.viewmodel.LanguageViewModel
@@ -41,10 +38,6 @@ enum class SeeAllCategory {
     UPCOMING
 }
 
-/**
- * Voyager Screen wrappers around existing composables.
- * UI/logic stays inside the original composables; navigation is handled here.
- */
 
 object HomeScreenRoute : Screen {
     @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
@@ -72,7 +65,7 @@ object HomeScreenRoute : Screen {
             )
         }
 
-        HomeScreen(
+        HomeScreenContent(
             homeViewModel = homeViewModel,
             mainViewModel = mainViewModel,
             onMovieClick = { movieId ->
@@ -130,10 +123,10 @@ object SearchScreenRoute : Screen {
             )
         }
 
-        SearchScreen(
+        DiscoverScreen(
             searchViewModel = searchViewModel,
-            onMovieClick = { movie ->
-                navigator.push(MovieDetailsScreenRoute(movie.id))
+            onMovieClick = { movieId ->
+                navigator.push(MovieDetailsScreenRoute(movieId))
             }
         )
     }
@@ -167,12 +160,13 @@ object ProfileScreenRoute : Screen {
             )
         }
 
-        ProfileScreen(
+        ProfileScreenContent(
             mainViewModel = mainViewModel,
-            themeViewModel = themeViewModel,
-            languageViewModel = languageViewModel,
             onMovieClick = { movieId ->
                 navigator.push(MovieDetailsScreenRoute(movieId))
+            },
+            onEditProfile = {
+                navigator.push(EditProfileScreen())
             }
         )
     }
@@ -181,6 +175,8 @@ object ProfileScreenRoute : Screen {
 data class MovieDetailsScreenRoute(
     val movieId: Int
 ) : Screen {
+
+    @androidx.annotation.RequiresPermission(android.Manifest.permission.POST_NOTIFICATIONS)
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
@@ -224,9 +220,9 @@ data class SeeAllScreenRoute(
 
         LaunchedEffect(category) {
             val title = when (category) {
-                POPULAR -> "Popular"
-                TOP_RATED -> "Top Rated"
-                UPCOMING -> "Upcoming"
+                SeeAllCategory.POPULAR -> "Popular"
+                SeeAllCategory.TOP_RATED -> "Top Rated"
+                SeeAllCategory.UPCOMING -> "Upcoming"
             }
             topBarState.value = AppTopBarConfig(
                 title = title,
@@ -236,7 +232,7 @@ data class SeeAllScreenRoute(
             )
         }
 
-        SeeAllMoviesScreen(
+        SeeAllMoviesScreenContent(
             category = category,
             homeViewModel = homeViewModel,
             onMovieClick = { movieId ->
@@ -266,12 +262,12 @@ object SettingsScreenRoute : Screen {
             )
         }
 
-        SettingsScreen(
+        SettingsScreenContent(
             authViewModel = authViewModel,
             languageViewModel = languageViewModel,
             themeViewModel = themeViewModel,
             onEditProfile = {
-                // TODO: Navigate to edit profile screen when implemented
+                navigator.push(EditProfileScreen())
             },
             onDeleteAccount = {
                 // TODO: Implement delete account functionality
@@ -291,7 +287,7 @@ object LoginScreenRoute : Screen {
     override fun Content() {
         val authViewModel: AuthViewModel = viewModel()
 
-        LoginScreen(authViewModel = authViewModel)
+        LoginScreenContent(authViewModel = authViewModel)
     }
 }
 
@@ -302,7 +298,7 @@ data class VideoPlayerScreenRoute(
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
 
-        VideoPlayerScreen(
+        VideoPlayerScreenContent(
             trailerKey = trailerKey,
             onBack = { navigator.pop() }
         )
