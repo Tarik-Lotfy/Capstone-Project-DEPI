@@ -13,9 +13,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
+import com.google.firebase.auth.FirebaseAuth.AuthStateListener
 
 data class UserProfile(
     val name: String = "",
@@ -44,10 +46,26 @@ class AuthViewModel : ViewModel() {
     private val _userProfile = MutableStateFlow(UserProfile())
     val userProfile: StateFlow<UserProfile> = _userProfile.asStateFlow()
 
+    private val authStateListener = AuthStateListener { firebaseAuth ->
+        val user = firebaseAuth.currentUser
+        _isLoggedIn.value = user != null
+        if (user != null) {
+            loadUserProfile()
+        } else {
+            _userProfile.value = UserProfile()
+        }
+    }
+
     init {
+        auth.addAuthStateListener(authStateListener)
         if (auth.currentUser != null) {
             loadUserProfile()
         }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        auth.removeAuthStateListener(authStateListener)
     }
 
     fun loadUserProfile() {
@@ -72,11 +90,7 @@ class AuthViewModel : ViewModel() {
     fun updateUserProfile(name: String, bio: String) {
         val user = auth.currentUser ?: return
 
-        _userProfile.value = _userProfile.value.copy(
-            name = name,
-            bio = bio
-        )
-        _uiState.value = AuthUiState(isUpdateSuccess = true)
+        _uiState.value = AuthUiState(isLoading = true)
 
         viewModelScope.launch {
             try {
@@ -95,6 +109,9 @@ class AuthViewModel : ViewModel() {
                         .set(userData, SetOptions.merge())
                         .await()
                 }
+                // Reload profile from Firebase to ensure everything is synced
+                loadUserProfile()
+                _uiState.value = AuthUiState(isUpdateSuccess = true)
             } catch (e: Exception) {
                 Log.e("AuthViewModel", "Error updating profile", e)
                 _uiState.value = AuthUiState(error = e.message ?: "Unknown Error")

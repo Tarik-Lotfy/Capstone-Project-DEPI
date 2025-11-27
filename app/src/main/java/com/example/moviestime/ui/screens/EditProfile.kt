@@ -37,8 +37,21 @@ class EditProfileScreen : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
+        val topBarState = LocalAppTopBarState.current
+        val title = stringResource(R.string.edit_profile)
         // Fix: Use standard viewModel() to avoid unresolved reference errors
         val authViewModel: AuthViewModel = viewModel()
+
+        LaunchedEffect(Unit) {
+            topBarState.value = AppTopBarConfig(
+                title = title,
+                showBack = true,
+                onBack = { navigator.pop() },
+                trailingContent = null
+            )
+            // Reload profile when opening edit screen
+            authViewModel.loadUserProfile()
+        }
 
         EditProfileScreenContent(
             authViewModel = authViewModel,
@@ -81,12 +94,6 @@ fun EditProfileScreenContent(
     val maxBioLength = 300
 
     Scaffold(
-        topBar = {
-            ProfileScreenTopBar(
-                title = stringResource(R.string.edit_profile),
-                onBackClick = onBackClick
-            )
-        },
         containerColor = backgroundColor
     ) { paddingValues ->
         Column(
