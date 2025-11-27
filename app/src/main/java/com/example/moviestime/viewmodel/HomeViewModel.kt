@@ -1,5 +1,6 @@
 package com.example.moviestime.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,19 +25,33 @@ class HomeViewModel : ViewModel() {
     private val _upcoming = MutableStateFlow<List<Movie>>(emptyList())
     val upcoming: StateFlow<List<Movie>> = _upcoming.asStateFlow()
 
+    private val _isLoading = MutableStateFlow(true)
+    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
+
+    private val _error = MutableStateFlow<String?>(null)
+    val error: StateFlow<String?> = _error.asStateFlow()
+
     init {
         loadMovies()
     }
 
     fun loadMovies() {
         viewModelScope.launch {
+            _isLoading.value = true
+            _error.value = null
             try {
+                Log.d("HomeViewModel", "Loading movies...")
                 _popular.value = repository.getPopularMovies()
+                Log.d("HomeViewModel", "Popular loaded: ${_popular.value.size}")
                 _topRated.value = repository.getTopRatedMovies()
                 _nowPlaying.value = repository.getNowPlayingMovies()
                 _upcoming.value = repository.getUpcomingMovies()
+                Log.d("HomeViewModel", "All movies loaded successfully")
             } catch (e: Exception) {
-                e.printStackTrace()
+                Log.e("HomeViewModel", "Error loading movies", e)
+                _error.value = e.message ?: "Failed to load movies"
+            } finally {
+                _isLoading.value = false
             }
         }
     }

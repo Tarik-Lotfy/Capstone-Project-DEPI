@@ -100,8 +100,7 @@ dependencies {
     implementation("com.google.android.gms:play-services-auth:21.0.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3")
 
-    // --- Facebook SDK ---
-    implementation("com.facebook.android:facebook-login:16.3.0")
+  
 
     // DataStore
     implementation("androidx.datastore:datastore-preferences:1.1.1")
