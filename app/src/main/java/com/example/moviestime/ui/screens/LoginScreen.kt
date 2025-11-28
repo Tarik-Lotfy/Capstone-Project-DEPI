@@ -85,12 +85,12 @@ fun LoginScreenContent(
             LoginBranding()
             Spacer(Modifier.height(28.dp))
 
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 16.dp),
-                contentAlignment = Alignment.Center
-            ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 0.dp),
+            contentAlignment = Alignment.Center
+        ) {
                 CinematicCard(
                     modifier = Modifier
                         .fillMaxWidth(0.87f)

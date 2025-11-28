@@ -90,7 +90,13 @@ class AuthViewModel : ViewModel() {
     fun updateUserProfile(name: String, bio: String) {
         val user = auth.currentUser ?: return
 
-        _uiState.value = AuthUiState(isLoading = true)
+        _userProfile.value = _userProfile.value.copy(
+            name = name,
+            bio = bio,
+            email = user.email ?: _userProfile.value.email,
+            photoUrl = user.photoUrl?.toString() ?: _userProfile.value.photoUrl
+        )
+        _uiState.value = AuthUiState(isUpdateSuccess = true)
 
         viewModelScope.launch {
             try {
@@ -109,12 +115,8 @@ class AuthViewModel : ViewModel() {
                         .set(userData, SetOptions.merge())
                         .await()
                 }
-                // Reload profile from Firebase to ensure everything is synced
-                loadUserProfile()
-                _uiState.value = AuthUiState(isUpdateSuccess = true)
             } catch (e: Exception) {
                 Log.e("AuthViewModel", "Error updating profile", e)
-                _uiState.value = AuthUiState(error = e.message ?: "Unknown Error")
             }
         }
     }

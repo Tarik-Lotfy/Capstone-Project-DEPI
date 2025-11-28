@@ -78,7 +78,7 @@ fun SeeAllMoviesScreenContent(
                 .fillMaxSize()
                 .padding(padding)
                 .padding(horizontal = 8.dp),
-            contentPadding = PaddingValues(vertical = 8.dp),
+            contentPadding = PaddingValues(top = 8.dp, bottom = 96.dp),
             horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(8.dp),
             verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(8.dp)
         ) {

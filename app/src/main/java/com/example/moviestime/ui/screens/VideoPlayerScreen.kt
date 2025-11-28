@@ -81,19 +81,7 @@ fun VideoPlayerScreenContent(
                 }
             )
 
-            IconButton(
-                onClick = onBack,
-                modifier = Modifier
-                    .align(Alignment.TopStart)
-                    .padding(top = 40.dp, start = 20.dp)
-                    .background(Color.Black.copy(alpha = 0.6f), MaterialTheme.shapes.small)
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Back",
-                    tint = Color.White
-                )
-            }
+            
         }
     }
 }

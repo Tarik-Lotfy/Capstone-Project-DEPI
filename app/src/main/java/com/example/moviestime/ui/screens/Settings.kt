@@ -85,7 +85,8 @@ fun SettingsScreenContent(
         modifier = Modifier
             .fillMaxSize()
             .background(backgroundColor)
-            .padding(16.dp)
+            .padding(horizontal = 8.dp)
+            .padding(bottom = 100.dp)
             .verticalScroll(rememberScrollState())
     ) {
 
@@ -108,7 +109,7 @@ fun SettingsScreenContent(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 18.dp),
+                    .padding(horizontal = 8.dp, vertical = 18.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
@@ -140,7 +141,7 @@ fun SettingsScreenContent(
             HorizontalDivider(
                 color = Color.White.copy(alpha = 0.05f),
                 thickness = 1.dp,
-                modifier = Modifier.padding(horizontal = 16.dp)
+                modifier = Modifier.padding(horizontal = 8.dp)
             )
             SettingsItem(
                 icon = Icons.Outlined.Notifications,
@@ -246,7 +247,7 @@ fun SettingsItem(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 18.dp),
+                .padding(horizontal = 8.dp, vertical = 18.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
@@ -276,7 +277,7 @@ fun SettingsItem(
             HorizontalDivider(
                 color = Color.White.copy(alpha = 0.05f),
                 thickness = 1.dp,
-                modifier = Modifier.padding(horizontal = 16.dp)
+                modifier = Modifier.padding(horizontal = 8.dp)
             )
         }
     }
@@ -297,7 +298,7 @@ fun SettingsButton(
             .border(1.dp, borderColor, RoundedCornerShape(16.dp))
             .clip(RoundedCornerShape(16.dp))
             .clickable { onClick() }
-            .padding(horizontal = 16.dp),
+            .padding(horizontal = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(

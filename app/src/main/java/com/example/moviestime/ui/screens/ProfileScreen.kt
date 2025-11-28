@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -100,7 +102,15 @@ fun ProfileScreenContent(
     val goldColor = colorResource(R.color.secondary)
 
     var selectedTabIndex by remember { mutableIntStateOf(0) }
-    val tabs = listOf("Favorites", "Watchlist", "Watched")
+    val tabs = listOf("Favorites", "Watched", "Watchlist")
+    val pagerState = rememberPagerState(initialPage = selectedTabIndex, pageCount = { tabs.size })
+
+    LaunchedEffect(selectedTabIndex) {
+        pagerState.animateScrollToPage(selectedTabIndex)
+    }
+    LaunchedEffect(pagerState.currentPage) {
+        selectedTabIndex = pagerState.currentPage
+    }
 
     val displayName = userProfile.name.ifEmpty { "Movie Lover" }
     val initials = if (displayName.isNotEmpty()) displayName.take(1).uppercase() else "U"
@@ -110,7 +120,7 @@ fun ProfileScreenContent(
         modifier = Modifier
             .fillMaxSize()
             .background(backgroundColor)
-            .padding(16.dp),
+            .padding(horizontal = 8.dp, vertical = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Box(
@@ -239,39 +249,47 @@ fun ProfileScreenContent(
 
         Spacer(Modifier.height(20.dp))
 
-        val currentList = when (selectedTabIndex) {
-            0 -> favorites
-            1 -> watchlist
-            2 -> watched
-            else -> emptyList()
-        }
+        HorizontalPager(
+            state = pagerState,
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+        ) { page ->
+            val list = when (page) {
+                0 -> favorites
+                1 -> watched
+                2 -> watchlist
+                else -> emptyList()
+            }
+            val message = when (page) {
+                0 -> "No favorites yet"
+                1 -> "No watched movies yet"
+                2 -> "Your watchlist is empty"
+                else -> "No items yet"
+            }
 
-        val emptyMessage = when (selectedTabIndex) {
-            0 -> "No favorites yet"
-            1 -> "Your watchlist is empty"
-            2 -> "No watched movies yet"
-            else -> "No items yet"
-        }
-
-        if (currentList.isEmpty()) {
-            EmptyTabState(
-                message = emptyMessage,
-                actionText = "Explore movies",
-                mutedColor = mutedColor,
-                goldColor = goldColor
-            )
-        } else {
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(3),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.fillMaxSize()
-            ) {
-                items(currentList) { movie ->
-                    ProfileMovieItem(
-                        movie = movie,
-                        onClick = { onMovieClick(movie.id) }
-                    )
+            if (list.isEmpty()) {
+                EmptyTabState(
+                    message = message,
+                    actionText = "Explore movies",
+                    mutedColor = mutedColor,
+                    goldColor = goldColor,
+                    onExploreClick = { mainViewModel.selectTab(1) }
+                )
+            } else {
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(3),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    contentPadding = PaddingValues(bottom = 100.dp),
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    items(list) { movie ->
+                        ProfileMovieItem(
+                            movie = movie,
+                            onClick = { onMovieClick(movie.id) }
+                        )
+                    }
                 }
             }
         }
@@ -299,7 +317,7 @@ fun ProfileMovieItem(movie: Movie, onClick: () -> Unit) {
 }
 
 @Composable
-fun EmptyTabState(message: String, actionText: String, mutedColor: Color, goldColor: Color) {
+fun EmptyTabState(message: String, actionText: String, mutedColor: Color, goldColor: Color, onExploreClick: () -> Unit) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
@@ -315,7 +333,7 @@ fun EmptyTabState(message: String, actionText: String, mutedColor: Color, goldCo
             fontSize = 16.sp,
             fontWeight = FontWeight.Bold,
             color = goldColor,
-            modifier = Modifier.clickable { }
+            modifier = Modifier.clickable { onExploreClick() }
         )
     }
 }
