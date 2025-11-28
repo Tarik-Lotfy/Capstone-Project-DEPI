@@ -154,6 +154,8 @@ class AuthViewModel : ViewModel() {
                 _uiState.value = AuthUiState(error = "Failed to update profile: ${e.message}")
             } finally {
                 isProfileUpdateInProgress = false
+                // Add a small delay to ensure Firestore has been updated
+                kotlinx.coroutines.delay(300)
                 loadUserProfile(force = true)
             }
         }

@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package com.example.moviestime.ui.navigation
 
 import android.Manifest
@@ -7,9 +9,13 @@ import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -62,15 +68,7 @@ object HomeScreenRoute : Screen {
                 title = appTitle,
                 showBack = false,
                 onBack = null,
-                trailingContent = {
-                    IconButton(onClick = { navigator.push(SettingsScreenRoute) }) {
-                        Icon(
-                            imageVector = Icons.Outlined.Settings,
-                            contentDescription = settingsCd,
-                            tint = Color.White
-                        )
-                    }
-                }
+                trailingContent = null
             )
         }
 
@@ -121,6 +119,7 @@ object DiscoverScreenRoute : Screen {
 }
 
 object SearchScreenRoute : Screen {
+    @Suppress("unused")
     private fun readResolve(): Any = SearchScreenRoute
 
     @Composable
@@ -160,9 +159,18 @@ object ProfileScreenRoute : Screen {
         val profileTitle = stringResource(R.string.profile)
         val settingsCd = stringResource(R.string.settings_button_cd)
 
-        // Load user profile when screen appears
-        LaunchedEffect(Unit) {
+        // Reload profile when screen is entered
+        // Use a key that ensures reload when navigating back
+        var reloadKey by remember { mutableIntStateOf(0) }
+        
+        LaunchedEffect(reloadKey) {
             authViewModel.loadUserProfile(force = true)
+        }
+        
+        // Increment reload key when screen becomes visible (using DisposableEffect)
+        DisposableEffect(Unit) {
+            reloadKey++
+            onDispose { }
         }
 
         LaunchedEffect(profileTitle) {
@@ -333,7 +341,7 @@ object EditProfileScreenRoute : Screen {
             authViewModel = authViewModel,
             onBackClick = { navigator.pop() },
             onNavigateToProfile = {
-                navigator.replaceAll(ProfileScreenRoute)
+                navigator.pop()
             }
         )
     }
