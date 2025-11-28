@@ -21,6 +21,8 @@ import com.example.moviestime.ui.screens.DiscoverScreen
 import com.example.moviestime.ui.screens.HomeScreenContent
 import com.example.moviestime.ui.screens.LocalAppTopBarState
 import com.example.moviestime.ui.screens.LocalMainViewModel
+import com.example.moviestime.ui.screens.LocalLanguageViewModel
+import com.example.moviestime.ui.screens.LocalThemeViewModel
 import com.example.moviestime.ui.screens.LoginScreenContent
 import com.example.moviestime.ui.screens.MovieDetailsScreen
 import com.example.moviestime.ui.screens.ProfileScreenContent
@@ -148,8 +150,6 @@ object ProfileScreenRoute : Screen {
         val topBarState = LocalAppTopBarState.current
         val mainViewModel = LocalMainViewModel.current
         val authViewModel: AuthViewModel = viewModel()
-        val themeViewModel: ThemeViewModel = viewModel()
-        val languageViewModel: LanguageViewModel = viewModel()
 
         LaunchedEffect(Unit) {
             topBarState.value = AppTopBarConfig(
@@ -259,8 +259,8 @@ object SettingsScreenRoute : Screen {
         val navigator = LocalNavigator.currentOrThrow
         val topBarState = LocalAppTopBarState.current
         val authViewModel: AuthViewModel = viewModel()
-        val themeViewModel: ThemeViewModel = viewModel()
-        val languageViewModel: LanguageViewModel = viewModel()
+        val themeViewModel = LocalThemeViewModel.current
+        val languageViewModel = LocalLanguageViewModel.current
 
         LaunchedEffect(Unit) {
             topBarState.value = AppTopBarConfig(
