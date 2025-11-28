@@ -11,7 +11,7 @@ import androidx.compose.runtime.*
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.moviestime.ui.screens.LoginScreen
+import com.example.moviestime.ui.screens.LoginScreenContent
 import com.example.moviestime.ui.screens.MoviesApp
 import com.example.moviestime.ui.screens.OnboardingScreen
 import com.example.moviestime.ui.theme.MovieMiniTheme
@@ -85,7 +85,7 @@ class MainActivity : ComponentActivity() {
                         )
                     }
                     !isLoggedIn -> {
-                        LoginScreen().Content()
+                        LoginScreenContent(authViewModel = authViewModel)
                     }
                     else -> {
                         val mainViewModel: MainViewModel = viewModel { MainViewModel(application) }

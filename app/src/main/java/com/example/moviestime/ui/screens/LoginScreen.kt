@@ -23,7 +23,6 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import cafe.adriel.voyager.core.screen.Screen
 import com.example.moviestime.R
 import com.example.moviestime.ui.components.login.CinematicCard
 import com.example.moviestime.ui.components.login.LoginAccentColor
@@ -31,15 +30,6 @@ import com.example.moviestime.ui.components.login.LoginOnAccentColor
 import com.example.moviestime.ui.components.login.LoginOnSurfaceColor
 import com.example.moviestime.ui.components.login.NeonTextField
 import com.example.moviestime.viewmodel.AuthViewModel
-
-class LoginScreen : Screen {
-    @Composable
-    override fun Content() {
-        // يمكننا استخدام viewModel() هنا كما هو معتاد
-        val authViewModel: AuthViewModel = viewModel()
-        LoginScreenContent(authViewModel)
-    }
-}
 
 @Composable
 fun LoginScreenContent(

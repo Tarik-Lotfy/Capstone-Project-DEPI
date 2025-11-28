@@ -25,44 +25,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.currentOrThrow
 import coil.compose.AsyncImage
 import com.example.moviestime.R
-import com.example.moviestime.ui.navigation.ProfileScreenRoute
 import com.example.moviestime.ui.theme.Inter
 import com.example.moviestime.ui.theme.PlayFair
 import com.example.moviestime.viewmodel.AuthViewModel
-
-class EditProfileScreen : Screen {
-    @Composable
-    override fun Content() {
-        val navigator = LocalNavigator.currentOrThrow
-        val topBarState = LocalAppTopBarState.current
-        val title = stringResource(R.string.edit_profile)
-        val authViewModel: AuthViewModel = LocalAuthViewModel.current ?: viewModel()
-
-        LaunchedEffect(Unit) {
-            topBarState.value = AppTopBarConfig(
-                title = title,
-                showBack = true,
-                onBack = { navigator.pop() },
-                trailingContent = null
-            )
-            // Reload profile when opening edit screen
-            authViewModel.loadUserProfile()
-        }
-
-        EditProfileScreenContent(
-            authViewModel = authViewModel,
-            onBackClick = { navigator.pop() },
-            onNavigateToProfile = {
-                navigator.replaceAll(ProfileScreenRoute)
-            }
-        )
-    }
-}
 
 @Composable
 fun EditProfileScreenContent(

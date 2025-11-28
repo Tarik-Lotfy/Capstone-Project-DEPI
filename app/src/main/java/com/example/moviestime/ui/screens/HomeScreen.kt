@@ -2,75 +2,47 @@ package com.example.moviestime.ui.screens
 
 import android.Manifest
 import androidx.annotation.RequiresPermission
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Settings
-import androidx.compose.material3.*
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.currentOrThrow
 import com.example.moviestime.R
-import com.example.moviestime.ui.components.*
-import com.example.moviestime.ui.navigation.MovieDetailsScreenRoute
+import com.example.moviestime.ui.components.FeaturedCard
+import com.example.moviestime.ui.components.FeaturedLargeCard
+import com.example.moviestime.ui.components.MovieRowCard
+import com.example.moviestime.ui.components.ShimmerLargeMovieCard
+import com.example.moviestime.ui.components.ShimmerMovieCard
 import com.example.moviestime.ui.navigation.SeeAllCategory
-import com.example.moviestime.ui.navigation.SeeAllScreenRoute
-import com.example.moviestime.ui.navigation.SettingsScreenRoute
 import com.example.moviestime.viewmodel.HomeViewModel
 import com.example.moviestime.viewmodel.MainViewModel
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.launch
-
-object HomeScreen : Screen {
-    @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
-    @Composable
-    override fun Content() {
-        val navigator = LocalNavigator.currentOrThrow
-        val topBarState = LocalAppTopBarState.current
-        val homeViewModel: HomeViewModel = viewModel()
-        val mainViewModel: MainViewModel = viewModel()
-        val appTitle = stringResource(R.string.app_name)
-        val settingsCd = stringResource(R.string.settings_button_cd)
-
-        LaunchedEffect(appTitle) {
-            topBarState.value = AppTopBarConfig(
-                title = appTitle,
-                showBack = false,
-                onBack = null,
-                trailingContent = {
-                    IconButton(onClick = { navigator.push(SettingsScreenRoute) }) {
-                        Icon(
-                            imageVector = Icons.Outlined.Settings,
-                            contentDescription = settingsCd,
-                            tint = Color.White
-                        )
-                    }
-                }
-            )
-        }
-
-        HomeScreenContent(
-            homeViewModel = homeViewModel,
-            mainViewModel = mainViewModel,
-            onMovieClick = { navigator.push(MovieDetailsScreenRoute(it)) },
-            onSeeAllClick = { navigator.push(SeeAllScreenRoute(it)) }
-        )
-    }
-}
 
 @Composable
 fun HomeScreenContent(

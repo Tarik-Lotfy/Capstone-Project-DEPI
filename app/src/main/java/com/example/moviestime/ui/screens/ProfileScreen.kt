@@ -29,55 +29,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.currentOrThrow
 import coil.compose.AsyncImage
 import com.example.moviestime.R
 import com.example.moviestime.data.model.Movie
-import com.example.moviestime.ui.navigation.MovieDetailsScreenRoute
-import com.example.moviestime.ui.navigation.SettingsScreenRoute
 import com.example.moviestime.ui.theme.Inter
 import com.example.moviestime.ui.theme.PlayFair
 import com.example.moviestime.viewmodel.AuthViewModel
 import com.example.moviestime.viewmodel.MainViewModel
-
-object ProfileScreen : Screen {
-    @Composable
-    override fun Content() {
-        val navigator = LocalNavigator.currentOrThrow
-        val topBarState = LocalAppTopBarState.current
-        val mainViewModel = LocalMainViewModel.current
-        val authViewModel: AuthViewModel = LocalAuthViewModel.current ?: viewModel()
-        val profileTitle = stringResource(R.string.profile)
-
-        LaunchedEffect(profileTitle) {
-            topBarState.value = AppTopBarConfig(
-                title = profileTitle,
-                showBack = false,
-                onBack = null,
-                trailingContent = {
-                    IconButton(onClick = { navigator.push(SettingsScreenRoute) }) {
-                        Icon(
-                            imageVector = Icons.Outlined.Settings,
-                            contentDescription = stringResource(R.string.settings_button_cd),
-                            tint = Color.White
-                        )
-                    }
-                }
-            )
-            // Reload profile when screen appears
-            authViewModel.loadUserProfile()
-        }
-
-        ProfileScreenContent(
-            authViewModel = authViewModel,
-            mainViewModel = mainViewModel,
-            onMovieClick = { navigator.push(MovieDetailsScreenRoute(it)) },
-            onEditProfile = { navigator.push(EditProfileScreen()) }
-        )
-    }
-}
 
 @Composable
 fun ProfileScreenContent(
@@ -90,11 +48,6 @@ fun ProfileScreenContent(
     val favorites by mainViewModel.favorites.collectAsState()
     val watchlist by mainViewModel.watchlist.collectAsState()
     val watched by mainViewModel.watched.collectAsState()
-
-    // Reload profile when screen becomes visible
-    LaunchedEffect(Unit) {
-        authViewModel.loadUserProfile()
-    }
 
     val backgroundColor = colorResource(R.color.background)
     val primaryColor = colorResource(R.color.primary)

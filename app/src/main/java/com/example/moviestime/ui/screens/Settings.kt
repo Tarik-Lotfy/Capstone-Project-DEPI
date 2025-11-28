@@ -25,43 +25,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.currentOrThrow
 import com.example.moviestime.R
 import com.example.moviestime.ui.theme.Inter
 import com.example.moviestime.ui.theme.PlayFair
 import com.example.moviestime.viewmodel.AuthViewModel
 import com.example.moviestime.viewmodel.LanguageViewModel
 import com.example.moviestime.viewmodel.ThemeViewModel
-object SettingsScreen : Screen {
-    @Composable
-    override fun Content() {
-        val navigator = LocalNavigator.currentOrThrow
-        val topBarState = LocalAppTopBarState.current
-        val authViewModel: AuthViewModel = LocalAuthViewModel.current ?: viewModel()
-        val languageViewModel: LanguageViewModel = LocalLanguageViewModel.current
-        val themeViewModel: ThemeViewModel = LocalThemeViewModel.current
-        val title = stringResource(R.string.settings)
-
-        LaunchedEffect(title) {
-            topBarState.value = AppTopBarConfig(
-                title = title,
-                showBack = true,
-                onBack = { navigator.pop() },
-                trailingContent = null
-            )
-        }
-
-        SettingsScreenContent(
-            authViewModel = authViewModel,
-            languageViewModel = languageViewModel,
-            themeViewModel = themeViewModel,
-            onEditProfile = { navigator.push(EditProfileScreen()) },
-            onDeleteAccount = { /* TODO */ },
-            onSignOut = { navigator.pop() }
-        )
-    }
-}
 
 @Composable
 fun SettingsScreenContent(

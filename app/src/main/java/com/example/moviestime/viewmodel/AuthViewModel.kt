@@ -76,17 +76,46 @@ class AuthViewModel : ViewModel() {
         val user = auth.currentUser ?: return
         viewModelScope.launch {
             try {
-                val document = db.collection("users").document(user.uid).get().await()
-                val bio = document.getString("bio") ?: "Tell us about your love for cinema..."
+                val documentSnapshot = db.collection("users").document(user.uid).get().await()
+                
+                val bio: String
+                val name: String
+                
+                if (documentSnapshot.exists()) {
+                    // Document exists, read from Firestore
+                    bio = documentSnapshot.getString("bio") ?: "Tell us about your love for cinema..."
+                    name = documentSnapshot.getString("name") ?: user.displayName ?: "Movie Lover"
+                } else {
+                    // Document doesn't exist, create it with default values
+                    bio = "Tell us about your love for cinema..."
+                    name = user.displayName ?: "Movie Lover"
+                    
+                    // Create the document in Firestore
+                    val userData = hashMapOf(
+                        "bio" to bio,
+                        "name" to name,
+                        "email" to (user.email ?: "")
+                    )
+                    db.collection("users").document(user.uid)
+                        .set(userData)
+                        .await()
+                }
 
                 _userProfile.value = UserProfile(
-                    name = user.displayName ?: "Movie Lover",
+                    name = name,
                     email = user.email ?: "",
                     bio = bio,
                     photoUrl = user.photoUrl?.toString()
                 )
             } catch (e: Exception) {
                 Log.e("AuthViewModel", "Error loading profile", e)
+                // Fallback to Firebase Auth data if Firestore fails
+                _userProfile.value = UserProfile(
+                    name = user.displayName ?: "Movie Lover",
+                    email = user.email ?: "",
+                    bio = "Tell us about your love for cinema...",
+                    photoUrl = user.photoUrl?.toString()
+                )
             }
         }
     }
@@ -152,9 +181,9 @@ class AuthViewModel : ViewModel() {
                 if (result.isSuccess) {
                     _isLoggedIn.value = true
                     _uiState.value = AuthUiState()
-                    loadUserProfile()
-
-
+                    // Load profile after a short delay to ensure Firebase Auth is updated
+                    kotlinx.coroutines.delay(100)
+                    loadUserProfile(force = true)
                 } else {
                     _uiState.value = AuthUiState(error = "Login failed: ${result.exceptionOrNull()?.message}")
                 }
@@ -184,9 +213,25 @@ class AuthViewModel : ViewModel() {
             try {
                 val result = repository.register(email, password, name)
                 if (result.isSuccess) {
+                    val user = result.getOrNull()
+                    if (user != null) {
+                        // Create initial Firestore document
+                        try {
+                            val userData = hashMapOf(
+                                "bio" to "Tell us about your love for cinema...",
+                                "name" to name,
+                                "email" to email
+                            )
+                            db.collection("users").document(user.uid)
+                                .set(userData)
+                                .await()
+                        } catch (e: Exception) {
+                            Log.e("AuthViewModel", "Error creating user document", e)
+                        }
+                    }
                     _isLoggedIn.value = true
                     _uiState.value = AuthUiState()
-                    loadUserProfile()
+                    loadUserProfile(force = true)
                 } else {
                     _uiState.value = AuthUiState(error = "Registration failed: ${result.exceptionOrNull()?.message}")
                 }

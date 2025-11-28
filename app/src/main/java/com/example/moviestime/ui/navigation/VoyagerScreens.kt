@@ -20,25 +20,22 @@ import com.example.moviestime.R
 import com.example.moviestime.data.model.Movie
 import com.example.moviestime.ui.screens.AppTopBarConfig
 import com.example.moviestime.ui.screens.DiscoverScreen
+import com.example.moviestime.ui.screens.EditProfileScreenContent
 import com.example.moviestime.ui.screens.HomeScreenContent
 import com.example.moviestime.ui.screens.LocalAppTopBarState
-import com.example.moviestime.ui.screens.LocalMainViewModel
-import com.example.moviestime.ui.screens.LocalLanguageViewModel
-import com.example.moviestime.ui.screens.LocalThemeViewModel
 import com.example.moviestime.ui.screens.LocalAuthViewModel
+import com.example.moviestime.ui.screens.LocalLanguageViewModel
+import com.example.moviestime.ui.screens.LocalMainViewModel
+import com.example.moviestime.ui.screens.LocalThemeViewModel
 import com.example.moviestime.ui.screens.LoginScreenContent
 import com.example.moviestime.ui.screens.MovieDetailsScreen
 import com.example.moviestime.ui.screens.ProfileScreenContent
-import com.example.moviestime.ui.screens.EditProfileScreen
 import com.example.moviestime.ui.screens.SeeAllMoviesScreenContent
 import com.example.moviestime.ui.screens.SettingsScreenContent
 import com.example.moviestime.ui.screens.VideoPlayerScreenContent
 import com.example.moviestime.viewmodel.AuthViewModel
 import com.example.moviestime.viewmodel.HomeViewModel
-import com.example.moviestime.viewmodel.LanguageViewModel
-import com.example.moviestime.viewmodel.MainViewModel
 import com.example.moviestime.viewmodel.SearchViewModel
-import com.example.moviestime.viewmodel.ThemeViewModel
 
 enum class SeeAllCategory {
     POPULAR,
@@ -48,6 +45,8 @@ enum class SeeAllCategory {
 
 
 object HomeScreenRoute : Screen {
+    private fun readResolve(): Any = HomeScreenRoute
+
     @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
     @Composable
     override fun Content() {
@@ -161,6 +160,11 @@ object ProfileScreenRoute : Screen {
         val profileTitle = stringResource(R.string.profile)
         val settingsCd = stringResource(R.string.settings_button_cd)
 
+        // Load user profile when screen appears
+        LaunchedEffect(Unit) {
+            authViewModel.loadUserProfile(force = true)
+        }
+
         LaunchedEffect(profileTitle) {
             topBarState.value = AppTopBarConfig(
                 title = profileTitle,
@@ -185,7 +189,7 @@ object ProfileScreenRoute : Screen {
                 navigator.push(MovieDetailsScreenRoute(movieId))
             },
             onEditProfile = {
-                navigator.push(EditProfileScreen())
+                navigator.push(EditProfileScreenRoute)
             }
         )
     }
@@ -195,7 +199,7 @@ data class MovieDetailsScreenRoute(
     val movieId: Int
 ) : Screen {
 
-    @androidx.annotation.RequiresPermission(android.Manifest.permission.POST_NOTIFICATIONS)
+    @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
@@ -288,7 +292,7 @@ object SettingsScreenRoute : Screen {
             languageViewModel = languageViewModel,
             themeViewModel = themeViewModel,
             onEditProfile = {
-                navigator.push(EditProfileScreen())
+                navigator.push(EditProfileScreenRoute)
             },
             onDeleteAccount = {
                 // TODO: Implement delete account functionality
@@ -296,6 +300,40 @@ object SettingsScreenRoute : Screen {
             onSignOut = {
                 // Navigate to login screen after logout
                 // The MainActivity will handle this based on isLoggedIn state
+            }
+        )
+    }
+}
+
+object EditProfileScreenRoute : Screen {
+    private fun readResolve(): Any = EditProfileScreenRoute
+
+    @Composable
+    override fun Content() {
+        val navigator = LocalNavigator.currentOrThrow
+        val topBarState = LocalAppTopBarState.current
+        val authViewModel: AuthViewModel = LocalAuthViewModel.current ?: viewModel()
+        val editProfileTitle = stringResource(R.string.edit_profile)
+
+        // Load user profile when screen appears
+        LaunchedEffect(Unit) {
+            authViewModel.loadUserProfile(force = true)
+        }
+
+        LaunchedEffect(editProfileTitle) {
+            topBarState.value = AppTopBarConfig(
+                title = editProfileTitle,
+                showBack = true,
+                onBack = { navigator.pop() },
+                trailingContent = null
+            )
+        }
+
+        EditProfileScreenContent(
+            authViewModel = authViewModel,
+            onBackClick = { navigator.pop() },
+            onNavigateToProfile = {
+                navigator.replaceAll(ProfileScreenRoute)
             }
         )
     }
