@@ -3,9 +3,17 @@ package com.example.moviestime.ui.screens
 
 import android.Manifest
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Explore
@@ -15,9 +23,6 @@ import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
@@ -32,9 +37,16 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.navigator.CurrentScreen
 import cafe.adriel.voyager.navigator.Navigator
 import com.example.moviestime.ui.navigation.DiscoverScreenRoute
@@ -97,9 +109,9 @@ fun MoviesApp(
 
             LaunchedEffect(selectedTabState.selectedTab) {
                 when (selectedTabState.selectedTab) {
-                    0 -> navigator.replace(HomeScreenRoute)
-                    1 -> navigator.replace(DiscoverScreenRoute)
-                    2 -> navigator.replace(ProfileScreenRoute)
+                    0 -> navigator.replaceAll(HomeScreenRoute)
+                    1 -> navigator.replaceAll(DiscoverScreenRoute)
+                    2 -> navigator.replaceAll(ProfileScreenRoute)
                 }
             }
 
@@ -142,47 +154,106 @@ fun MoviesApp(
                         ),
                     )
                 },
-                bottomBar = {
-                    NavigationBar(
-                        containerColor = Color.Black.copy(alpha = 0.7f)
-                    ) {
-                        tabs.forEachIndexed { index, title ->
-                            NavigationBarItem(
-                                icon = {
-                                    Icon(
-                                        icons[index],
-                                        contentDescription = title,
-                                        tint = if (selectedTabState.selectedTab == index) androidx.compose.material3.MaterialTheme.colorScheme.primary else Color.White.copy(
-                                            alpha = 0.7f
-                                        )
-                                    )
-                                },
-                                label = {
-                                    Text(
-                                        title,
-                                        color = if (selectedTabState.selectedTab == index) androidx.compose.material3.MaterialTheme.colorScheme.primary else Color.White.copy(
-                                            alpha = 0.7f
-                                        )
-                                    )
-                                },
-                                selected = selectedTabState.selectedTab == index,
-                                onClick = { mainViewModel.selectTab(index) },
-                                colors = NavigationBarItemDefaults.colors(
-                                    indicatorColor = Color.White.copy(alpha = 0.2f)
-                                )
-                            )
-                        }
-                    }
-                },
                 containerColor = Color.Transparent
             ) { padding ->
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
                         .background(androidx.compose.material3.MaterialTheme.colorScheme.background)
-                        .padding(padding)
+                        .padding(
+                            top = padding.calculateTopPadding(),
+                            start = padding.calculateStartPadding(
+                                LocalLayoutDirection.current
+                            ),
+                            end = padding.calculateEndPadding(
+                                LocalLayoutDirection.current
+                            )
+                        )
                 ) {
                     CurrentScreen()
+                    CinematicBottomBar(
+                        tabs = tabs,
+                        icons = icons,
+                        selectedIndex = selectedTabState.selectedTab,
+                        onSelect = { index ->
+                            if (selectedTabState.selectedTab == index) {
+                                when (index) {
+                                    0 -> navigator.replaceAll(HomeScreenRoute)
+                                    1 -> navigator.replaceAll(DiscoverScreenRoute)
+                                    2 -> navigator.replaceAll(ProfileScreenRoute)
+                                }
+                            } else {
+                                mainViewModel.selectTab(index)
+                            }
+                        },
+                        modifier = Modifier.align(Alignment.BottomCenter)
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun CinematicBottomBar(
+    tabs: List<String>,
+    icons: List<androidx.compose.ui.graphics.vector.ImageVector>,
+    selectedIndex: Int,
+    onSelect: (Int) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val scheme = androidx.compose.material3.MaterialTheme.colorScheme
+    val containerShape = RoundedCornerShape(26.dp)
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(start = 0.dp, end = 0.dp, bottom = 10.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth(.92f)
+                .clip(containerShape)
+                .shadow(24.dp, containerShape, clip = false)
+                .background(scheme.surface)
+                .border(1.dp, Color.White.copy(alpha = 0.08f), containerShape)
+                .padding(horizontal = 8.dp, vertical = 6.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                tabs.forEachIndexed { index, title ->
+                    val selected = index == selectedIndex
+                    Column(
+                        modifier = Modifier
+                            .weight(1f)
+                            .clickable { onSelect(index) }
+                            .padding(vertical = 6.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(46.dp)
+                                .clip(CircleShape)
+                                .background(
+                                    if (selected) scheme.secondary.copy(alpha = 0.18f) else Color.Transparent
+                                ),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = icons[index],
+                                contentDescription = title,
+                                tint = if (selected) scheme.secondary else Color.White.copy(alpha = 0.7f)
+                            )
+                        }
+                        Text(
+                            text = title,
+                            color = if (selected) scheme.secondary else Color.White.copy(alpha = 0.7f),
+                            fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal,
+                            fontSize = 12.sp
+                        )
+                    }
                 }
             }
         }
