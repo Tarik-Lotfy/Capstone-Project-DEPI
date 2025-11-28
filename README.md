@@ -234,9 +234,8 @@ This project is part of a Capstone project for DEPI.
 
 ## 🙏 Acknowledgments
 
+- ENG/ Ahmed Khwaa
 - [The Movie Database (TMDB)](https://www.themoviedb.org/) for movie data API
 - Firebase for backend services
-- All open-source library contributors
-  -ENG/ Ahmed Khwaa
 
 ---
