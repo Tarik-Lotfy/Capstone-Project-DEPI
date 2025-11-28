@@ -16,6 +16,10 @@
     <string name="dark_mode">Dark Mode</string>
     <string name="notifications">Notifications</string>
     <string name="help_support">Help &amp; Support</string>
+    <string name="help_card_about_title">About MoviesTime</string>
+    <string name="help_card_about_desc">MoviesTime curates trending titles, genre-based picks, and editor notes so you can jump straight into the next movie night without digging through endless lists.</string>
+    <string name="help_card_support_prompt">Need help or want to send feedback?</string>
+    <string name="help_card_support_contact">support@moviestime.app • @MoviesTimeApp</string>
     <string name="logout">Logout</string>
     <string name="edit_profile">Edit Profile</string>
     <string name="settings">Settings</string>
@@ -46,9 +50,15 @@
     <!-- Profile & Edit Profile -->
     <string name="reviews">Reviews</string>
     <string name="favorites">Favorites</string>
+    <string name="profile_tab_favorites">Favorites</string>
+    <string name="profile_tab_watched">Watched</string>
+    <string name="profile_tab_watchlist">Watchlist</string>
     <string name="followers">Followers</string>
     <string name="following">Following</string>
     <string name="no_items">No items yet</string>
+    <string name="profile_empty_favorites">No favorites yet</string>
+    <string name="profile_empty_watched">No watched movies yet</string>
+    <string name="profile_empty_watchlist">Your watchlist is empty</string>
     <string name="explore_movies">Explore movies</string>
     <string name="watchlist_empty">Your watchlist is empty</string>
     <string name="add_movies">Add movies now</string>
@@ -57,8 +67,17 @@
     <string name="display_name_desc">Your display name</string>
     <string name="bio">Bio</string>
     <string name="bio_placeholder">Tell us about your love for cinema...</string>
+    <string name="name_placeholder">John Doe</string>
+    <string name="bio_char_count">%1$d/%2$d characters</string>
     <string name="save_changes">Save Changes</string>
     <string name="default_user_name">Movie Lover</string>
+    <string name="profile_initial_placeholder">U</string>
+    <string name="profile_image_cd">Profile image</string>
+    <string name="back_button_cd">Back</string>
+    <string name="settings_button_cd">Open settings</string>
+    <string name="settings_item_arrow_cd">Navigate to details</string>
+    <string name="movie_details_title">Movie Details</string>
+    <string name="trailer_title">Trailer</string>
 
     <!-- Login Screen -->
     <string name="create_account">Create Account</string>

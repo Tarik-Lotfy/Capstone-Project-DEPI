@@ -18,6 +18,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import com.google.firebase.auth.FirebaseAuth.AuthStateListener
+import kotlin.jvm.Volatile
 
 data class UserProfile(
     val name: String = "",
@@ -36,6 +37,8 @@ class AuthViewModel : ViewModel() {
     private val repository = AuthRepository()
     private val auth = FirebaseAuth.getInstance()
     private val db = FirebaseFirestore.getInstance()
+    @Volatile
+    private var isProfileUpdateInProgress = false
 
     private val _uiState = MutableStateFlow(AuthUiState())
     val uiState: StateFlow<AuthUiState> = _uiState.asStateFlow()
@@ -68,7 +71,8 @@ class AuthViewModel : ViewModel() {
         auth.removeAuthStateListener(authStateListener)
     }
 
-    fun loadUserProfile() {
+    fun loadUserProfile(force: Boolean = false) {
+        if (!force && isProfileUpdateInProgress) return
         val user = auth.currentUser ?: return
         viewModelScope.launch {
             try {
@@ -96,6 +100,7 @@ class AuthViewModel : ViewModel() {
             email = user.email ?: _userProfile.value.email,
             photoUrl = user.photoUrl?.toString() ?: _userProfile.value.photoUrl
         )
+        isProfileUpdateInProgress = true
         _uiState.value = AuthUiState(isUpdateSuccess = true)
 
         viewModelScope.launch {
@@ -117,6 +122,10 @@ class AuthViewModel : ViewModel() {
                 }
             } catch (e: Exception) {
                 Log.e("AuthViewModel", "Error updating profile", e)
+                _uiState.value = AuthUiState(error = "Failed to update profile: ${e.message}")
+            } finally {
+                isProfileUpdateInProgress = false
+                loadUserProfile(force = true)
             }
         }
     }

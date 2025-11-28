@@ -15,6 +15,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -22,6 +23,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.example.moviestime.R
 import com.example.moviestime.ui.components.*
 import com.example.moviestime.ui.navigation.MovieDetailsScreenRoute
 import com.example.moviestime.ui.navigation.SeeAllCategory
@@ -41,17 +43,19 @@ object HomeScreen : Screen {
         val topBarState = LocalAppTopBarState.current
         val homeViewModel: HomeViewModel = viewModel()
         val mainViewModel: MainViewModel = viewModel()
+        val appTitle = stringResource(R.string.app_name)
+        val settingsCd = stringResource(R.string.settings_button_cd)
 
-        LaunchedEffect(Unit) {
+        LaunchedEffect(appTitle) {
             topBarState.value = AppTopBarConfig(
-                title = "CineVault",
+                title = appTitle,
                 showBack = false,
                 onBack = null,
                 trailingContent = {
                     IconButton(onClick = { navigator.push(SettingsScreenRoute) }) {
                         Icon(
                             imageVector = Icons.Outlined.Settings,
-                            contentDescription = "Settings",
+                            contentDescription = settingsCd,
                             tint = Color.White
                         )
                     }
@@ -79,6 +83,10 @@ fun HomeScreenContent(
     val topRated by homeViewModel.topRated.collectAsState()
     val nowPlaying by homeViewModel.nowPlaying.collectAsState()
     val upcoming by homeViewModel.upcoming.collectAsState()
+    val nowPlayingLabel = stringResource(R.string.now_playing)
+    val popularLabel = stringResource(R.string.popular)
+    val topRatedLabel = stringResource(R.string.top_rated)
+    val upcomingLabel = stringResource(R.string.upcoming)
 
     val isLoading = popular.isEmpty() && topRated.isEmpty() && nowPlaying.isEmpty() && upcoming.isEmpty()
 
@@ -92,7 +100,7 @@ fun HomeScreenContent(
         ) {
             item {
                 Text(
-                    text = "Now Playing",
+                    text = nowPlayingLabel,
                     style = MaterialTheme.typography.headlineMedium,
                     color = MaterialTheme.colorScheme.onBackground
                 )
@@ -105,7 +113,7 @@ fun HomeScreenContent(
             }
 
             item {
-                SectionTitleWithSeeAll("Popular")
+                SectionTitleWithSeeAll(popularLabel)
                 Spacer(Modifier.height(8.dp))
             }
             items((0..7).chunked(2)) { row ->
@@ -125,7 +133,7 @@ fun HomeScreenContent(
             }
 
             item {
-                SectionTitleWithSeeAll(" Top Rated")
+                SectionTitleWithSeeAll(topRatedLabel)
                 Spacer(Modifier.height(8.dp))
                 LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     items(5) {
@@ -135,7 +143,7 @@ fun HomeScreenContent(
             }
 
             item {
-                SectionTitleWithSeeAll(" Upcoming")
+                SectionTitleWithSeeAll(upcomingLabel)
                 Spacer(Modifier.height(8.dp))
                 LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     items(5) {
@@ -170,7 +178,7 @@ fun HomeScreenContent(
             ) {
                 item {
                     Text(
-                        text = "Now Playing",
+                        text = nowPlayingLabel,
                         style = MaterialTheme.typography.headlineMedium,
                         color = MaterialTheme.colorScheme.onBackground
                     )
@@ -198,13 +206,13 @@ fun HomeScreenContent(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                "Popular",
+                                popularLabel,
                                 style = MaterialTheme.typography.headlineMedium,
                                 color = MaterialTheme.colorScheme.onBackground
                             )
                             TextButton(onClick = { onSeeAllClick(SeeAllCategory.POPULAR) }) {
                                 Text(
-                                    "See All",
+                                    stringResource(R.string.see_all),
                                     color = MaterialTheme.colorScheme.primary
                                 )
                             }
@@ -245,13 +253,13 @@ fun HomeScreenContent(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = "Top Rated",
+                            text = topRatedLabel,
                             style = MaterialTheme.typography.headlineMedium,
                             color = MaterialTheme.colorScheme.onBackground
                         )
                         TextButton(onClick = { onSeeAllClick(SeeAllCategory.TOP_RATED) }) {
                             Text(
-                                "See All",
+                                stringResource(R.string.see_all),
                                 color = MaterialTheme.colorScheme.primary
                             )
                         }
@@ -278,13 +286,13 @@ fun HomeScreenContent(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = "Upcoming",
+                            text = upcomingLabel,
                             style = MaterialTheme.typography.headlineMedium,
                             color = MaterialTheme.colorScheme.onBackground
                         )
                         TextButton(onClick = { onSeeAllClick(SeeAllCategory.UPCOMING) }) {
                             Text(
-                                "See All",
+                                stringResource(R.string.see_all),
                                 color = MaterialTheme.colorScheme.primary
                             )
                         }
@@ -310,6 +318,7 @@ fun HomeScreenContent(
 
 @Composable
 fun SectionTitleWithSeeAll(title: String, onClick: () -> Unit = {}) {
+    val seeAllLabel = stringResource(R.string.see_all)
     Row(
         Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -322,7 +331,7 @@ fun SectionTitleWithSeeAll(title: String, onClick: () -> Unit = {}) {
         )
         TextButton(onClick = onClick) {
             Text(
-                "See All",
+                seeAllLabel,
                 color = MaterialTheme.colorScheme.primary
             )
         }

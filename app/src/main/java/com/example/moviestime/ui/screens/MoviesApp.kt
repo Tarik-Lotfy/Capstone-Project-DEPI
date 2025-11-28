@@ -49,9 +49,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.navigator.CurrentScreen
 import cafe.adriel.voyager.navigator.Navigator
+import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.moviestime.R
 import com.example.moviestime.ui.navigation.DiscoverScreenRoute
 import com.example.moviestime.ui.navigation.HomeScreenRoute
 import com.example.moviestime.ui.navigation.ProfileScreenRoute
+import com.example.moviestime.viewmodel.AuthViewModel
 import com.example.moviestime.viewmodel.LanguageViewModel
 import com.example.moviestime.viewmodel.MainViewModel
 import com.example.moviestime.viewmodel.ThemeViewModel
@@ -79,6 +83,8 @@ val LocalThemeViewModel = compositionLocalOf<ThemeViewModel> {
     error("ThemeViewModel not provided")
 }
 
+val LocalAuthViewModel = compositionLocalOf<AuthViewModel?> { null }
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MoviesApp(
@@ -87,13 +93,19 @@ fun MoviesApp(
     languageViewModel: LanguageViewModel
 ) {
     val selectedTabState by mainViewModel.uiState.collectAsState()
-    val tabs = listOf("Home", "Discover", "Profile")
+    val tabLabels = listOf(
+        stringResource(R.string.home),
+        stringResource(R.string.discover),
+        stringResource(R.string.profile)
+    )
     val icons = listOf(Icons.Default.Home, Icons.Default.Explore, Icons.Default.Person)
+    val appTitle = stringResource(R.string.app_name)
+    val authViewModel: AuthViewModel = viewModel()
 
-    val topBarState = remember {
+    val topBarState = remember(appTitle) {
         mutableStateOf(
             AppTopBarConfig(
-                title = "CineVault",
+                title = appTitle,
                 showBack = false
             )
         )
@@ -103,7 +115,8 @@ fun MoviesApp(
         LocalAppTopBarState provides topBarState,
         LocalMainViewModel provides mainViewModel,
         LocalLanguageViewModel provides languageViewModel,
-        LocalThemeViewModel provides themeViewModel
+        LocalThemeViewModel provides themeViewModel,
+        LocalAuthViewModel provides authViewModel
     ) {
         Navigator(HomeScreenRoute) { navigator ->
 
@@ -128,11 +141,12 @@ fun MoviesApp(
                             )
                         },
                         navigationIcon = {
+                            val backCd = stringResource(R.string.back_button_cd)
                             if (canPop && config.onBack != null) {
                                 IconButton(onClick = config.onBack) {
                                     Icon(
                                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                        contentDescription = "Back",
+                                        contentDescription = backCd,
                                         tint = Color.White
                                     )
                                 }
@@ -140,7 +154,7 @@ fun MoviesApp(
                                 IconButton(onClick = { navigator.pop() }) {
                                     Icon(
                                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                        contentDescription = "Back",
+                                        contentDescription = backCd,
                                         tint = Color.White
                                     )
                                 }
@@ -172,7 +186,7 @@ fun MoviesApp(
                 ) {
                     CurrentScreen()
                     CinematicBottomBar(
-                        tabs = tabs,
+                        tabs = tabLabels,
                         icons = icons,
                         selectedIndex = selectedTabState.selectedTab,
                         onSelect = { index ->

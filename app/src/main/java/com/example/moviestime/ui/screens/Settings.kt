@@ -1,5 +1,4 @@
 package com.example.moviestime.ui.screens
-
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -34,15 +33,14 @@ import com.example.moviestime.ui.theme.PlayFair
 import com.example.moviestime.viewmodel.AuthViewModel
 import com.example.moviestime.viewmodel.LanguageViewModel
 import com.example.moviestime.viewmodel.ThemeViewModel
-
 object SettingsScreen : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val topBarState = LocalAppTopBarState.current
-        val authViewModel: AuthViewModel = viewModel()
-        val languageViewModel: LanguageViewModel = viewModel()
-        val themeViewModel: ThemeViewModel = viewModel()
+        val authViewModel: AuthViewModel = LocalAuthViewModel.current ?: viewModel()
+        val languageViewModel: LanguageViewModel = LocalLanguageViewModel.current
+        val themeViewModel: ThemeViewModel = LocalThemeViewModel.current
         val title = stringResource(R.string.settings)
 
         LaunchedEffect(title) {
@@ -67,9 +65,9 @@ object SettingsScreen : Screen {
 
 @Composable
 fun SettingsScreenContent(
-    authViewModel: AuthViewModel = viewModel(),
-    languageViewModel: LanguageViewModel = viewModel(),
-    themeViewModel: ThemeViewModel = viewModel(),
+    authViewModel: AuthViewModel,
+    languageViewModel: LanguageViewModel,
+    themeViewModel: ThemeViewModel,
     onEditProfile: () -> Unit = {},
     onDeleteAccount: () -> Unit = {},
     onSignOut: () -> Unit = {}
@@ -85,10 +83,18 @@ fun SettingsScreenContent(
         modifier = Modifier
             .fillMaxSize()
             .background(backgroundColor)
-            .padding(horizontal = 8.dp)
-            .padding(bottom = 100.dp)
+            .padding(16.dp)
             .verticalScroll(rememberScrollState())
     ) {
+        // --- Header ---
+        Text(
+            text = stringResource(R.string.settings),
+            fontFamily = PlayFair,
+            fontWeight = FontWeight.Bold,
+            fontSize = 26.sp,
+            color = textColor,
+            modifier = Modifier.padding(top = 12.dp, bottom = 24.dp)
+        )
 
         // --- Account Section ---
         SectionHeader(title = stringResource(R.string.account_section), color = mutedColor)
@@ -109,7 +115,7 @@ fun SettingsScreenContent(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 8.dp, vertical = 18.dp),
+                    .padding(horizontal = 16.dp, vertical = 18.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
@@ -141,7 +147,7 @@ fun SettingsScreenContent(
             HorizontalDivider(
                 color = Color.White.copy(alpha = 0.05f),
                 thickness = 1.dp,
-                modifier = Modifier.padding(horizontal = 8.dp)
+                modifier = Modifier.padding(horizontal = 16.dp)
             )
             SettingsItem(
                 icon = Icons.Outlined.Notifications,
@@ -247,7 +253,7 @@ fun SettingsItem(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 8.dp, vertical = 18.dp),
+                .padding(horizontal = 16.dp, vertical = 18.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
@@ -269,7 +275,7 @@ fun SettingsItem(
             }
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                contentDescription = "Arrow",
+                contentDescription = stringResource(R.string.settings_item_arrow_cd),
                 tint = textColor.copy(alpha = 0.3f)
             )
         }
@@ -277,7 +283,7 @@ fun SettingsItem(
             HorizontalDivider(
                 color = Color.White.copy(alpha = 0.05f),
                 thickness = 1.dp,
-                modifier = Modifier.padding(horizontal = 8.dp)
+                modifier = Modifier.padding(horizontal = 16.dp)
             )
         }
     }
@@ -298,7 +304,7 @@ fun SettingsButton(
             .border(1.dp, borderColor, RoundedCornerShape(16.dp))
             .clip(RoundedCornerShape(16.dp))
             .clickable { onClick() }
-            .padding(horizontal = 8.dp),
+            .padding(horizontal = 16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
@@ -364,7 +370,7 @@ fun HelpFeedbackCard(
         if (isExpanded) {
             Spacer(Modifier.height(12.dp))
             Text(
-                text = "About MoviesTime",
+                text = stringResource(R.string.help_card_about_title),
                 fontFamily = PlayFair,
                 fontWeight = FontWeight.Bold,
                 fontSize = 16.sp,
@@ -372,7 +378,7 @@ fun HelpFeedbackCard(
             )
             Spacer(Modifier.height(8.dp))
             Text(
-                text = "MoviesTime curates trending titles, genre-based picks, and editor notes so you can jump straight into the next movie night without digging through endless lists.",
+                text = stringResource(R.string.help_card_about_desc),
                 fontFamily = Inter,
                 fontSize = 14.sp,
                 color = mutedColor,
@@ -380,7 +386,7 @@ fun HelpFeedbackCard(
             )
             Spacer(Modifier.height(12.dp))
             Text(
-                text = "Need help or want to send feedback?",
+                text = stringResource(R.string.help_card_support_prompt),
                 fontFamily = Inter,
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 14.sp,
@@ -388,7 +394,7 @@ fun HelpFeedbackCard(
             )
             Spacer(Modifier.height(4.dp))
             Text(
-                text = "support@moviestime.app • @MoviesTimeApp",
+                text = stringResource(R.string.help_card_support_contact),
                 fontFamily = Inter,
                 fontSize = 14.sp,
                 color = mutedColor
