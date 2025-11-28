@@ -14,7 +14,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.moviestime.ui.screens.LoginScreenContent
 import com.example.moviestime.ui.screens.MoviesApp
 import com.example.moviestime.ui.screens.OnboardingScreen
+import com.example.moviestime.ui.screens.SplashScreen
 import com.example.moviestime.ui.theme.MovieMiniTheme
+import kotlinx.coroutines.delay
 import com.example.moviestime.viewmodel.AuthViewModel
 import com.example.moviestime.viewmodel.LanguageViewModel
 import com.example.moviestime.viewmodel.MainViewModel
@@ -74,26 +76,38 @@ class MainActivity : ComponentActivity() {
             ) {
                 val authViewModel: AuthViewModel = viewModel()
                 val isLoggedIn by authViewModel.isLoggedIn.collectAsState()
+                
+                var showSplash by remember { mutableStateOf(true) }
 
-                when {
-                    !hasSeenOnboarding -> {
-                        OnboardingScreen(
-                            onFinish = {
-                                prefs.edit().putBoolean("has_seen_onboarding", true).apply()
-                                hasSeenOnboarding = true
-                            }
-                        )
-                    }
-                    !isLoggedIn -> {
-                        LoginScreenContent(authViewModel = authViewModel)
-                    }
-                    else -> {
-                        val mainViewModel: MainViewModel = viewModel { MainViewModel(application) }
-                        MoviesApp(
-                            mainViewModel = mainViewModel,
-                            themeViewModel = themeViewModel,
-                            languageViewModel = languageViewModel,
-                        )
+                // Show medieval splash screen for 3 seconds
+                LaunchedEffect(Unit) {
+                    delay(3000)
+                    showSplash = false
+                }
+
+                if (showSplash) {
+                    SplashScreen()
+                } else {
+                    when {
+                        !hasSeenOnboarding -> {
+                            OnboardingScreen(
+                                onFinish = {
+                                    prefs.edit().putBoolean("has_seen_onboarding", true).apply()
+                                    hasSeenOnboarding = true
+                                }
+                            )
+                        }
+                        !isLoggedIn -> {
+                            LoginScreenContent(authViewModel = authViewModel)
+                        }
+                        else -> {
+                            val mainViewModel: MainViewModel = viewModel { MainViewModel(application) }
+                            MoviesApp(
+                                mainViewModel = mainViewModel,
+                                themeViewModel = themeViewModel,
+                                languageViewModel = languageViewModel,
+                            )
+                        }
                     }
                 }
             }

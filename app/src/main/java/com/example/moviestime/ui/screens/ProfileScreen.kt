@@ -134,16 +134,6 @@ fun ProfileScreenContent(
             )
         }
 
-        if (userProfile.email.isNotEmpty()) {
-            Spacer(Modifier.height(4.dp))
-            Text(
-                text = userProfile.email,
-                fontFamily = Inter,
-                fontSize = 12.sp,
-                color = mutedColor.copy(alpha = 0.7f),
-                textAlign = TextAlign.Center
-            )
-        }
 
         Spacer(Modifier.height(24.dp))
 

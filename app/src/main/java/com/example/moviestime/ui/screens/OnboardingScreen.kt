@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.moviestime.R
@@ -32,6 +33,11 @@ data class OnboardingPage(
     val title: String,
     val description: String
 )
+@Preview
+@Composable
+fun OnboardingScreenPreview() {
+    OnboardingScreen(onFinish = {})
+}
 
 @Composable
 fun OnboardingScreen(
