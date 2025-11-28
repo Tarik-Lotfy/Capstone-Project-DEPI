@@ -23,6 +23,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -47,18 +48,19 @@ object ProfileScreen : Screen {
         val navigator = LocalNavigator.currentOrThrow
         val topBarState = LocalAppTopBarState.current
         val mainViewModel = LocalMainViewModel.current
-        val authViewModel: AuthViewModel = viewModel()
+        val authViewModel: AuthViewModel = LocalAuthViewModel.current ?: viewModel()
+        val profileTitle = stringResource(R.string.profile)
 
-        LaunchedEffect(Unit) {
+        LaunchedEffect(profileTitle) {
             topBarState.value = AppTopBarConfig(
-                title = "Profile",
+                title = profileTitle,
                 showBack = false,
                 onBack = null,
                 trailingContent = {
                     IconButton(onClick = { navigator.push(SettingsScreenRoute) }) {
                         Icon(
                             imageVector = Icons.Outlined.Settings,
-                            contentDescription = "Settings",
+                            contentDescription = stringResource(R.string.settings_button_cd),
                             tint = Color.White
                         )
                     }
@@ -102,7 +104,10 @@ fun ProfileScreenContent(
     val goldColor = colorResource(R.color.secondary)
 
     var selectedTabIndex by remember { mutableIntStateOf(0) }
-    val tabs = listOf("Favorites", "Watched", "Watchlist")
+    val favoritesTab = stringResource(R.string.profile_tab_favorites)
+    val watchedTab = stringResource(R.string.profile_tab_watched)
+    val watchlistTab = stringResource(R.string.profile_tab_watchlist)
+    val tabs = listOf(favoritesTab, watchedTab, watchlistTab)
     val pagerState = rememberPagerState(initialPage = selectedTabIndex, pageCount = { tabs.size })
 
     LaunchedEffect(selectedTabIndex) {
@@ -112,9 +117,10 @@ fun ProfileScreenContent(
         selectedTabIndex = pagerState.currentPage
     }
 
-    val displayName = userProfile.name.ifEmpty { "Movie Lover" }
-    val initials = if (displayName.isNotEmpty()) displayName.take(1).uppercase() else "U"
-    val username = if (userProfile.email.isNotEmpty()) userProfile.email.substringBefore("@") else displayName.lowercase()
+    val defaultName = stringResource(R.string.default_user_name)
+    val displayName = userProfile.name.ifEmpty { defaultName }
+    val initials = if (displayName.isNotEmpty()) displayName.take(1).uppercase()
+    else stringResource(R.string.profile_initial_placeholder)
 
     Column(
         modifier = Modifier
@@ -135,7 +141,7 @@ fun ProfileScreenContent(
             if (userProfile.photoUrl != null && userProfile.photoUrl!!.isNotEmpty()) {
                 AsyncImage(
                     model = userProfile.photoUrl,
-                    contentDescription = "Profile",
+                    contentDescription = stringResource(R.string.profile_image_cd),
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .fillMaxSize()
@@ -192,9 +198,9 @@ fun ProfileScreenContent(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            ProfileStat(number = "${favorites.size}", label = "Favorites", textColor, mutedColor)
-            ProfileStat(number = "${watchlist.size}", label = "Watchlist", textColor, mutedColor)
-            ProfileStat(number = "${watched.size}", label = "Watched", textColor, mutedColor)
+            ProfileStat(number = "${favorites.size}", label = favoritesTab, numberColor = textColor, labelColor = mutedColor)
+            ProfileStat(number = "${watchlist.size}", label = watchlistTab, numberColor = textColor, labelColor = mutedColor)
+            ProfileStat(number = "${watched.size}", label = watchedTab, numberColor = textColor, labelColor = mutedColor)
         }
 
         Spacer(Modifier.height(24.dp))
@@ -211,7 +217,7 @@ fun ProfileScreenContent(
             )
         ) {
             Text(
-                text = "Edit Profile",
+                text = stringResource(R.string.edit_profile),
                 fontFamily = Inter,
                 fontWeight = FontWeight.SemiBold,
                 color = textColor
@@ -262,16 +268,16 @@ fun ProfileScreenContent(
                 else -> emptyList()
             }
             val message = when (page) {
-                0 -> "No favorites yet"
-                1 -> "No watched movies yet"
-                2 -> "Your watchlist is empty"
-                else -> "No items yet"
+                0 -> stringResource(R.string.profile_empty_favorites)
+                1 -> stringResource(R.string.profile_empty_watched)
+                2 -> stringResource(R.string.profile_empty_watchlist)
+                else -> stringResource(R.string.no_items)
             }
 
             if (list.isEmpty()) {
                 EmptyTabState(
                     message = message,
-                    actionText = "Explore movies",
+                    actionText = stringResource(R.string.explore_movies),
                     mutedColor = mutedColor,
                     goldColor = goldColor,
                     onExploreClick = { mainViewModel.selectTab(1) }

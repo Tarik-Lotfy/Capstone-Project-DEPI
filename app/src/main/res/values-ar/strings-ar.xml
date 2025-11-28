@@ -16,6 +16,10 @@
     <string name="dark_mode">الوضع الليلي</string>
     <string name="notifications">الإشعارات</string>
     <string name="help_support">المساعدة والدعم</string>
+    <string name="help_card_about_title">عن MoviesTime</string>
+    <string name="help_card_about_desc">يُقدم MoviesTime أبرز الأعمال الرائجة، وتوصيات بحسب النوع، وملاحظات المحررين لتنتقل مباشرة إلى فيلمك التالي دون البحث في قوائم لا تنتهي.</string>
+    <string name="help_card_support_prompt">تحتاج مساعدة أو تريد إرسال ملاحظات؟</string>
+    <string name="help_card_support_contact">support@moviestime.app • @MoviesTimeApp</string>
     <string name="logout">تسجيل الخروج</string>
     <string name="edit_profile">تعديل الملف</string>
     <string name="settings">الإعدادات</string>
@@ -39,14 +43,22 @@
     <string name="preferences_section">التفضيلات</string>
     <string name="privacy">الخصوصية</string>
     <string name="support_section">الدعم</string>
+    <string name="tap_to_expand">اضغط للتوسيع</string>
+    <string name="tap_to_hide">اضغط للإخفاء</string>
     <string name="delete_account">حذف الحساب</string>
 
     <!-- Profile & Edit Profile -->
     <string name="reviews">المراجعات</string>
     <string name="favorites">المفضلة</string>
+    <string name="profile_tab_favorites">المفضلة</string>
+    <string name="profile_tab_watched">تمت مشاهدتها</string>
+    <string name="profile_tab_watchlist">قائمة المشاهدة</string>
     <string name="followers">المتابعين</string>
     <string name="following">المتابَعين</string>
     <string name="no_items">لا توجد عناصر بعد</string>
+    <string name="profile_empty_favorites">لا توجد عناصر مفضلة بعد</string>
+    <string name="profile_empty_watched">لا توجد أفلام تمت مشاهدتها بعد</string>
+    <string name="profile_empty_watchlist">قائمة المشاهدة فارغة</string>
     <string name="explore_movies">استكشف الأفلام</string>
     <string name="watchlist_empty">قائمة المشاهدة فارغة</string>
     <string name="add_movies">أضف أفلاماً الآن</string>
@@ -55,8 +67,17 @@
     <string name="display_name_desc">اسم العرض الخاص بك</string>
     <string name="bio">نبذة</string>
     <string name="bio_placeholder">أخبرنا عن حبك للسينما...</string>
+    <string name="name_placeholder">جون دو</string>
+    <string name="bio_char_count">%1$d/%2$d حرف</string>
     <string name="save_changes">حفظ التغييرات</string>
     <string name="default_user_name">عاشق السينما</string>
+    <string name="profile_initial_placeholder">س</string>
+    <string name="profile_image_cd">صورة الملف الشخصي</string>
+    <string name="back_button_cd">رجوع</string>
+    <string name="settings_button_cd">فتح الإعدادات</string>
+    <string name="settings_item_arrow_cd">الانتقال إلى التفاصيل</string>
+    <string name="movie_details_title">تفاصيل الفيلم</string>
+    <string name="trailer_title">الإعلان</string>
 
     <!-- Login Screen -->
     <string name="create_account">إنشاء حساب</string>

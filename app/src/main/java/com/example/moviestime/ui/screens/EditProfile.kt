@@ -11,7 +11,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -31,6 +30,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import coil.compose.AsyncImage
 import com.example.moviestime.R
+import com.example.moviestime.ui.navigation.ProfileScreenRoute
 import com.example.moviestime.ui.theme.Inter
 import com.example.moviestime.ui.theme.PlayFair
 import com.example.moviestime.viewmodel.AuthViewModel
@@ -41,8 +41,7 @@ class EditProfileScreen : Screen {
         val navigator = LocalNavigator.currentOrThrow
         val topBarState = LocalAppTopBarState.current
         val title = stringResource(R.string.edit_profile)
-        // Fix: Use standard viewModel() to avoid unresolved reference errors
-        val authViewModel: AuthViewModel = viewModel()
+        val authViewModel: AuthViewModel = LocalAuthViewModel.current ?: viewModel()
 
         LaunchedEffect(Unit) {
             topBarState.value = AppTopBarConfig(
@@ -57,7 +56,10 @@ class EditProfileScreen : Screen {
 
         EditProfileScreenContent(
             authViewModel = authViewModel,
-            onBackClick = { navigator.pop() }
+            onBackClick = { navigator.pop() },
+            onNavigateToProfile = {
+                navigator.replaceAll(ProfileScreenRoute)
+            }
         )
     }
 }
@@ -65,7 +67,8 @@ class EditProfileScreen : Screen {
 @Composable
 fun EditProfileScreenContent(
     authViewModel: AuthViewModel,
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    onNavigateToProfile: () -> Unit = onBackClick
 ) {
     val userProfile by authViewModel.userProfile.collectAsState()
     val uiState by authViewModel.uiState.collectAsState()
@@ -89,7 +92,7 @@ fun EditProfileScreenContent(
         if (uiState.isUpdateSuccess) {
             Toast.makeText(context, successMsg, Toast.LENGTH_SHORT).show()
             authViewModel.resetState()
-            onBackClick()
+            onNavigateToProfile()
         }
     }
 
@@ -110,7 +113,8 @@ fun EditProfileScreenContent(
             Spacer(Modifier.height(16.dp))
 
             AvatarSection(
-                initials = if (fullName.isNotEmpty()) fullName.take(1).uppercase() else "U",
+                initials = if (fullName.isNotEmpty()) fullName.take(1).uppercase()
+                else stringResource(R.string.profile_initial_placeholder),
                 imageUrl = userProfile.photoUrl,
                 goldColor = goldColor,
                 primaryColor = primaryColor,
@@ -142,7 +146,7 @@ fun EditProfileScreenContent(
                     value = fullName,
                     onValueChange = { fullName = it },
                     label = stringResource(R.string.name),
-                    placeholder = "John Doe",
+                    placeholder = stringResource(R.string.name_placeholder),
                     supportingText = stringResource(R.string.display_name_desc),
                     cardColor = cardColor,
                     textColor = textColor,
@@ -163,6 +167,7 @@ fun EditProfileScreenContent(
                 )
 
                 val isSaveEnabled = fullName.isNotBlank() && (fullName != userProfile.name || bio != userProfile.bio)
+                val isSaving = uiState.isLoading
 
                 Button(
                     onClick = {
@@ -179,15 +184,23 @@ fun EditProfileScreenContent(
                         containerColor = primaryColor,
                         contentColor = textColor
                     ),
-                    enabled = isSaveEnabled
+                    enabled = isSaveEnabled && !isSaving
                 ) {
-                    Text(
-                        text = stringResource(R.string.save_changes),
-                        fontFamily = Inter,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp,
-                        color = textColor
-                    )
+                    if (isSaving) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(24.dp),
+                            color = textColor,
+                            strokeWidth = 2.dp
+                        )
+                    } else {
+                        Text(
+                            text = stringResource(R.string.save_changes),
+                            fontFamily = Inter,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 16.sp,
+                            color = textColor
+                        )
+                    }
                 }
             }
         }
@@ -211,7 +224,7 @@ fun ProfileScreenTopBar(title: String, onBackClick: () -> Unit) {
         ) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = "Back",
+                contentDescription = stringResource(R.string.back_button_cd),
                 tint = textColor,
                 modifier = Modifier.size(24.dp)
             )
@@ -250,7 +263,7 @@ fun AvatarSection(
             if (imageUrl != null) {
                 AsyncImage(
                     model = imageUrl,
-                    contentDescription = "Profile",
+                    contentDescription = stringResource(R.string.profile_image_cd),
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .fillMaxSize()
@@ -356,7 +369,7 @@ fun EditProfileBioField(
             ),
             supportingText = {
                 Text(
-                    text = "${value.length}/$maxBioLength characters",
+                    text = stringResource(R.string.bio_char_count, value.length, maxBioLength),
                     fontFamily = Inter,
                     fontSize = 12.sp,
                     color = mutedColor,

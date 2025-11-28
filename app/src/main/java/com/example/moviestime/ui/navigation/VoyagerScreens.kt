@@ -11,10 +11,12 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.example.moviestime.R
 import com.example.moviestime.data.model.Movie
 import com.example.moviestime.ui.screens.AppTopBarConfig
 import com.example.moviestime.ui.screens.DiscoverScreen
@@ -23,6 +25,7 @@ import com.example.moviestime.ui.screens.LocalAppTopBarState
 import com.example.moviestime.ui.screens.LocalMainViewModel
 import com.example.moviestime.ui.screens.LocalLanguageViewModel
 import com.example.moviestime.ui.screens.LocalThemeViewModel
+import com.example.moviestime.ui.screens.LocalAuthViewModel
 import com.example.moviestime.ui.screens.LoginScreenContent
 import com.example.moviestime.ui.screens.MovieDetailsScreen
 import com.example.moviestime.ui.screens.ProfileScreenContent
@@ -52,17 +55,19 @@ object HomeScreenRoute : Screen {
         val topBarState = LocalAppTopBarState.current
         val homeViewModel: HomeViewModel = viewModel()
         val mainViewModel = LocalMainViewModel.current
+        val appTitle = stringResource(R.string.app_name)
+        val settingsCd = stringResource(R.string.settings_button_cd)
 
-        LaunchedEffect(Unit) {
+        LaunchedEffect(appTitle) {
             topBarState.value = AppTopBarConfig(
-                title = "CineVault",
+                title = appTitle,
                 showBack = false,
                 onBack = null,
                 trailingContent = {
                     IconButton(onClick = { navigator.push(SettingsScreenRoute) }) {
                         Icon(
                             imageVector = Icons.Outlined.Settings,
-                            contentDescription = "Settings",
+                            contentDescription = settingsCd,
                             tint = Color.White
                         )
                     }
@@ -92,11 +97,13 @@ object DiscoverScreenRoute : Screen {
         val topBarState = LocalAppTopBarState.current
         val searchViewModel: SearchViewModel = viewModel()
         val query by searchViewModel.searchQuery.collectAsState()
+        val discoverTitle = stringResource(R.string.discover)
+        val searchingTitle = stringResource(R.string.searching)
         
         val isSearchTyping = query.isNotEmpty()
-        val title = if (isSearchTyping) "Searching..." else "Discover"
+        val title = if (isSearchTyping) searchingTitle else discoverTitle
 
-        LaunchedEffect(query) {
+        LaunchedEffect(title) {
             topBarState.value = AppTopBarConfig(
                 title = title,
                 showBack = false,
@@ -122,10 +129,11 @@ object SearchScreenRoute : Screen {
         val navigator = LocalNavigator.currentOrThrow
         val topBarState = LocalAppTopBarState.current
         val searchViewModel: SearchViewModel = viewModel()
+        val discoverTitle = stringResource(R.string.discover)
 
-        LaunchedEffect(Unit) {
+        LaunchedEffect(discoverTitle) {
             topBarState.value = AppTopBarConfig(
-                title = "Discover",
+                title = discoverTitle,
                 showBack = false,
                 onBack = null,
                 trailingContent = null
@@ -149,18 +157,20 @@ object ProfileScreenRoute : Screen {
         val navigator = LocalNavigator.currentOrThrow
         val topBarState = LocalAppTopBarState.current
         val mainViewModel = LocalMainViewModel.current
-        val authViewModel: AuthViewModel = viewModel()
+        val authViewModel: AuthViewModel = LocalAuthViewModel.current ?: viewModel()
+        val profileTitle = stringResource(R.string.profile)
+        val settingsCd = stringResource(R.string.settings_button_cd)
 
-        LaunchedEffect(Unit) {
+        LaunchedEffect(profileTitle) {
             topBarState.value = AppTopBarConfig(
-                title = "Profile",
+                title = profileTitle,
                 showBack = false,
                 onBack = null,
                 trailingContent = {
                     IconButton(onClick = { navigator.push(SettingsScreenRoute) }) {
                         Icon(
                             imageVector = Icons.Outlined.Settings,
-                            contentDescription = "Settings",
+                            contentDescription = settingsCd,
                             tint = Color.White
                         )
                     }
@@ -191,10 +201,11 @@ data class MovieDetailsScreenRoute(
         val navigator = LocalNavigator.currentOrThrow
         val topBarState = LocalAppTopBarState.current
         val mainViewModel = LocalMainViewModel.current
+        val detailsTitle = stringResource(R.string.movie_details_title)
 
-        LaunchedEffect(Unit) {
+        LaunchedEffect(movieId, detailsTitle) {
             topBarState.value = AppTopBarConfig(
-                title = "Movie Details",
+                title = detailsTitle,
                 showBack = true,
                 onBack = { navigator.pop() },
                 trailingContent = null
@@ -226,13 +237,13 @@ data class SeeAllScreenRoute(
         val navigator = LocalNavigator.currentOrThrow
         val topBarState = LocalAppTopBarState.current
         val homeViewModel: HomeViewModel = viewModel()
+        val title = when (category) {
+            SeeAllCategory.POPULAR -> stringResource(R.string.popular)
+            SeeAllCategory.TOP_RATED -> stringResource(R.string.top_rated)
+            SeeAllCategory.UPCOMING -> stringResource(R.string.upcoming)
+        }
 
-        LaunchedEffect(category) {
-            val title = when (category) {
-                SeeAllCategory.POPULAR -> "Popular"
-                SeeAllCategory.TOP_RATED -> "Top Rated"
-                SeeAllCategory.UPCOMING -> "Upcoming"
-            }
+        LaunchedEffect(title) {
             topBarState.value = AppTopBarConfig(
                 title = title,
                 showBack = true,
@@ -258,13 +269,14 @@ object SettingsScreenRoute : Screen {
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val topBarState = LocalAppTopBarState.current
-        val authViewModel: AuthViewModel = viewModel()
+        val authViewModel: AuthViewModel = LocalAuthViewModel.current ?: viewModel()
         val themeViewModel = LocalThemeViewModel.current
         val languageViewModel = LocalLanguageViewModel.current
+        val settingsTitle = stringResource(R.string.settings)
 
-        LaunchedEffect(Unit) {
+        LaunchedEffect(settingsTitle) {
             topBarState.value = AppTopBarConfig(
-                title = "Settings",
+                title = settingsTitle,
                 showBack = true,
                 onBack = { navigator.pop() },
                 trailingContent = null
@@ -307,10 +319,11 @@ data class VideoPlayerScreenRoute(
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val topBarState = LocalAppTopBarState.current
+        val trailerTitle = stringResource(R.string.trailer_title)
 
-        LaunchedEffect(trailerKey) {
+        LaunchedEffect(trailerKey, trailerTitle) {
             topBarState.value = AppTopBarConfig(
-                title = "Trailer",
+                title = trailerTitle,
                 showBack = true,
                 onBack = { navigator.pop() },
                 trailingContent = null
