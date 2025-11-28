@@ -44,7 +44,7 @@ object ProfileScreen : Screen {
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val topBarState = LocalAppTopBarState.current
-        val mainViewModel: MainViewModel = viewModel()
+        val mainViewModel = LocalMainViewModel.current
         val authViewModel: AuthViewModel = viewModel()
 
         LaunchedEffect(Unit) {
@@ -62,6 +62,8 @@ object ProfileScreen : Screen {
                     }
                 }
             )
+            // Reload profile when screen appears
+            authViewModel.loadUserProfile()
         }
 
         ProfileScreenContent(
@@ -76,7 +78,7 @@ object ProfileScreen : Screen {
 @Composable
 fun ProfileScreenContent(
     authViewModel: AuthViewModel,
-    mainViewModel: MainViewModel = viewModel(),
+    mainViewModel: MainViewModel,
     onMovieClick: (Int) -> Unit,
     onEditProfile: () -> Unit
 ) {
@@ -84,6 +86,11 @@ fun ProfileScreenContent(
     val favorites by mainViewModel.favorites.collectAsState()
     val watchlist by mainViewModel.watchlist.collectAsState()
     val watched by mainViewModel.watched.collectAsState()
+
+    // Reload profile when screen becomes visible
+    LaunchedEffect(Unit) {
+        authViewModel.loadUserProfile()
+    }
 
     val backgroundColor = colorResource(R.color.background)
     val primaryColor = colorResource(R.color.primary)

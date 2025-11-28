@@ -59,6 +59,14 @@ val LocalMainViewModel = compositionLocalOf<MainViewModel> {
     error("MainViewModel not provided")
 }
 
+val LocalLanguageViewModel = compositionLocalOf<LanguageViewModel> {
+    error("LanguageViewModel not provided")
+}
+
+val LocalThemeViewModel = compositionLocalOf<ThemeViewModel> {
+    error("ThemeViewModel not provided")
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MoviesApp(
@@ -81,7 +89,9 @@ fun MoviesApp(
 
     CompositionLocalProvider(
         LocalAppTopBarState provides topBarState,
-        LocalMainViewModel provides mainViewModel
+        LocalMainViewModel provides mainViewModel,
+        LocalLanguageViewModel provides languageViewModel,
+        LocalThemeViewModel provides themeViewModel
     ) {
         Navigator(HomeScreenRoute) { navigator ->
 
