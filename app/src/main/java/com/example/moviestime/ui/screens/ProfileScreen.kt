@@ -113,7 +113,7 @@ fun ProfileScreenContent(
         modifier = Modifier
             .fillMaxSize()
             .background(backgroundColor)
-            .padding(16.dp),
+            .padding(horizontal = 8.dp, vertical = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Box(
@@ -274,6 +274,7 @@ fun ProfileScreenContent(
                     columns = GridCells.Fixed(3),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp),
+                    contentPadding = PaddingValues(bottom = 100.dp),
                     modifier = Modifier.fillMaxSize()
                 ) {
                     items(list) { movie ->

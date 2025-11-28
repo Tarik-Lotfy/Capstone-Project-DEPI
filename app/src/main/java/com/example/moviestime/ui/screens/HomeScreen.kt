@@ -86,8 +86,9 @@ fun HomeScreenContent(
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(20.dp)
+                .padding(horizontal = 8.dp, vertical = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(20.dp),
+            contentPadding = PaddingValues(bottom = 100.dp)
         ) {
             item {
                 Text(
@@ -163,8 +164,9 @@ fun HomeScreenContent(
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(20.dp)
+                    .padding(horizontal = 8.dp, vertical = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(20.dp),
+                contentPadding = PaddingValues(bottom = 100.dp)
             ) {
                 item {
                     Text(
@@ -173,10 +175,10 @@ fun HomeScreenContent(
                         color = MaterialTheme.colorScheme.onBackground
                     )
                     Spacer(Modifier.height(16.dp))
-                    LazyRow(
-                        horizontalArrangement = Arrangement.spacedBy(16.dp),
-                        contentPadding = PaddingValues(horizontal = 16.dp)
-                    ) {
+                LazyRow(
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    contentPadding = PaddingValues(horizontal = 8.dp)
+                ) {
                         items(nowPlaying.take(5)) { movie ->
                                     FeaturedLargeCard(
                                         movie = movie,

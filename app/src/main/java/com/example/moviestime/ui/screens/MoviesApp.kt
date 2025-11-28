@@ -8,6 +8,8 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -41,6 +43,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -147,7 +150,15 @@ fun MoviesApp(
                     modifier = Modifier
                         .fillMaxSize()
                         .background(androidx.compose.material3.MaterialTheme.colorScheme.background)
-                        .padding(padding)
+                        .padding(
+                            top = padding.calculateTopPadding(),
+                            start = padding.calculateStartPadding(
+                                LocalLayoutDirection.current
+                            ),
+                            end = padding.calculateEndPadding(
+                                LocalLayoutDirection.current
+                            )
+                        )
                 ) {
                     CurrentScreen()
                     CinematicBottomBar(
@@ -186,12 +197,12 @@ fun CinematicBottomBar(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .padding(start = 16.dp, end = 16.dp, bottom = 12.dp),
+            .padding(start = 0.dp, end = 0.dp, bottom = 10.dp),
         contentAlignment = Alignment.Center
     ) {
         Box(
             modifier = Modifier
-                .fillMaxWidth()
+                .fillMaxWidth(.92f)
                 .clip(containerShape)
                 .shadow(24.dp, containerShape, clip = false)
                 .background(scheme.surface)

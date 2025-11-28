@@ -5,6 +5,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -100,7 +102,9 @@ fun EditProfileScreenContent(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(horizontal = 16.dp),
+                .padding(horizontal = 8.dp)
+                .verticalScroll(rememberScrollState())
+                .padding(bottom = 100.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Spacer(Modifier.height(16.dp))
@@ -157,11 +161,9 @@ fun EditProfileScreenContent(
                     mutedColor = mutedColor,
                     borderColor = borderColor
                 )
-            }
 
-            if (uiState.isLoading) {
-                CircularProgressIndicator(color = goldColor)
-            } else {
+                val isSaveEnabled = fullName.isNotBlank() && (fullName != userProfile.name || bio != userProfile.bio)
+
                 Button(
                     onClick = {
                         authViewModel.updateUserProfile(
@@ -171,13 +173,13 @@ fun EditProfileScreenContent(
                     },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(56.dp)
-                        .padding(vertical = 8.dp),
+                        .height(56.dp),
                     shape = RoundedCornerShape(12.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = primaryColor,
                         contentColor = textColor
-                    )
+                    ),
+                    enabled = isSaveEnabled
                 ) {
                     Text(
                         text = stringResource(R.string.save_changes),

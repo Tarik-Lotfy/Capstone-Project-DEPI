@@ -259,7 +259,7 @@ fun MovieDetailsContent(
                             fontFamily = Inter,
                             fontSize = 12.sp,
                             color = textColor.copy(alpha = 0.9f),
-                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp)
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp)
                         )
                     }
                 }
@@ -268,7 +268,7 @@ fun MovieDetailsContent(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 20.dp, vertical = 24.dp)
+                    .padding(horizontal = 8.dp, vertical = 24.dp)
             ) {
                 val trailerKey = movie.trailerKey
 
@@ -444,7 +444,7 @@ fun MovieDetailsContent(
                         fontFamily = PlayFair,
                         fontWeight = FontWeight.Bold,
                         fontSize = 22.sp,
-                        modifier = Modifier.padding(horizontal = 20.dp)
+                        modifier = Modifier.padding(horizontal = 10.dp)
                     )
 
                     Spacer(Modifier.height(12.dp))
@@ -466,7 +466,7 @@ fun MovieDetailsContent(
                 }
             }
 
-            Spacer(Modifier.height(50.dp))
+            Spacer(Modifier.height(100.dp))
         }
 
         

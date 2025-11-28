@@ -306,6 +306,16 @@ data class VideoPlayerScreenRoute(
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
+        val topBarState = LocalAppTopBarState.current
+
+        LaunchedEffect(trailerKey) {
+            topBarState.value = AppTopBarConfig(
+                title = "Trailer",
+                showBack = true,
+                onBack = { navigator.pop() },
+                trailingContent = null
+            )
+        }
 
         VideoPlayerScreenContent(
             trailerKey = trailerKey,

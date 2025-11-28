@@ -101,7 +101,8 @@ fun DiscoverScreen(
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 16.dp),
+            .padding(horizontal = 8.dp),
+        contentPadding = PaddingValues(bottom = 100.dp)
     ) {
         item {
             Spacer(Modifier.height(20.dp))
@@ -154,7 +155,9 @@ fun DiscoverScreen(
                     fontFamily = PlayFair,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.SemiBold,
-                    color = Color.White
+                    color = Color.White,
+                    modifier = Modifier.padding(horizontal = 15.dp)
+
                 )
 
                 Spacer(Modifier.height(12.dp))
@@ -173,7 +176,7 @@ fun DiscoverScreen(
                                         Color(0xFFF1C40F)
                                 )
                                 .clickable { searchViewModel.onGenreSelected(genre.id) }
-                                .padding(horizontal = 16.dp, vertical = 8.dp),
+                                .padding(horizontal = 8.dp, vertical = 8.dp),
                         ) {
                             Text(
                                 genre.name,
