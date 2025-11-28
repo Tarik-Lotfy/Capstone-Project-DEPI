@@ -12,7 +12,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
@@ -78,6 +77,7 @@ fun MovieDetailsScreen(
     val textColor = colorResource(R.color.foreground)
     val cardColor = colorResource(R.color.card)
     val goldColor = colorResource(R.color.secondary)
+    val accentColor = colorResource(R.color.accent)
 
     if (isLoading) {
         Box(
@@ -111,7 +111,8 @@ fun MovieDetailsScreen(
                 primaryColor = primaryColor,
                 textColor = textColor,
                 cardColor = cardColor,
-                goldColor = goldColor
+                goldColor = goldColor,
+                accentColor = accentColor
             )
         } ?: run {
             Box(
@@ -144,7 +145,8 @@ fun MovieDetailsContent(
     primaryColor: Color,
     textColor: Color,
     cardColor: Color,
-    goldColor: Color
+    goldColor: Color,
+    accentColor: Color
 ) {
     val scrollState = rememberScrollState()
 
@@ -270,34 +272,35 @@ fun MovieDetailsContent(
             ) {
                 val trailerKey = movie.trailerKey
 
-                Button(
-                    onClick = onPlayClick,
-                    enabled = trailerKey != null,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(56.dp),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = if (trailerKey != null) primaryColor else cardColor.copy(alpha = 0.5f),
-                        contentColor = Color.White
-                    ),
-                    elevation = ButtonDefaults.buttonElevation(defaultElevation = 8.dp)
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_move),
-                        contentDescription = "Trailer",
-                        modifier = Modifier.size(24.dp)
-                    )
-                    Spacer(Modifier.width(10.dp))
-                    Text(
-                        text = "Play Trailer",
-                        fontFamily = Inter,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 18.sp
-                    )
-                }
+                if (trailerKey != null) {
+                    Button(
+                        onClick = onPlayClick,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(56.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = primaryColor,
+                            contentColor = Color.White
+                        ),
+                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 8.dp)
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_move),
+                            contentDescription = "Trailer",
+                            modifier = Modifier.size(24.dp)
+                        )
+                        Spacer(Modifier.width(10.dp))
+                        Text(
+                            text = "Play Trailer",
+                            fontFamily = Inter,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 18.sp
+                        )
+                    }
 
-                Spacer(Modifier.height(20.dp))
+                    Spacer(Modifier.height(20.dp))
+                }
 
                 Row(
                     modifier = Modifier
@@ -332,7 +335,7 @@ fun MovieDetailsContent(
                         contentDescription = "Watchlist",
                         isActive = isInWatchlist,
                         onClick = onWatchlistClick,
-                        activeColor = primaryColor,
+                        activeColor = accentColor,
                         cardColor = cardColor,
                         textColor = textColor
                     )
@@ -466,22 +469,7 @@ fun MovieDetailsContent(
             Spacer(Modifier.height(50.dp))
         }
 
-        IconButton(
-            onClick = onBack,
-            modifier = Modifier
-                .align(Alignment.TopStart)
-                .padding(top = 40.dp, start = 20.dp)
-                .size(42.dp)
-                .background(Color.Black.copy(alpha = 0.6f), RoundedCornerShape(12.dp))
-                .border(1.dp, Color.White.copy(alpha = 0.2f), RoundedCornerShape(12.dp))
-        ) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = "Back",
-                tint = Color.White,
-                modifier = Modifier.size(20.dp)
-            )
-        }
+        
     }
 }
 
