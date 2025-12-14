@@ -2,6 +2,7 @@
 
 A modern, elegant Android movie discovery and management app built with Jetpack Compose. CineVault helps you explore, organize, and track your favorite movies with a beautiful medieval-themed cinema aesthetic.
 
+
 ## 📱 Features
 
 ### Core Features
