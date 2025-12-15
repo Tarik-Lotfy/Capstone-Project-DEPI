@@ -33,6 +33,7 @@ import com.example.moviestime.ui.screens.LocalAuthViewModel
 import com.example.moviestime.ui.screens.LocalLanguageViewModel
 import com.example.moviestime.ui.screens.LocalMainViewModel
 import com.example.moviestime.ui.screens.LocalThemeViewModel
+import com.example.moviestime.ui.screens.LocalProfileViewModel
 import com.example.moviestime.ui.screens.LoginScreenContent
 import com.example.moviestime.ui.screens.MovieDetailsScreen
 import com.example.moviestime.ui.screens.ProfileScreenContent
@@ -41,6 +42,7 @@ import com.example.moviestime.ui.screens.SettingsScreenContent
 import com.example.moviestime.ui.screens.VideoPlayerScreenContent
 import com.example.moviestime.viewmodel.AuthViewModel
 import com.example.moviestime.viewmodel.HomeViewModel
+import com.example.moviestime.viewmodel.ProfileViewModel
 import com.example.moviestime.viewmodel.SearchViewModel
 
 enum class SeeAllCategory {
@@ -155,7 +157,7 @@ object ProfileScreenRoute : Screen {
         val navigator = LocalNavigator.currentOrThrow
         val topBarState = LocalAppTopBarState.current
         val mainViewModel = LocalMainViewModel.current
-        val authViewModel: AuthViewModel = LocalAuthViewModel.current ?: viewModel()
+        val profileViewModel: ProfileViewModel = LocalProfileViewModel.current ?: viewModel()
         val profileTitle = stringResource(R.string.profile)
         val settingsCd = stringResource(R.string.settings_button_cd)
 
@@ -179,7 +181,7 @@ object ProfileScreenRoute : Screen {
         }
 
         ProfileScreenContent(
-            authViewModel = authViewModel,
+            profileViewModel = profileViewModel,
             mainViewModel = mainViewModel,
             onMovieClick = { movieId ->
                 navigator.push(MovieDetailsScreenRoute(movieId))
@@ -270,6 +272,7 @@ object SettingsScreenRoute : Screen {
         val navigator = LocalNavigator.currentOrThrow
         val topBarState = LocalAppTopBarState.current
         val authViewModel: AuthViewModel = LocalAuthViewModel.current ?: viewModel()
+        val profileViewModel: ProfileViewModel = LocalProfileViewModel.current ?: viewModel()
         val themeViewModel = LocalThemeViewModel.current
         val languageViewModel = LocalLanguageViewModel.current
         val settingsTitle = stringResource(R.string.settings)
@@ -308,7 +311,7 @@ object EditProfileScreenRoute : Screen {
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val topBarState = LocalAppTopBarState.current
-        val authViewModel: AuthViewModel = LocalAuthViewModel.current ?: viewModel()
+        val profileViewModel: ProfileViewModel = LocalProfileViewModel.current ?: viewModel()
         val editProfileTitle = stringResource(R.string.edit_profile)
 
         // No manual reload; EditProfile updates shared state immediately
@@ -323,7 +326,7 @@ object EditProfileScreenRoute : Screen {
         }
 
         EditProfileScreenContent(
-            authViewModel = authViewModel,
+            profileViewModel = profileViewModel,
             onBackClick = { navigator.pop() },
             onNavigateToProfile = { navigator.pop() }
         )

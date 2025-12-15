@@ -59,6 +59,7 @@ import com.example.moviestime.viewmodel.AuthViewModel
 import com.example.moviestime.viewmodel.LanguageViewModel
 import com.example.moviestime.viewmodel.MainViewModel
 import com.example.moviestime.viewmodel.ThemeViewModel
+import com.example.moviestime.viewmodel.ProfileViewModel
 
 data class AppTopBarConfig(
     val title: String = "",
@@ -84,6 +85,7 @@ val LocalThemeViewModel = compositionLocalOf<ThemeViewModel> {
 }
 
 val LocalAuthViewModel = compositionLocalOf<AuthViewModel?> { null }
+val LocalProfileViewModel = compositionLocalOf<ProfileViewModel?> { null }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -101,6 +103,7 @@ fun MoviesApp(
     val icons = listOf(Icons.Default.Home, Icons.Default.Explore, Icons.Default.Person)
     val appTitle = stringResource(R.string.app_name)
     val authViewModel: AuthViewModel = viewModel()
+    val profileViewModel: ProfileViewModel = viewModel()
 
     val topBarState = remember(appTitle) {
         mutableStateOf(
@@ -116,7 +119,8 @@ fun MoviesApp(
         LocalMainViewModel provides mainViewModel,
         LocalLanguageViewModel provides languageViewModel,
         LocalThemeViewModel provides themeViewModel,
-        LocalAuthViewModel provides authViewModel
+        LocalAuthViewModel provides authViewModel,
+        LocalProfileViewModel provides profileViewModel
     ) {
         Navigator(HomeScreenRoute) { navigator ->
 

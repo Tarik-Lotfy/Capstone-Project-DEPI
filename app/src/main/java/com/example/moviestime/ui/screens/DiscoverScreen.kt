@@ -14,18 +14,21 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.example.moviestime.R
 import com.example.moviestime.data.remote.Genre
 import com.example.moviestime.ui.components.MovieRowCard
 import com.example.moviestime.viewmodel.SearchViewModel
@@ -122,6 +125,17 @@ fun DiscoverScreen(
                         contentDescription = "Search",
                         tint = Color.White.copy(0.7f)
                     )
+                },
+                trailingIcon = {
+                    if (query.isNotEmpty()) {
+                        IconButton(onClick = { searchViewModel.onSearchQueryChanged("") }) {
+                            Icon(
+                                imageVector = Icons.Default.Close,
+                                contentDescription = stringResource(R.string.clear_search_cd),
+                                tint = Color.White.copy(0.7f)
+                            )
+                        }
+                    }
                 },
                 placeholder = {
                     Text(

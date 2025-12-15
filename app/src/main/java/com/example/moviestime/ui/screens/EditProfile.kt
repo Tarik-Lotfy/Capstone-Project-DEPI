@@ -31,20 +31,20 @@ import coil.compose.AsyncImage
 import com.example.moviestime.R
 import com.example.moviestime.ui.theme.Inter
 import com.example.moviestime.ui.theme.PlayFair
-import com.example.moviestime.viewmodel.AuthViewModel
+import com.example.moviestime.viewmodel.ProfileViewModel
 
 @Composable
 fun EditProfileScreenContent(
-    authViewModel: AuthViewModel,
+    profileViewModel: ProfileViewModel,
     onBackClick: () -> Unit,
     onNavigateToProfile: () -> Unit = onBackClick
 ) {
-    val userProfile by authViewModel.userProfile.collectAsState()
-    val uiState by authViewModel.uiState.collectAsState()
+    val uiState by profileViewModel.uiState.collectAsState()
     val context = LocalContext.current
 
-    var fullName by remember(userProfile) { mutableStateOf(userProfile.name) }
-    var bio by remember(userProfile) { mutableStateOf(userProfile.bio) }
+    var selectedPhotoUri by remember { mutableStateOf<String?>(null) }
+    var initialName by remember(uiState.email) { mutableStateOf(uiState.name) }
+    var initialBio by remember(uiState.email) { mutableStateOf(uiState.bio) }
 
     val colorScheme = MaterialTheme.colorScheme
     val backgroundColor = colorScheme.background
@@ -56,18 +56,16 @@ fun EditProfileScreenContent(
     val goldColor = colorScheme.secondary
 
     val successMsg = stringResource(R.string.profile_updated_success)
-
-    var selectedPhotoUri by remember { mutableStateOf<String?>(null) }
     val imagePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri ->
         selectedPhotoUri = uri?.toString()
+        profileViewModel.updatePhotoUri(selectedPhotoUri)
     }
 
-    LaunchedEffect(uiState.isUpdateSuccess) {
-        if (uiState.isUpdateSuccess) {
+    LaunchedEffect(uiState.isSaved) {
+        if (uiState.isSaved) {
             Toast.makeText(context, successMsg, Toast.LENGTH_SHORT).show()
-            authViewModel.resetState()
             onNavigateToProfile()
         }
     }
@@ -89,9 +87,9 @@ fun EditProfileScreenContent(
             Spacer(Modifier.height(16.dp))
 
             AvatarSection(
-                initials = if (fullName.isNotEmpty()) fullName.take(1).uppercase()
+                initials = if (uiState.name.isNotEmpty()) uiState.name.take(1).uppercase()
                 else stringResource(R.string.profile_initial_placeholder),
-                imageUrl = selectedPhotoUri ?: userProfile.photoUrl,
+                imageUrl = selectedPhotoUri ?: uiState.photoUrl,
                 goldColor = goldColor,
                 primaryColor = primaryColor,
                 textColor = textColor,
@@ -115,7 +113,7 @@ fun EditProfileScreenContent(
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 EditProfileTextField(
-                    value = userProfile.email,
+                    value = uiState.email,
                     onValueChange = { },
                     label = stringResource(R.string.email),
                     placeholder = stringResource(R.string.email),
@@ -128,8 +126,8 @@ fun EditProfileScreenContent(
                 )
 
                 EditProfileTextField(
-                    value = fullName,
-                    onValueChange = { fullName = it },
+                    value = uiState.name,
+                    onValueChange = { profileViewModel.updateName(it) },
                     label = stringResource(R.string.name),
                     placeholder = stringResource(R.string.name_placeholder),
                     supportingText = stringResource(R.string.display_name_desc),
@@ -140,8 +138,8 @@ fun EditProfileScreenContent(
                 )
 
                 EditProfileBioField(
-                    value = bio,
-                    onValueChange = { if (it.length <= maxBioLength) bio = it },
+                    value = uiState.bio,
+                    onValueChange = { if (it.length <= maxBioLength) profileViewModel.updateBio(it) },
                     label = stringResource(R.string.bio),
                     placeholder = stringResource(R.string.bio_placeholder),
                     maxBioLength = maxBioLength,
@@ -152,18 +150,12 @@ fun EditProfileScreenContent(
                 )
 
                 val isSaveEnabled =
-                    (fullName.isNotBlank() || selectedPhotoUri != null) &&
-                    (fullName != userProfile.name || bio != userProfile.bio || selectedPhotoUri != null)
+                    (uiState.name.isNotBlank() || selectedPhotoUri != null) &&
+                    (uiState.name != initialName || uiState.bio != initialBio || selectedPhotoUri != null)
                 val isSaving = uiState.isLoading
 
                 Button(
-                    onClick = {
-                        authViewModel.updateUserProfile(
-                            name = fullName,
-                            bio = bio,
-                            photoUri = selectedPhotoUri
-                        )
-                    },
+                    onClick = { profileViewModel.save() },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(56.dp),

@@ -78,6 +78,8 @@
     <string name="settings_item_arrow_cd">الانتقال إلى التفاصيل</string>
     <string name="movie_details_title">تفاصيل الفيلم</string>
     <string name="trailer_title">الإعلان</string>
+    <string name="skip">تخطي</string>
+    <string name="clear_search_cd">مسح البحث</string>
     <string name="edit_photo">تعديل الصورة</string>
 
     <!-- Login Screen -->

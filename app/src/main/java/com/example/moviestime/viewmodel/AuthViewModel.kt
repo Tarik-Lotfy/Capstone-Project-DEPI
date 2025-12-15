@@ -9,6 +9,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
+import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -152,7 +153,14 @@ class AuthViewModel : ViewModel() {
                         "email" to user.email
                     )
                     if (photoUri != null) {
-                        userData["photoUrl"] = photoUri
+                        val storage = FirebaseStorage.getInstance()
+                        val storageRef = storage.reference.child("users/${user.uid}/profile_${System.currentTimeMillis()}.jpg")
+                        storageRef.putFile(android.net.Uri.parse(photoUri)).await()
+                        val downloadUrl = storageRef.downloadUrl.await().toString()
+                        userData["photoUrl"] = downloadUrl
+                        withContext(Dispatchers.Main) {
+                            _userProfile.value = _userProfile.value.copy(photoUrl = downloadUrl)
+                        }
                     }
                     db.collection("users").document(user.uid)
                         .set(userData, SetOptions.merge())

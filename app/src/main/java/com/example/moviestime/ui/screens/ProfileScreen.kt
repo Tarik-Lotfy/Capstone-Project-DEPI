@@ -34,17 +34,17 @@ import com.example.moviestime.R
 import com.example.moviestime.data.model.Movie
 import com.example.moviestime.ui.theme.Inter
 import com.example.moviestime.ui.theme.PlayFair
-import com.example.moviestime.viewmodel.AuthViewModel
+import com.example.moviestime.viewmodel.ProfileViewModel
 import com.example.moviestime.viewmodel.MainViewModel
 
 @Composable
 fun ProfileScreenContent(
-    authViewModel: AuthViewModel,
+    profileViewModel: ProfileViewModel,
     mainViewModel: MainViewModel,
     onMovieClick: (Int) -> Unit,
     onEditProfile: () -> Unit
 ) {
-    val userProfile by authViewModel.userProfile.collectAsState()
+    val uiState by profileViewModel.uiState.collectAsState()
     val favorites by mainViewModel.favorites.collectAsState()
     val watchlist by mainViewModel.watchlist.collectAsState()
     val watched by mainViewModel.watched.collectAsState()
@@ -71,7 +71,7 @@ fun ProfileScreenContent(
     }
 
     val defaultName = stringResource(R.string.default_user_name)
-    val displayName = userProfile.name.ifEmpty { defaultName }
+    val displayName = uiState.name.ifEmpty { defaultName }
     val initials = if (displayName.isNotEmpty()) displayName.take(1).uppercase()
     else stringResource(R.string.profile_initial_placeholder)
 
@@ -91,9 +91,9 @@ fun ProfileScreenContent(
                 .background(primaryColor),
             contentAlignment = Alignment.Center
         ) {
-            if (userProfile.photoUrl != null && userProfile.photoUrl!!.isNotEmpty()) {
+            if (uiState.photoUrl != null && uiState.photoUrl!!.isNotEmpty()) {
                 AsyncImage(
-                    model = userProfile.photoUrl,
+                    model = uiState.photoUrl,
                     contentDescription = stringResource(R.string.profile_image_cd),
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
@@ -122,10 +122,10 @@ fun ProfileScreenContent(
             textAlign = TextAlign.Center
         )
 
-        if (userProfile.bio.isNotEmpty()) {
+        if (uiState.bio.isNotEmpty()) {
             Spacer(Modifier.height(8.dp))
             Text(
-                text = userProfile.bio,
+                text = uiState.bio,
                 fontFamily = Inter,
                 fontSize = 14.sp,
                 color = mutedColor,
