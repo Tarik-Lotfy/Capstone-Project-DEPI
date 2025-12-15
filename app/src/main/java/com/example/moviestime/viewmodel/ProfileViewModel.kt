@@ -83,4 +83,8 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
             }
         }
     }
+
+    fun resetSavedFlag() {
+        _uiState.value = _uiState.value.copy(isSaved = false)
+    }
 }

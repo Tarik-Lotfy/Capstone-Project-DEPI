@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -45,6 +46,7 @@ fun ProfileScreenContent(
     onEditProfile: () -> Unit
 ) {
     val uiState by profileViewModel.uiState.collectAsState()
+    val context = LocalContext.current
     val favorites by mainViewModel.favorites.collectAsState()
     val watchlist by mainViewModel.watchlist.collectAsState()
     val watched by mainViewModel.watched.collectAsState()
@@ -68,6 +70,12 @@ fun ProfileScreenContent(
     }
     LaunchedEffect(pagerState.currentPage) {
         selectedTabIndex = pagerState.currentPage
+    }
+
+    LaunchedEffect(uiState.error) {
+        uiState.error?.let { msg ->
+            android.widget.Toast.makeText(context, msg, android.widget.Toast.LENGTH_SHORT).show()
+        }
     }
 
     val defaultName = stringResource(R.string.default_user_name)

@@ -43,8 +43,14 @@ fun EditProfileScreenContent(
     val context = LocalContext.current
 
     var selectedPhotoUri by remember { mutableStateOf<String?>(null) }
-    var initialName by remember(uiState.email) { mutableStateOf(uiState.name) }
-    var initialBio by remember(uiState.email) { mutableStateOf(uiState.bio) }
+    var initialName by remember { mutableStateOf<String?>(null) }
+    var initialBio by remember { mutableStateOf<String?>(null) }
+    LaunchedEffect(uiState.email, uiState.name, uiState.bio) {
+        if (initialName == null || initialBio == null) {
+            initialName = uiState.name
+            initialBio = uiState.bio
+        }
+    }
 
     val colorScheme = MaterialTheme.colorScheme
     val backgroundColor = colorScheme.background
@@ -56,6 +62,10 @@ fun EditProfileScreenContent(
     val goldColor = colorScheme.secondary
 
     val successMsg = stringResource(R.string.profile_updated_success)
+    LaunchedEffect(Unit) {
+        profileViewModel.resetSavedFlag()
+    }
+
     val imagePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri ->
@@ -67,6 +77,12 @@ fun EditProfileScreenContent(
         if (uiState.isSaved) {
             Toast.makeText(context, successMsg, Toast.LENGTH_SHORT).show()
             onNavigateToProfile()
+        }
+    }
+
+    LaunchedEffect(uiState.error) {
+        uiState.error?.let { msg ->
+            Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -149,9 +165,12 @@ fun EditProfileScreenContent(
                     borderColor = borderColor
                 )
 
+                val isDirty =
+                    (initialName != null && uiState.name != initialName) ||
+                    (initialBio != null && uiState.bio != initialBio) ||
+                    (selectedPhotoUri != null)
                 val isSaveEnabled =
-                    (uiState.name.isNotBlank() || selectedPhotoUri != null) &&
-                    (uiState.name != initialName || uiState.bio != initialBio || selectedPhotoUri != null)
+                    (uiState.name.isNotBlank() || selectedPhotoUri != null) && isDirty
                 val isSaving = uiState.isLoading
 
                 Button(
