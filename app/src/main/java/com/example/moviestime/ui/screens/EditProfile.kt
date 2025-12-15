@@ -100,6 +100,14 @@ fun EditProfileScreenContent(
 
             Spacer(Modifier.height(32.dp))
 
+            TextButton(onClick = { imagePickerLauncher.launch("image/*") }) {
+                Text(
+                    text = stringResource(R.string.edit_photo),
+                    fontFamily = Inter,
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
+
             Column(
                 modifier = Modifier
                     .weight(1f)
@@ -143,7 +151,9 @@ fun EditProfileScreenContent(
                     borderColor = borderColor
                 )
 
-                val isSaveEnabled = fullName.isNotBlank() && (fullName != userProfile.name || bio != userProfile.bio)
+                val isSaveEnabled =
+                    (fullName.isNotBlank() || selectedPhotoUri != null) &&
+                    (fullName != userProfile.name || bio != userProfile.bio || selectedPhotoUri != null)
                 val isSaving = uiState.isLoading
 
                 Button(

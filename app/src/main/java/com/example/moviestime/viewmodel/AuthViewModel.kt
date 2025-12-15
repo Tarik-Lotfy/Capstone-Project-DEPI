@@ -80,15 +80,18 @@ class AuthViewModel : ViewModel() {
                 
                 val bio: String
                 val name: String
+                val photoUrl: String?
                 
                 if (documentSnapshot.exists()) {
                     // Document exists, read from Firestore
                     bio = documentSnapshot.getString("bio") ?: "Tell us about your love for cinema..."
                     name = documentSnapshot.getString("name") ?: user.displayName ?: "Movie Lover"
+                    photoUrl = documentSnapshot.getString("photoUrl") ?: user.photoUrl?.toString()
                 } else {
                     // Document doesn't exist, create it with default values
                     bio = "Tell us about your love for cinema..."
                     name = user.displayName ?: "Movie Lover"
+                    photoUrl = user.photoUrl?.toString()
                     
                     // Create the document in Firestore
                     val userData = hashMapOf(
@@ -96,6 +99,9 @@ class AuthViewModel : ViewModel() {
                         "name" to name,
                         "email" to (user.email ?: "")
                     )
+                    if (photoUrl != null) {
+                        userData["photoUrl"] = photoUrl
+                    }
                     db.collection("users").document(user.uid)
                         .set(userData)
                         .await()
@@ -105,7 +111,7 @@ class AuthViewModel : ViewModel() {
                     name = name,
                     email = user.email ?: "",
                     bio = bio,
-                    photoUrl = user.photoUrl?.toString()
+                    photoUrl = photoUrl
                 )
             } catch (e: Exception) {
                 Log.e("AuthViewModel", "Error loading profile", e)
