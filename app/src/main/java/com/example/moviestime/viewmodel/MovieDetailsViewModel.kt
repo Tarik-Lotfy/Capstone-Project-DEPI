@@ -31,9 +31,25 @@ class MovieDetailsViewModel : ViewModel() {
                 val similarMoviesResponse = repository.getSimilarMovies(movieId)
                 val creditsResponse = repository.getMovieCredits(movieId)
                 
+                // Debug: Log all videos
+                android.util.Log.d("MovieDetailsViewModel", "Total videos found: ${videosResponse.results.size}")
+                videosResponse.results.forEachIndexed { index, video ->
+                    android.util.Log.d("MovieDetailsViewModel", "Video $index: site=${video.site}, type=${video.type}, key=${video.key}, name=${video.name}")
+                }
+                
                 val trailerKey = videosResponse.results.firstOrNull {
                     it.site == "YouTube" && it.type == "Trailer"
                 }?.key
+                
+                // Debug: Log trailer key
+                if (trailerKey != null) {
+                    android.util.Log.d("MovieDetailsViewModel", "Found trailer key: $trailerKey")
+                } else {
+                    android.util.Log.w("MovieDetailsViewModel", "No trailer found! Available videos:")
+                    videosResponse.results.forEach { video ->
+                        android.util.Log.w("MovieDetailsViewModel", "  - ${video.site}/${video.type}: ${video.key}")
+                    }
+                }
 
                 // Extract director from crew
                 val directorCrew = creditsResponse.crew.firstOrNull { 

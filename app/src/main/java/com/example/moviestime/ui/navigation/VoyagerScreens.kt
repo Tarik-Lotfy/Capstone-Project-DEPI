@@ -228,11 +228,7 @@ data class MovieDetailsScreenRoute(
             movieId = movieId,
             mainViewModel = mainViewModel,
             onBack = { navigator.pop() },
-            onPlayClick = { movie: Movie ->
-                movie.trailerKey?.let { trailerKey ->
-                    navigator.push(VideoPlayerScreenRoute(trailerKey))
-                }
-            },
+            onPlayClick = { _ -> }, // No longer needed - trailer plays inline
             onShareClick = { _ -> },
             onMovieClick = { id ->
                 navigator.push(MovieDetailsScreenRoute(id))

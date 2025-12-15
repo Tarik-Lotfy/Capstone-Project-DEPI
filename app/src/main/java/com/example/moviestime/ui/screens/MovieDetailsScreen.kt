@@ -1,21 +1,50 @@
 package com.example.moviestime.ui.screens
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -24,29 +53,28 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
+import androidx.core.net.toUri
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.example.moviestime.R
-import com.example.moviestime.data.model.Movie
 import com.example.moviestime.data.model.CastMember
 import com.example.moviestime.data.model.Director
-import com.example.moviestime.ui.components.SectionWithRow
+import com.example.moviestime.data.model.Movie
+import com.example.moviestime.ui.components.FloatingTrailerPlayer
+import com.example.moviestime.ui.components.MovieRowCard
+import com.example.moviestime.ui.components.TrailerPlayer
 import com.example.moviestime.ui.theme.Inter
 import com.example.moviestime.ui.theme.PlayFair
 import com.example.moviestime.viewmodel.MainViewModel
 import com.example.moviestime.viewmodel.MovieDetailsViewModel
-
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.List
-import com.example.moviestime.ui.components.MovieRowCard
 
 @SuppressLint("MissingPermission")
 @Composable
@@ -148,7 +176,55 @@ fun MovieDetailsContent(
     goldColor: Color,
     accentColor: Color
 ) {
+    val context = LocalContext.current
     val scrollState = rememberScrollState()
+    val trailerKey = movie.trailerKey
+    
+    // Debug: Log trailer key
+    LaunchedEffect(trailerKey) {
+        if (trailerKey != null) {
+            android.util.Log.d("MovieDetailsScreen", "Trailer key: $trailerKey")
+        } else {
+            android.util.Log.d("MovieDetailsScreen", "No trailer key available")
+        }
+    }
+    
+    // State to control trailer visibility
+    var showTrailer by remember { mutableStateOf(false) }
+    var hasEmbedError by remember { mutableStateOf(false) }
+    
+    // Reset error state when movie changes
+    LaunchedEffect(movie.id) {
+        hasEmbedError = false
+        showTrailer = false
+    }
+    
+    // Detect scroll position to show/hide floating player
+    val isScrolledDown by remember {
+        derivedStateOf {
+            scrollState.value > 300 // Show floating player after scrolling 300px
+        }
+    }
+    
+    var showFloatingPlayer by remember { mutableStateOf(false) }
+    var isFloatingPlayerDismissed by remember { mutableStateOf(false) }
+    
+    // Show floating player when trailer is playing and user scrolls down
+    // Do NOT show floating player if there's an embed error
+    LaunchedEffect(isScrolledDown, showTrailer, hasEmbedError) {
+        if (showTrailer && !isFloatingPlayerDismissed && !hasEmbedError) {
+            if (isScrolledDown) {
+                showFloatingPlayer = true
+            } else {
+                showFloatingPlayer = false
+                isFloatingPlayerDismissed = false
+            }
+        } else if (hasEmbedError) {
+            // Hide floating player if embed error occurs
+            showFloatingPlayer = false
+            isFloatingPlayerDismissed = true
+        }
+    }
 
     Box(
         modifier = Modifier
@@ -165,19 +241,23 @@ fun MovieDetailsContent(
                     .fillMaxWidth()
                     .height(420.dp)
             ) {
+                // Layer 0: Backdrop image (bottom layer)
                 AsyncImage(
                     model = movie.backdropPath ?: movie.posterPath,
                     contentDescription = "Backdrop",
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .fillMaxSize()
+                        .zIndex(0f)
                         .alpha(0.65f),
                     error = painterResource(R.drawable.ic_launcher_background)
                 )
 
+                // Layer 1: Gradient overlay
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
+                        .zIndex(1f)
                         .background(
                             Brush.verticalGradient(
                                 colors = listOf(
@@ -191,12 +271,51 @@ fun MovieDetailsContent(
                         )
                 )
 
+                // Layer 2: Trailer player (when visible)
+                // Show trailer player ONLY if user explicitly clicked play and not showing floating player
+                // Hide player if there's an embed error
+                // TMDB's trailerKey is already a YouTube video ID, pass it directly
+                if (showTrailer && !showFloatingPlayer && trailerKey != null && !hasEmbedError) {
+                    android.util.Log.d("MovieDetailsScreen", "Playing trailer with video ID: $trailerKey")
+                    TrailerPlayer(
+                        videoId = trailerKey,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .zIndex(2f),
+                        onEmbedError = {
+                            android.util.Log.d("MovieDetailsScreen", "Embed error detected, opening YouTube")
+                            hasEmbedError = true
+                            showTrailer = false // Hide inline player
+                            // Open YouTube using intent
+                            try {
+                                val intent = Intent(
+                                    Intent.ACTION_VIEW,
+                                    "https://www.youtube.com/watch?v=$trailerKey".toUri()
+                                ).apply {
+                                    setPackage("com.google.android.youtube")
+                                }
+                                context.startActivity(intent)
+                            } catch (e: Exception) {
+                                // Fallback to browser if YouTube app is not installed
+                                android.util.Log.w("MovieDetailsScreen", "YouTube app not found, using browser", e)
+                                val intent = Intent(
+                                    Intent.ACTION_VIEW,
+                                    "https://www.youtube.com/watch?v=$trailerKey".toUri()
+                                )
+                                context.startActivity(intent)
+                            }
+                        }
+                    )
+                }
+
+                // Layer 3: Poster and text UI (top layer)
                 AsyncImage(
                     model = movie.posterPath,
                     contentDescription = "Poster",
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .align(Alignment.BottomStart)
+                        .zIndex(3f)
                         .padding(start = 20.dp)
                         .width(130.dp)
                         .height(190.dp)
@@ -207,6 +326,7 @@ fun MovieDetailsContent(
                 Column(
                     modifier = Modifier
                         .align(Alignment.BottomStart)
+                        .zIndex(3f)
                         .padding(start = 166.dp, bottom = 10.dp, end = 16.dp)
                 ) {
                     Text(
@@ -251,7 +371,7 @@ fun MovieDetailsContent(
                     Surface(
                         color = cardColor,
                         shape = RoundedCornerShape(6.dp),
-                        border = androidx.compose.foundation.BorderStroke(1.dp, color = Color.White.copy(0.1f)),
+                        border = BorderStroke(1.dp, color = Color.White.copy(0.1f)),
                         modifier = Modifier.padding(top = 4.dp)
                     ) {
                         Text(
@@ -270,14 +390,17 @@ fun MovieDetailsContent(
                     .fillMaxWidth()
                     .padding(horizontal = 8.dp, vertical = 24.dp)
             ) {
-                val trailerKey = movie.trailerKey
-
+                // Play Trailer Button
                 if (trailerKey != null) {
                     Button(
-                        onClick = onPlayClick,
+                        onClick = { 
+                            android.util.Log.d("MovieDetailsScreen", "Play Trailer clicked - videoId: $trailerKey")
+                            showTrailer = true 
+                        },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(56.dp),
+                            .height(56.dp)
+                            .padding(horizontal = 16.dp),
                         shape = RoundedCornerShape(12.dp),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = primaryColor,
@@ -331,7 +454,7 @@ fun MovieDetailsContent(
                     )
 
                     CircularToggleButton(
-                        icon = Icons.Default.List,
+                        icon = Icons.AutoMirrored.Filled.List,
                         contentDescription = "Watchlist",
                         isActive = isInWatchlist,
                         onClick = onWatchlistClick,
@@ -468,8 +591,51 @@ fun MovieDetailsContent(
 
             Spacer(Modifier.height(100.dp))
         }
-
         
+        // Floating trailer player - only show if trailer was played
+        // Do NOT show if there's an embed error
+        // TMDB's trailerKey is already a YouTube video ID, pass it directly
+        val floatingVideoId = if (showTrailer && trailerKey != null && !hasEmbedError) {
+            trailerKey
+        } else null
+        
+        if (floatingVideoId != null) {
+            FloatingTrailerPlayer(
+                videoId = floatingVideoId,
+                isVisible = showFloatingPlayer,
+                onDismiss = {
+                    showFloatingPlayer = false
+                    isFloatingPlayerDismissed = true
+                },
+                onEmbedError = {
+                    android.util.Log.d("MovieDetailsScreen", "Embed error in floating player, opening YouTube")
+                    hasEmbedError = true
+                    showTrailer = false
+                    showFloatingPlayer = false
+                    // Open YouTube using intent
+                    try {
+                        val intent = Intent(
+                            Intent.ACTION_VIEW,
+                            "https://www.youtube.com/watch?v=$trailerKey".toUri()
+                        ).apply {
+                            setPackage("com.google.android.youtube")
+                        }
+                        context.startActivity(intent)
+                    } catch (e: Exception) {
+                        // Fallback to browser if YouTube app is not installed
+                        android.util.Log.w("MovieDetailsScreen", "YouTube app not found, using browser", e)
+                        val intent = Intent(
+                            Intent.ACTION_VIEW,
+                            "https://www.youtube.com/watch?v=$trailerKey".toUri()
+                        )
+                        context.startActivity(intent)
+                    }
+                },
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .padding(top = 16.dp)
+            )
+        }
     }
 }
 
