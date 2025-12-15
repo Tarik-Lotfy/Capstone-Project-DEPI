@@ -120,14 +120,14 @@ class AuthViewModel : ViewModel() {
         }
     }
 
-    fun updateUserProfile(name: String, bio: String) {
+    fun updateUserProfile(name: String, bio: String, photoUri: String? = null) {
         val user = auth.currentUser ?: return
 
         _userProfile.value = _userProfile.value.copy(
             name = name,
             bio = bio,
             email = user.email ?: _userProfile.value.email,
-            photoUrl = user.photoUrl?.toString() ?: _userProfile.value.photoUrl
+            photoUrl = photoUri ?: user.photoUrl?.toString() ?: _userProfile.value.photoUrl
         )
         isProfileUpdateInProgress = true
         _uiState.value = AuthUiState(isUpdateSuccess = true)
@@ -145,6 +145,9 @@ class AuthViewModel : ViewModel() {
                         "name" to name,
                         "email" to user.email
                     )
+                    if (photoUri != null) {
+                        userData["photoUrl"] = photoUri
+                    }
                     db.collection("users").document(user.uid)
                         .set(userData, SetOptions.merge())
                         .await()
@@ -154,9 +157,7 @@ class AuthViewModel : ViewModel() {
                 _uiState.value = AuthUiState(error = "Failed to update profile: ${e.message}")
             } finally {
                 isProfileUpdateInProgress = false
-                // Add a small delay to ensure Firestore has been updated
-                kotlinx.coroutines.delay(300)
-                loadUserProfile(force = true)
+                // Do not reload; UI is already driven by StateFlow
             }
         }
     }

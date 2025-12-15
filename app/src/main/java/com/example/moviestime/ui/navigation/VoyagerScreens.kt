@@ -159,19 +159,7 @@ object ProfileScreenRoute : Screen {
         val profileTitle = stringResource(R.string.profile)
         val settingsCd = stringResource(R.string.settings_button_cd)
 
-        // Reload profile when screen is entered
-        // Use a key that ensures reload when navigating back
-        var reloadKey by remember { mutableIntStateOf(0) }
-        
-        LaunchedEffect(reloadKey) {
-            authViewModel.loadUserProfile(force = true)
-        }
-        
-        // Increment reload key when screen becomes visible (using DisposableEffect)
-        DisposableEffect(Unit) {
-            reloadKey++
-            onDispose { }
-        }
+        // Observe shared AuthViewModel state only; no manual reloads
 
         LaunchedEffect(profileTitle) {
             topBarState.value = AppTopBarConfig(
@@ -323,10 +311,7 @@ object EditProfileScreenRoute : Screen {
         val authViewModel: AuthViewModel = LocalAuthViewModel.current ?: viewModel()
         val editProfileTitle = stringResource(R.string.edit_profile)
 
-        // Load user profile when screen appears
-        LaunchedEffect(Unit) {
-            authViewModel.loadUserProfile(force = true)
-        }
+        // No manual reload; EditProfile updates shared state immediately
 
         LaunchedEffect(editProfileTitle) {
             topBarState.value = AppTopBarConfig(
@@ -340,9 +325,7 @@ object EditProfileScreenRoute : Screen {
         EditProfileScreenContent(
             authViewModel = authViewModel,
             onBackClick = { navigator.pop() },
-            onNavigateToProfile = {
-                navigator.pop()
-            }
+            onNavigateToProfile = { navigator.pop() }
         )
     }
 }

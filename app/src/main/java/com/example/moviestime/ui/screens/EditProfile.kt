@@ -13,6 +13,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -55,6 +57,13 @@ fun EditProfileScreenContent(
 
     val successMsg = stringResource(R.string.profile_updated_success)
 
+    var selectedPhotoUri by remember { mutableStateOf<String?>(null) }
+    val imagePickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri ->
+        selectedPhotoUri = uri?.toString()
+    }
+
     LaunchedEffect(uiState.isUpdateSuccess) {
         if (uiState.isUpdateSuccess) {
             Toast.makeText(context, successMsg, Toast.LENGTH_SHORT).show()
@@ -82,10 +91,11 @@ fun EditProfileScreenContent(
             AvatarSection(
                 initials = if (fullName.isNotEmpty()) fullName.take(1).uppercase()
                 else stringResource(R.string.profile_initial_placeholder),
-                imageUrl = userProfile.photoUrl,
+                imageUrl = selectedPhotoUri ?: userProfile.photoUrl,
                 goldColor = goldColor,
                 primaryColor = primaryColor,
-                textColor = textColor
+                textColor = textColor,
+                onImageClick = { imagePickerLauncher.launch("image/*") }
             )
 
             Spacer(Modifier.height(32.dp))
@@ -140,7 +150,8 @@ fun EditProfileScreenContent(
                     onClick = {
                         authViewModel.updateUserProfile(
                             name = fullName,
-                            bio = bio
+                            bio = bio,
+                            photoUri = selectedPhotoUri
                         )
                     },
                     modifier = Modifier
@@ -153,6 +164,7 @@ fun EditProfileScreenContent(
                     ),
                     enabled = isSaveEnabled && !isSaving
                 ) {
+                    
                     if (isSaving) {
                         CircularProgressIndicator(
                             modifier = Modifier.size(24.dp),
@@ -215,7 +227,8 @@ fun AvatarSection(
     imageUrl: String?,
     goldColor: Color,
     primaryColor: Color,
-    textColor: Color
+    textColor: Color,
+    onImageClick: () -> Unit = {}
 ) {
     Box(modifier = Modifier.size(100.dp)) {
         Box(
@@ -224,7 +237,8 @@ fun AvatarSection(
                 .border(2.dp, goldColor, CircleShape)
                 .padding(4.dp)
                 .clip(CircleShape)
-                .background(primaryColor),
+                .background(primaryColor)
+                .clickable { onImageClick() },
             contentAlignment = Alignment.Center
         ) {
             if (imageUrl != null) {
