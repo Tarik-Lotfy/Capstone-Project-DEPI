@@ -23,9 +23,15 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import com.example.moviestime.R
 import com.example.moviestime.ui.theme.Inter
 import com.example.moviestime.ui.theme.PlayFair
+import com.example.moviestime.viewmodel.AuthViewModel
+import com.example.moviestime.ui.screens.LoginScreenContent
 import kotlinx.coroutines.launch
 
 data class OnboardingPage(
@@ -43,6 +49,13 @@ fun OnboardingScreenPreview() {
 fun OnboardingScreen(
     onFinish: () -> Unit
 ) {
+    val context = LocalContext.current
+    val authViewModel: com.example.moviestime.viewmodel.AuthViewModel = viewModel()
+    var goLogin by remember { mutableStateOf(false) }
+    if (goLogin) {
+        LoginScreenContent(authViewModel = authViewModel)
+        return
+    }
     val pages = listOf(
         OnboardingPage(
             icon = Icons.Default.Movie,
@@ -89,17 +102,19 @@ fun OnboardingScreen(
     ) {
         // Skip button
         TextButton(
-            onClick = onFinish,
+            onClick = {
+                context.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
+                    .edit()
+                    .putBoolean("has_seen_onboarding", true)
+                    .apply()
+                goLogin = true
+                onFinish()
+            },
             modifier = Modifier
                 .align(Alignment.TopEnd)
                 .padding(16.dp)
         ) {
-            Text(
-                text = "Skip",
-                color = primaryColor,
-                fontFamily = Inter,
-                fontWeight = FontWeight.Medium
-            )
+
         }
 
         Column(

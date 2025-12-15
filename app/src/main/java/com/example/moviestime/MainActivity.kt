@@ -78,6 +78,7 @@ class MainActivity : ComponentActivity() {
                 val isLoggedIn by authViewModel.isLoggedIn.collectAsState()
                 
                 var showSplash by remember { mutableStateOf(true) }
+                var forceLogin by remember { mutableStateOf(false) }
 
                 // Show medieval splash screen for 3 seconds
                 LaunchedEffect(Unit) {
@@ -94,14 +95,23 @@ class MainActivity : ComponentActivity() {
                                 onFinish = {
                                     prefs.edit().putBoolean("has_seen_onboarding", true).apply()
                                     hasSeenOnboarding = true
+                                    forceLogin = true
                                 }
                             )
+                        }
+                        forceLogin -> {
+                            LoginScreenContent(authViewModel = authViewModel)
                         }
                         !isLoggedIn -> {
                             LoginScreenContent(authViewModel = authViewModel)
                         }
                         else -> {
                             val mainViewModel: MainViewModel = viewModel { MainViewModel(application) }
+                            LaunchedEffect(Unit) {
+                                when (intent?.getStringExtra("navigate_to")) {
+                                    "profile" -> mainViewModel.selectTab(2)
+                                }
+                            }
                             MoviesApp(
                                 mainViewModel = mainViewModel,
                                 themeViewModel = themeViewModel,

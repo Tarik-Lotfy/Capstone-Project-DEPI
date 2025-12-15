@@ -47,7 +47,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 localRepository.removeFavorite(movie)
             } else {
                 localRepository.addFavorite(movie)
-                notificationManager.sendMovieAddedNotification(movie)
+                val prefs = getApplication<Application>().getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
+                val notificationsEnabled = prefs.getBoolean("notifications_enabled", true)
+                if (notificationsEnabled) {
+                    notificationManager.sendMovieAddedNotification(movie)
+                }
             }
             loadFavorites()
         }

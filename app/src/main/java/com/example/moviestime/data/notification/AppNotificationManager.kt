@@ -18,6 +18,9 @@ import android.os.Build
 import androidx.annotation.RequiresPermission
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.graphics.scale
+import android.app.PendingIntent
+import android.content.Intent
+import com.example.moviestime.MainActivity
 
 class AppNotificationManager(private val context: Context) {
 
@@ -30,6 +33,7 @@ class AppNotificationManager(private val context: Context) {
         val notificationId = movie.id
 
         val largeIcon = loadBitmapFromUrl(movie.posterPath)
+        val contentIntent = buildContentIntentForProfile()
 
         val notification = NotificationCompat.Builder(context, NotificationUtils.getNotificationChannelId())
             .setSmallIcon(R.drawable.ic_launcher_foreground)
@@ -38,6 +42,7 @@ class AppNotificationManager(private val context: Context) {
             .setContentText("“${movie.title}” has been added to your favorites.")
             .setStyle(NotificationCompat.BigTextStyle().bigText("“${movie.title}” has been added to your watchlist. Enjoy!"))
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setContentIntent(contentIntent)
             .setAutoCancel(true)
             .build()
 
@@ -49,6 +54,7 @@ class AppNotificationManager(private val context: Context) {
         val notificationId = movie.id + 1000
 
         val largeIcon = loadBitmapFromUrl(movie.posterPath)
+        val contentIntent = buildContentIntentForProfile()
 
         val notification = NotificationCompat.Builder(context, NotificationUtils.getNotificationChannelId())
             .setSmallIcon(R.drawable.ic_launcher_foreground)
@@ -57,6 +63,7 @@ class AppNotificationManager(private val context: Context) {
             .setContentText("“${movie.title}” is now available to watch!")
             .setStyle(NotificationCompat.BigTextStyle().bigText("“${movie.title}” is now available to watch! Don't miss it."))
             .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setContentIntent(contentIntent)
             .setAutoCancel(true)
             .build()
 
@@ -71,6 +78,7 @@ class AppNotificationManager(private val context: Context) {
 
         val firstMovie = movies.first()
         val largeIcon = loadBitmapFromUrl(firstMovie.posterPath)
+        val contentIntent = buildContentIntentForProfile()
 
         val movieTitles = movies.joinToString(", ") { "“${it.title}”" }
 
@@ -81,6 +89,7 @@ class AppNotificationManager(private val context: Context) {
             .setContentText("Check out: ${movies.first().title} and more!")
             .setStyle(NotificationCompat.BigTextStyle().bigText("We recommend: $movieTitles"))
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setContentIntent(contentIntent)
             .setAutoCancel(true)
             .build()
 
@@ -134,5 +143,18 @@ class AppNotificationManager(private val context: Context) {
         } else {
             NotificationManagerCompat.from(context).notify(id, notification)
         }
+    }
+
+    private fun buildContentIntentForProfile(): PendingIntent {
+        val intent = Intent(context, MainActivity::class.java).apply {
+            putExtra("navigate_to", "profile")
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+        }
+        val flags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        } else {
+            PendingIntent.FLAG_UPDATE_CURRENT
+        }
+        return PendingIntent.getActivity(context, 2001, intent, flags)
     }
 }

@@ -13,6 +13,7 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -31,6 +32,12 @@ import com.example.moviestime.ui.theme.PlayFair
 import com.example.moviestime.viewmodel.AuthViewModel
 import com.example.moviestime.viewmodel.LanguageViewModel
 import com.example.moviestime.viewmodel.ThemeViewModel
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 
 @Composable
 fun SettingsScreenContent(
@@ -47,6 +54,15 @@ fun SettingsScreenContent(
     val cardColor = colorResource(R.color.card)
     val textColor = colorResource(R.color.foreground)
     val mutedColor = colorResource(R.color.muted_foreground)
+    val context = LocalContext.current
+    val prefs = remember { context.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE) }
+    var notificationsEnabled by remember { mutableStateOf(prefs.getBoolean("notifications_enabled", true)) }
+    val notificationPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        notificationsEnabled = granted || Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU
+        prefs.edit().putBoolean("notifications_enabled", notificationsEnabled).apply()
+    }
 
     Column(
         modifier = Modifier
@@ -81,47 +97,39 @@ fun SettingsScreenContent(
         // --- Preferences Section ---
         SectionHeader(title = stringResource(R.string.preferences_section), color = mutedColor)
         SettingsGroup(cardColor = cardColor) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 18.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        imageVector = Icons.Outlined.Palette,
-                        contentDescription = null,
-                        tint = textColor.copy(alpha = 0.7f),
-                        modifier = Modifier.size(24.dp)
-                    )
-                    Spacer(Modifier.width(16.dp))
-                    Text(
-                        text = stringResource(R.string.dark_mode),
-                        fontFamily = Inter,
-                        fontWeight = FontWeight.Medium,
-                        fontSize = 16.sp,
-                        color = textColor
-                    )
-                }
-                Switch(
-                    checked = isDarkTheme,
-                    onCheckedChange = { themeViewModel.setDarkThemeEnabled(it) },
-                    colors = SwitchDefaults.colors(
-                        checkedThumbColor = colorResource(R.color.primary),
-                        checkedTrackColor = colorResource(R.color.primary).copy(alpha = 0.5f)
-                    )
-                )
-            }
+
             HorizontalDivider(
                 color = Color.White.copy(alpha = 0.05f),
                 thickness = 1.dp,
                 modifier = Modifier.padding(horizontal = 16.dp)
             )
-            SettingsItem(
+            SettingsToggleItem(
                 icon = Icons.Outlined.Notifications,
                 title = stringResource(R.string.notifications),
-                textColor = textColor
+                textColor = textColor,
+                checked = notificationsEnabled,
+                onCheckedChange = { enabled ->
+                    if (enabled) {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                            val granted = ContextCompat.checkSelfPermission(
+                                context,
+                                Manifest.permission.POST_NOTIFICATIONS
+                            ) == PackageManager.PERMISSION_GRANTED
+                            if (!granted) {
+                                notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                            } else {
+                                notificationsEnabled = true
+                                prefs.edit().putBoolean("notifications_enabled", true).apply()
+                            }
+                        } else {
+                            notificationsEnabled = true
+                            prefs.edit().putBoolean("notifications_enabled", true).apply()
+                        }
+                    } else {
+                        notificationsEnabled = false
+                        prefs.edit().putBoolean("notifications_enabled", false).apply()
+                    }
+                }
             )
         }
 
@@ -140,34 +148,21 @@ fun SettingsScreenContent(
         SettingsButton(
             icon = Icons.AutoMirrored.Filled.Logout,
             title = stringResource(R.string.logout),
-            color = textColor,
-            borderColor = textColor.copy(alpha = 0.3f),
+            color = Color(0xFFE53935),
+            borderColor = Color(0xFFE53935).copy(alpha = 0.5f),
             onClick = {
                 authViewModel.logout()
                 onSignOut()
             }
         )
 
-        Spacer(Modifier.height(16.dp))
-
-        SettingsButton(
-            icon = Icons.Outlined.Delete,
-            title = stringResource(R.string.delete_account),
-            color = Color(0xFFE53935),
-            borderColor = Color(0xFFE53935).copy(alpha = 0.5f),
-            onClick = onDeleteAccount
-        )
 
         Spacer(Modifier.height(32.dp))
 
         // --- Support Section ---
         SectionHeader(title = stringResource(R.string.support_section), color = mutedColor)
         SettingsGroup(cardColor = cardColor) {
-            SettingsItem(
-                icon = Icons.Outlined.HelpOutline,
-                title = stringResource(R.string.help_support),
-                textColor = textColor
-            )
+
         }
         Spacer(Modifier.height(12.dp))
         HelpFeedbackCard(
@@ -253,6 +248,53 @@ fun SettingsItem(
                 color = Color.White.copy(alpha = 0.05f),
                 thickness = 1.dp,
                 modifier = Modifier.padding(horizontal = 16.dp)
+            )
+        }
+    }
+}
+
+@Composable
+fun SettingsToggleItem(
+    icon: ImageVector,
+    title: String,
+    textColor: Color,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 18.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = textColor.copy(alpha = 0.7f),
+                    modifier = Modifier.size(24.dp)
+                )
+                Spacer(Modifier.width(16.dp))
+                Text(
+                    text = title,
+                    fontFamily = Inter,
+                    fontWeight = FontWeight.Medium,
+                    fontSize = 16.sp,
+                    color = textColor
+                )
+            }
+            Switch(
+                checked = checked,
+                onCheckedChange = onCheckedChange,
+                colors = SwitchDefaults.colors(
+                    checkedThumbColor = textColor,
+                    uncheckedThumbColor = textColor.copy(alpha = 0.6f)
+                )
             )
         }
     }
